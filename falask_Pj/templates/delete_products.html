@@ -1,0 +1,302 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ela Admin - HTML5 Admin Template</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
+    <link rel="stylesheet" href="/static/bootstrap/pe-icon-7-filled.css">
+    <link rel="stylesheet" href="/static/bootstrap/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/bootstrap/style.css">
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+    <link href="/static/bootstrap/weather-icons.css" rel="stylesheet"/>
+    <link href="/static/bootstrap/fullcalendar.css" rel="stylesheet"/>
+
+    <link href="/static/bootstrap/chartist.min.css" rel="stylesheet">
+    <link href="/static/bootstrap/jqvmap.min.css" rel="stylesheet">
+    <link href="/static/bootstrap/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        .mbottom {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Left Panel -->
+
+        <aside id="left-panel" class="left-panel">
+        <nav class="navbar navbar-expand-sm navbar-default">
+            <div id="main-menu" class="main-menu collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="admin-home.html"><i class="menu-icon fa fa-laptop"></i>欢迎</a>
+                    </li>
+
+                    <li class="menu-title">菜单</li><!-- /.menu-title -->
+                    <li>
+                        <a href="{{ url_for("product_management.show_products") }}  "><i class="menu-icon fa fa-cogs"></i>成品列表</a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for("product_management.add_product") }}"> <i class="menu-icon fa fa-th"></i>添加成品</a>
+                    </li>
+                    <li class="active">
+                        <a href="{{ url_for("product_management.delete_products") }}"> <i class="menu-icon fa fa-th"></i>删除成品</a>
+                    </li>
+
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+    </aside>
+
+    <!-- Left Panel -->
+
+    <div id="right-panel" class="right-panel">
+
+        <!-- Header-->
+        <header id="header" class="header">
+            <div class="top-left">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="./"><img src="/static/images/logo.png" alt="Logo"></a>
+                    <a class="navbar-brand hidden" href="./"><img src="images/logo2.png" alt="Logo"></a>
+                    <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+                </div>
+            </div>
+            <div class="top-right">
+                <div class="header-menu">
+
+
+                    <div class="user-area dropdown float-right">
+                        <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="User Avatar">
+                        </a>
+
+                        <div class="user-menu dropdown-menu">
+                            <a class="nav-link" href="#"><i class="fa fa-user"></i>My Profile</a>
+
+                            <a class="nav-link" href="#"><i class="fa fa-bell-o"></i>Notifications <span class="count">13</span></a>
+
+                            <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+
+                            <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power-off"></i>Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header><!-- /header -->
+        <!-- Header-->
+
+
+
+            <div class="content">
+            <div class="animated fadeIn">
+                <div class="row">
+
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">删除成品</strong>
+                            </div>
+                            <div class="card-body">
+                                <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        {% if authority=='1'%}
+                                            <th width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                            <th>成品编码</th>
+                                            <th>成品型号</th>
+                                            <th>交易客户</th>
+                                        {% elif authority=='2' or authority=='3'%}
+                                            <th width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                            <th>成品编码</th>
+                                            <th>成品型号</th>
+                                            <th>交易客户</th>
+                                            <th>成品价格</th>
+                                            <th>成品利润</th>
+                                        {% endif %}
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% if authority=='1'%}
+                                        {% for i in products %}
+                                            <tr>
+                                                <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% elif authority=='2' or authority=='3'%}
+                                        {% for i in products %}
+                                            <tr>
+                                                <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[3] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[4] }}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div><!-- .animated -->
+
+
+                <!--<div class="mbottom">-->
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+                <div>
+                    <form id="products_form" action="#" method="post" novalidate="novalidate">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {{ form.delete_submit }}
+                                {{ form.csrf_token }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+        </div><!-- .content -->
+    </div>
+    <!-- Scripts -->
+
+    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
+    <script src="/static/jquery/popper.min.js"></script>
+    <script src="/static/jquery/plugins.js"></script>
+    <script src="/static/jquery/main.js"></script>
+    <script src="/static/jquery/Chart.bundle.js"></script>
+
+    <script src="/static/lib/datatables.min.js"></script>
+    <script src="/static/lib/dataTables.bootstrap.min.js"></script>
+    <script src="/static/lib/dataTables.buttons.min.js"></script>
+    <script src="/static/lib/buttons.bootstrap.min.js"></script>
+    <script src="/static/lib/jszip.min.js"></script>
+    <script src="/static/lib/vfs_fonts.js"></script>
+    <script src="/static/lib/buttons.html5.min.js"></script>
+    <script src="/static/lib/buttons.print.min.js"></script>
+    <script src="/static/lib/buttons.colVis.min.js"></script>
+    <script src="/static/lib/datatables-init.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $('#bootstrap-data-table-export').DataTable();
+      } );
+    </script>
+
+    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
+    <script>
+        $(function() {
+            $("#products_form").submit(function(e)
+            {
+                e.preventDefault();
+
+                var table=document.getElementById("bootstrap-data-table");
+                var productCodeArr=new Array();
+                for(var i=1; i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder.type = "CHECKBOX") {
+                        if (chkOrder.checked) {
+                            var cell = table.rows[i].cells[1].firstChild;
+                            console.log(cell);
+                            productCodeArr[i-1] = cell.innerHTML;
+                        }
+                    }
+                }
+
+                var data={'productCodeArr':productCodeArr
+                };
+
+                $.ajax({
+                    url: "/delete_products",
+                    type: "POST",
+                    dataType: "json",
+                    //data:$(this).serialize(),
+                    data:JSON.stringify(data),
+                    contentType: 'application/json; charset=UTF-8',
+                    success: function (callback) {
+                        console.log(callback);
+                        if(callback['ok']){
+                            window.location.href="/product_management";//跳转地址
+                        }else if(!callback['ok']){
+                            alert("出错了！");
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.log(xhr.status);// 状态码
+                        console.log(xhr.readyState);// 状态
+                        console.log(textStatus);// 错误信息
+                        alert('返回值错误');
+                    }
+                });
+            })
+        })
+
+    /*全部勾选*/
+    function checkAll() {
+        var mckeckbox=document.activeElement;
+        var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
+        console.log(mckeckbox);
+        console.log(table);
+        console.log(table.rows);
+        console.log(table.label);
+        console.log(table.tagName);
+        console.log(mckeckbox.checked);
+        if(table.tagName=="TABLE"){
+            if(mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type = "CHECKBOX"){
+                            chkOrder.checked=true;
+                            //chkOrder.setAttribute("checked", true);
+                        }
+                    }
+                }
+            }else if(!mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type = "CHECKBOX"){
+                            chkOrder.checked=false;
+                            //chkOrder.setAttribute("checked", false);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    </script>
+
+</body>
+</html>

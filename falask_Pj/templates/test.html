@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        .left {
+            float: left;
+            width: 50%;
+            height: 100%;
+            background-color: red;
+        }
+        .right {
+            margin-left: 200px;
+            background-color: blue;
+        }
+    </style>
+    <title>用户注册</title>
+
+    <!--jQuery示例-->
+    <!--导入jQuery模块-->
+    <!--jquery是一个js包，为了就是减少js的代码量-->
+    <!--<script src="http://libs.baidu.com/jquery/1.11.1/jquery.min.js"></script>-->
+    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
+    <script>
+        $(function(){
+            $('#register').click(function(){
+                var name=$('#name').val();
+                var pass=$('#pass').val();
+                var phone=$('#phone').val();
+                if(name==''){
+                    alert('用户名不能为空');
+                    return false;
+                }else if(pass==''){
+                    alert('密码不能为空。');
+                    return false;
+                }else if(phone==''){
+                    alert('手机号码不能为空');
+                    return false;
+                }else if(phone!=''){
+                    var reg=/^1[3458]\d{9}$/;
+                    if(!reg.test(phone)){
+                        alert('手机号码格式不正确');
+                        return false;
+                    }
+                }else{
+                    $('form').submit(); //只有所有输入正确，表单才会提交，才能执行下面的$("#myform").submit()函数
+                }
+            })
+        })
+    </script>
+
+    <!--jQuery ajax示例：前端向后端异步传递数据-->
+    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
+    <script>
+        $(function(){
+            $("#myform").submit(function(e)
+            {
+                e.preventDefault();
+                // alert("提交");
+
+                // var name = $('#name').val();
+                // data = $(this).serialize();
+                data= {
+                    "username":"xijiawei",
+                    "password":201
+                }
+                console.log(data);
+
+                /* ajax 采用“post”方法，但是没有告诉后端传递参数contentType: 'application/json; charset=UTF-8',
+                这样就告诉后端才用的是json格式，你的datatype其实是希望后端返回的数据格式！
+                但是这样设置后也只有request.get_data有数据()，request.get_json()还是得不到数据，这时候需要设置data:JSON.stringify（）也就是楼主找到的方法。*/
+                $.ajax({
+                    url: "/test",
+                    type: "POST",
+                    dataType: 'json',
+                    data:JSON.stringify(data),
+                    contentType: 'application/json; charset=UTF-8',
+                    /*done:function (res) {
+                    },
+                    fail:function() {
+                    }*/
+                    success: function (res) {
+                        console.log(res);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.log(xhr.status);// 状态码
+                        console.log(xhr.readyState);// 状态
+                        console.log(textStatus);// 错误信息
+                        alert('错误');
+                    }
+                })
+
+                /*异步*/
+                $.ajax({
+                    url: "/test2",
+                    type: "POST",
+                    dataType: 'json',
+                    data:$(this).serialize(), //传递表单数据给后台，serialize()序列化表格内容为字符串
+                    success: function (res) {
+                        console.log(res);
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.log(xhr.status);// 状态码
+                        console.log(xhr.readyState);// 状态
+                        console.log(textStatus);// 错误信息
+                        alert('错误');
+                    }
+                })
+            })
+        })
+    </script>
+</head>
+<body>
+<form id="myform" method="post" action="/test">
+    <input type="text" name="username" value="" id="username"/>
+    <input type="password" name="pass" value="" id="pass" />
+    <input type="text" name="phone" id="phone" {% if telephone == '' %}
+                                           placeholder="CODE1"
+                                            {% else %}
+                                           value={{ telephone }}
+                                            {% endif %}/>
+    <input type="submit" name="reg" value="用户注册" id="register"/>
+</form>
+</body>
+</html>
