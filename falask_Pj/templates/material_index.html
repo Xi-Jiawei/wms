@@ -32,15 +32,21 @@
         <div id="main-menu" class="main-menu collapse navbar-collapse">
             <ul class="nav navbar-nav">
                 <li>
-                    <a href="stu_index.html"><i class="menu-icon fa fa-laptop"></i>欢迎 </a>
+
+                    <a href="{{ url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
                 </li>
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
                 <li>
-                    <a href="{{ url_for("show_material") }}"> <i class="menu-icon fa fa-cogs"></i>查看物料信息</a>
+                    <a href="{{ url_for("show_material")}}"> <i class="menu-icon fa fa-cogs"></i>查看物料信息</a>
                 </li>
-                <li>
+
+                {% if Authority == '3'or Authority == '8' %}
+                 <li>
                     <a href="{{ url_for('material_outorin',mName='物料3号') }}"> <i class="menu-icon fa fa-th"></i>出入库物料</a>
                 </li>
+                {% else %}
+
+                 {% endif %}
 
 
             </ul>
@@ -176,16 +182,28 @@
                                         <td>{{ i[2] }}</td>
                                         <td>{{ i[3] }}</td>
                                         <td>{{ i[4] }}</td>
-                                        <td>{{ i[5] }}</td>
+                                        {% if Authority == '1' %}
+                                            <td>{{ '无查看权限' }}</td>
+                                        {% else %}
+                                         <td>{{ i[5] }}</td>
+                                         {% endif %}
                                         <td>{{ i[6] }}</td>
                                         {% if i[7] == 1 %}
                                             <td>出库</td>
                                         {% elif i[7] == 0 %}
                                             <td>入库</td>
                                         {% endif %}
-                                        <td>{{ i[8] }}</td>
+                                        {% if Authority == '1' %}
+                                            <td>{{ '无查看权限' }}</td>
+                                        {% else  %}
+                                         <td>{{ i[8] }}</td>
+                                         {% endif %}
                                         <td>{{ i[9] }}</td>
-                                        <td>{{ i[10] }}</td>
+                                       {% if Authority == '1' %}
+                                            <td>{{ '无查看权限' }}</td>
+                                        {% else  %}
+                                         <td>{{ i[8] }}</td>
+                                         {% endif %}
                                         <td>{{ i[11] }}</td>
                                         <td>{{ i[12] }}</td>
                                         <td>{{ i[13] }}</td>
@@ -201,8 +219,7 @@
             </div>
         </div><!-- .animated -->
     </div><!-- .content -->
-
-
+</div>
     <!-- Right Panel -->
 
     <!-- Scripts -->
