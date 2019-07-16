@@ -102,11 +102,12 @@ def index_adm():
 # cc 操作员
 @app.route('/oprator')
 def index_operator():
-    print(session['username'])
-    return render_template('operator_index.html')
+    personName = session['username']
+    Authority = session['authority']
+    return render_template('operator_index.html',Authority=Authority,personName=personName)
 
 # cc 登陆
-@app.route('/login/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def user_login():
     print(session)
     if session:
@@ -132,7 +133,7 @@ def user_login():
         Authority = login_Authority(user.id)
         print("测试Authorith 输出数字", Authority)
         # print("admin login", Authority)
-        # print(type(Authority))
+        session['authority'] = Authority
         if loginCheck(user.id, user.pwd):
             session['username'] = user.id
             if Authority == '888':
@@ -152,7 +153,7 @@ def user_login():
 # bill退出系统
 @app.route('/out', methods=['GET', 'POST'])
 def out():
-    session.pop('username')
+    session.clear()
     return redirect(url_for('user_login'))
 
 
@@ -235,9 +236,32 @@ def person_management():
 # cc 人员管理_查看人员
 @app.route('/show_person',methods=['GET', 'POST'])
 def show_person():
-    person = show_allperson()
+    temp = list(show_allperson())
+    person = []
+    for i in temp:
+        i = list(i)
+        if i[3] == '888':
+            i[3] = "管理员"
+        else:
+            a = i[3][0]
+            b = i[3][1]
+            c = i[3][2]
+            sa = "物料" + person_authority(a)
+            sb = "成品" + person_authority(b)
+            sc = "采购" + person_authority(c)
+            i[3] = sa + "、" + sb + "、" + sc
+        person.append(i)
     # print(person)
     return render_template('person_management_show.html',person =person)
+
+# cc 查看人员管理的数字映射权限
+def person_authority(auth):
+    return {
+        '0': "无权限",
+        '1': "读权限无金额",
+        '2': "读权限有金额",
+        '3': "修改权限",
+    }.get(auth,'error')
 
 # cc 人员管理_增加人员
 @app.route('/add_person',methods=['GET', 'POST'])
@@ -252,8 +276,8 @@ def add_person():
         user.name = request.form["name"]
         authority = form.data['status'] + "" + form.data['statusPro'] + "" + form.data['statusPur']
         user.authority = authority
-        print(user.name, user.pwd, user.authority)
-        cc_add_account(user.name, user.pwd, user.authority)
+        # print(user.name, user.pwd, user.authority)
+        cc_add_account(user.name, user.pwd, int(user.authority))
         add_message = "添加成功"
         return render_template('add_person.html', add_message=add_message, form=form)
     return render_template('add_person.html',form=form)
@@ -285,6 +309,50 @@ def change_person():
         change_message = "修改成功"
         return render_template('change_person.html', change_message=change_message, form=form, person=person)
     return render_template('change_person.html', form=form, person=person)
+
+# cc 修改密码
+@app.route('/cc_change_pass', methods=['GET', 'POST'])
+def cc_change_pass():
+    print("修改界面", session['username'])
+    # sql 修改数据库中的密码
+    # fun_changepassword(user)
+    if request.method == "POST":
+        user = NewUser()
+        user.name = session['username']
+        print("需要修改的用户是", user.name)
+        user.pwd = select_pass(user.name)
+        print("数据库查询到的密码是：", user.pwd)
+        oldpassword = request.form["oldpassword"]
+        print("需要修改的用户是", oldpassword)
+        newpassword = request.form["newpassword"]
+        renewpassword = request.form["renewpassword"]
+        if newpassword == renewpassword:
+            print("两次输入密码一致")
+            print("----------------------------------------------")
+        else:
+            message = "两次密码不一致，请重新输入"
+            print("两次密码不一致，请重新输入")
+            return render_template('changepassword.html', message=message)
+        # print("新密码： 旧密码：", oldpassword, user.pwd[0])
+        if str(oldpassword) == str(user.pwd[0]):
+            print("新旧密码一致")
+            user.pwd = newpassword
+            update_pass(user.name, user.pwd)
+            print("密码修改成功")
+            print("密码修改成功，请推出当前界面重新登陆")
+            # return 'ok'
+            message = "密码修改成功，请重新登陆"
+            # session.pop(user.name)
+            # return redirect(url_for("user_login"))  # 跳到主页
+            return render_template('user_login.html', message=message)
+        else:
+            message = "旧密码有误，请重新输入"
+            print("旧密码有误，请重新输入")
+            return render_template('changepassword.html', message=message)
+            #   session.pop(user.name)
+    else:
+        return render_template('changepassword.html')
+
 # Bill  学生签到
 @app.route('/stu_register', methods=['GET', 'POST'])
 def stu_register():
@@ -359,6 +427,8 @@ def show_material():
     materialType = ''
     materialFactory = ''
     personName = session['username']
+    Authority = session['authority']
+    Authority = Authority[0]
     if request.method == "POST":
         materialCode = request.form["materialCode"]
         materialName = request.form["materialName"]
@@ -371,7 +441,7 @@ def show_material():
     # print(materialAll)
     return render_template('material_index.html', materialAll=materialAll, materialCode=materialCode,
                            materialName=materialName, materialTime=materialTime, materialType=materialType,
-                           materialFactory=materialFactory)
+                           materialFactory=materialFactory,Authority=Authority,personName=personName)
 # lh 物料出入库
 @app.route('/material_outorin/<mName>', methods=['GET', 'POST'])
 def material_outorin(mName):
@@ -438,9 +508,9 @@ def material_outorin(mName):
             materialCode = i[0]
             materialName = i[1]
             materialType = i[2]
-            materialFactory = i[8]
             mDepartment = i[3]
             m_price = i[4]
+            materialFactory = i[7]
         print("materialFactory:" + materialFactory)
         return render_template('material_outorin.html',materialCode=materialCode,materialName=materialName,
                                materialType=materialType,mDepartment=mDepartment,m_price=m_price,materialFactory=materialFactory)
@@ -451,4 +521,4 @@ app.register_blueprint(product_management)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    pass
