@@ -719,58 +719,57 @@ def dao_show_materialoutin():
     conn.close()
 
 # lh1  点击物料自动补全
-def dao_show_materialoutorin(materialName):
+def dao_show_materialoutorin(materialCode):
     conf = []
-    if materialName != '':
-        conf.append(' and materialName = \'' + materialName + '\'')
+    if materialCode != '':
+        conf.append(' and materialCode = \'' + materialCode + '\'')
     result = select('materialofinfo',conf)
     return result
     conn.close()
 
-# lh1  出库物料
+# lh1  出库物料1
 def dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
     # sql = "delete from materialofinfo where materialName = '%s' "%( materialName )
     # print("sql语句: "+sql)
-    sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time)" \
-           " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',1,'%s')" % \
-           (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
-            float(m_price) * int(mNum), mDcNum, materialFactory, materialTime)
-    # print("sql语句: " + sql2)
     # 更新余库存
     sql3 = " update materialofinfo set remainderAmount = remainderAmount - '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
+    sql4 = "select * from materialofinfo where materialName = '%s' " % (materialName)
 
-    # sql4 = "select * from materialofinfo where materialName = '%s' " % (materialName)
-    # # print("sql4语句: " + sql4)
-    # res = cur.execute(sql4)
     try:
-        cur.execute(sql2)
         cur.execute(sql3)
+        cur.execute(sql4)
+        result = cur.fetchall()
+        sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
+               " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',1,'%s','%d','%lf')" % \
+               (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
+                float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
+        cur.execute(sql2)
         conn.commit()
         return True
         conn.close()
     except:
         conn.rollback()
 
-# lh1  入库物料
+# lh1  入库物料0
 def dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
     sql = "insert into materialofinfo(materialCode,materialName,type,department,price,supplierFactory) " \
           "values('%s','%s','%s' ,'%s', '%lf', '%s')" % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory)
-    # print("sql语句: "+sql)
-    sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time)" \
-           " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',0,'%s')" % \
-           (personName,materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),float(m_price)*int(mNum), mDcNum, materialFactory,materialTime)
-    #更新余库存
+    #更新静态表余库存
     sql3 = " update materialofinfo set remainderAmount = remainderAmount + '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
-
     sql4 = "select * from materialofinfo where materialName = '%s' " % (materialName)
-    # print("sql4语句: " + sql4)
     res = cur.execute(sql4)
-    # print(res)
+
     try:
         if(res == 0):
             cur.execute(sql)
-        cur.execute(sql2)
         cur.execute(sql3)
+        cur.execute(sql4)
+        result = cur.fetchall()
+        sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
+               " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',0,'%s','%d','%lf')" % \
+               (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
+                float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
+        cur.execute(sql2)
         conn.commit()
         return True
         conn.close()
@@ -779,10 +778,10 @@ def dao_material_in(materialCode, materialName, materialType, m_price,materialFa
 
 
 # lh1  修改物料
-def dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price,materialFactory,mName):
+def dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price,materialFactory,mCode):
     sql = "update materialofinfo " \
-          "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialName='%s'" \
-          % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory,mName)
+          "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialCode='%s'" \
+          % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory,mCode)
     print("sql语句: "+sql)
     try:
         cur.execute(sql)

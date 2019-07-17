@@ -445,10 +445,9 @@ def show_material():
                            materialFactory=materialFactory,Authority=Authority,personName=personName)
 
 # lh 物料出入库
-@app.route('/material_outorin/<mName>', methods=['GET', 'POST'])
-def material_outorin(mName):
-    # print("出入库传参"+mName)
-    material_init = dao_show_materialoutorin(mName)
+@app.route('/material_outorin/<mCode>', methods=['GET', 'POST'])
+def material_outorin(mCode):
+    material_init = dao_show_materialoutorin(mCode)
     materialCode = ''
     materialName = ''
     materialType = ''
@@ -503,7 +502,7 @@ def material_outorin(mName):
 
             mDepartment = request.form['mDepartment']
             m_price = request.form['m_price']
-            if dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price, materialFactory,mName):
+            if dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price, materialFactory,mCode):
                 print("修改成功")
                 message = "修改成功"
                 return render_template('material_outorin.html', message=message)
