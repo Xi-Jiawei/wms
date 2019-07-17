@@ -39,7 +39,7 @@
                     <a href="{{ url_for("show_material")}}"> <i class="menu-icon fa fa-cogs"></i>查看物料信息</a>
                 </li>
                 <li>
-                    <a href="{{ url_for('material_outorin',mName='物料3号') }}"> <i class="menu-icon fa fa-th"></i>出入库物料</a>
+                    <a href="{{ url_for('material_outorin',mName='物料3号') }}"> <i class="menu-icon fa fa-th"></i>物料出入库及修改</a>
                 </li>
 
             </ul>
@@ -69,7 +69,7 @@
                 <div class="user-area dropdown float-right">
                     <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
                        aria-expanded="false">
-                        <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="User Avatar">
+                        <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="{{ personName }}">
                     </a>
 
                     <div class="user-menu dropdown-menu">
@@ -122,7 +122,7 @@
                                             {% if materialType == '' %}
                                            placeholder="型号1号"
                                             {% else %}
-                                           value={{ materialName }}
+                                           value={{ materialType }}
                                             {% endif %}>
                                 </div>
                                 <div class="col-md-2">
@@ -188,9 +188,13 @@
                                             出库
                                         </option>
 
-                                        <option value="0" {% if isoutorin == '0' %} selected="selected" {% endif %}>
+                                        <option value="0"
+                                                {% if isoutorin == '0' %}
+                                                selected="selected"
+                                                {% endif %}>
                                             入库
                                         </option>
+                                      <option value="2"> 修改</option>
                                       </select>
                                 </div>
 

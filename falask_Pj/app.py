@@ -97,7 +97,8 @@ def index_account():
 # bill管理员
 @app.route('/admin')
 def index_adm():
-    return render_template('adm_index.html')
+    personName = session['username']
+    return render_template('adm_index.html',personName=personName)
 
 # cc 操作员
 @app.route('/oprator')
@@ -442,6 +443,7 @@ def show_material():
     return render_template('material_index.html', materialAll=materialAll, materialCode=materialCode,
                            materialName=materialName, materialTime=materialTime, materialType=materialType,
                            materialFactory=materialFactory,Authority=Authority,personName=personName)
+
 # lh 物料出入库
 @app.route('/material_outorin/<mName>', methods=['GET', 'POST'])
 def material_outorin(mName):
@@ -472,7 +474,7 @@ def material_outorin(mName):
         isinorout = request.form['isinorout']
         print("物料出入库", session['username'],isinorout)
         if isinorout == '1':
-           print("出库！")
+           # print("出库！")
            if dao_material_out(materialName):
                 print("出库成功")
                 message = "出库成功"
@@ -482,8 +484,8 @@ def material_outorin(mName):
                 print("出库失败,请重新填写")
                 return render_template('material_outorin.html', message=message)
                 #   session.pop(user.name)
-        else:
-            print("入库！")
+        elif isinorout == '0':
+            # print("入库！")
             materialCode = request.form["materialCode"]
             materialName = request.form["materialName"]
             materialType = request.form["materialType"]
@@ -503,7 +505,24 @@ def material_outorin(mName):
                 print("入库失败,请重新填写")
                 return render_template('material_outorin.html', message=message)
                 #   session.pop(user.name)
+        else :
+            materialCode = request.form["materialCode"]
+            materialName = request.form["materialName"]
+            materialType = request.form["materialType"]
+            materialFactory = request.form["materialFactory"]
+
+            mDepartment = request.form['mDepartment']
+            m_price = request.form['m_price']
+            if dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price, materialFactory,mName):
+                print("修改成功")
+                message = "修改成功"
+                return render_template('material_outorin.html', message=message)
+            else:
+                message = "修改成功,请重新填写"
+                return render_template('material_outorin.html', message=message)
+
     else:
+        print(material_init)
         for i in material_init:
             materialCode = i[0]
             materialName = i[1]
@@ -511,9 +530,8 @@ def material_outorin(mName):
             mDepartment = i[3]
             m_price = i[4]
             materialFactory = i[7]
-        print("materialFactory:" + materialFactory)
         return render_template('material_outorin.html',materialCode=materialCode,materialName=materialName,
-                               materialType=materialType,mDepartment=mDepartment,m_price=m_price,materialFactory=materialFactory)
+                               materialType=materialType,mDepartment=mDepartment,m_price=m_price,materialFactory=materialFactory,personName=personName)
 
 # xijiawei
 # 添加“product_management.py”蓝本

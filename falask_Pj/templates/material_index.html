@@ -42,7 +42,7 @@
 
                 {% if Authority == '3'or Authority == '8' %}
                  <li>
-                    <a href="{{ url_for('material_outorin',mName='物料3号') }}"> <i class="menu-icon fa fa-th"></i>出入库物料</a>
+                    <a href="{{ url_for('material_outorin',mName='物料3号') }}"> <i class="menu-icon fa fa-th"></i>物料出入库及修改</a>
                 </li>
                 {% else %}
 
@@ -76,7 +76,7 @@
                 <div class="user-area dropdown float-right">
                     <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
                        aria-expanded="false">
-                        <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="User Avatar">
+                        <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="{{ personName }}">
                     </a>
 
                     <div class="user-menu dropdown-menu">

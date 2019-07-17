@@ -754,14 +754,29 @@ def dao_material_in(materialCode, materialName, materialType, m_price,materialFa
     sql3 = " update materialofinfo set remainderAmount = remainderAmount + '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
 
     sql4 = "select * from materialofinfo where materialName = '%s' " % (materialName)
-    print("sql4语句: " + sql4)
+    # print("sql4语句: " + sql4)
     res = cur.execute(sql4)
-    print(res)
+    # print(res)
     try:
         if(res == 0):
             cur.execute(sql)
         cur.execute(sql2)
         cur.execute(sql3)
+        conn.commit()
+        return True
+        conn.close()
+    except:
+        conn.rollback()
+
+
+# lh1  修改物料
+def dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price,materialFactory,mName):
+    sql = "update materialofinfo " \
+          "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialName='%s'" \
+          % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory,mName)
+    print("sql语句: "+sql)
+    try:
+        cur.execute(sql)
         conn.commit()
         return True
         conn.close()
