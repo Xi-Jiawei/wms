@@ -696,9 +696,9 @@ def dao_show_material(materialCode, materialName, materialTime, materialType, ma
     if materialFactory != '':
         conf.append(' and supplierFactory =\'' + materialFactory + '\'')
 
-    sql = 'select t1.materialCode,t1.materialName,t1.type,t1.department,t1.remainderAmount,t1.remainderMoney,' \
+    sql = 'select t1.materialCode,t1.materialName,t1.type,t1.department,t2.afterAmount,t2.afterMoney,' \
           't1.supplierFactory,t2.isInOrOut,t1.price,t2.amount,t2.totalPrice,t2.documentNumber,t2.time,t2.personName' \
-          ' from materialofinfo as t1 INNER JOIN  materialofinout as t2  on t1.materialName = t2.materialName '
+          ' from materialofinfo as t1 LEFT JOIN  materialofinout as t2  on t1.materialName = t2.materialName '
     cur.execute(sql)
     result = cur.fetchall()
     return result
