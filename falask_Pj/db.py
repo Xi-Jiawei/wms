@@ -728,14 +728,23 @@ def dao_show_materialoutorin(materialName):
     conn.close()
 
 # lh1  出库物料
-def dao_material_out(materialName):
-    sql = "delete from materialofinfo where materialName = '%s' "%( materialName )
+def dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
+    # sql = "delete from materialofinfo where materialName = '%s' "%( materialName )
     # print("sql语句: "+sql)
-    sql2 = "delete from materialofinout where materialName = '%s' " %( materialName )
+    sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time)" \
+           " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',1,'%s')" % \
+           (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
+            float(m_price) * int(mNum), mDcNum, materialFactory, materialTime)
     # print("sql语句: " + sql2)
+    # 更新余库存
+    sql3 = " update materialofinfo set remainderAmount = remainderAmount - '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
+
+    # sql4 = "select * from materialofinfo where materialName = '%s' " % (materialName)
+    # # print("sql4语句: " + sql4)
+    # res = cur.execute(sql4)
     try:
-        cur.execute(sql)
         cur.execute(sql2)
+        cur.execute(sql3)
         conn.commit()
         return True
         conn.close()

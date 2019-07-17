@@ -474,8 +474,7 @@ def material_outorin(mName):
         isinorout = request.form['isinorout']
         print("物料出入库", session['username'],isinorout)
         if isinorout == '1':
-           # print("出库！")
-           if dao_material_out(materialName):
+           if dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
                 print("出库成功")
                 message = "出库成功"
                 return render_template('material_outorin.html', message=message)
@@ -486,16 +485,7 @@ def material_outorin(mName):
                 #   session.pop(user.name)
         elif isinorout == '0':
             # print("入库！")
-            materialCode = request.form["materialCode"]
-            materialName = request.form["materialName"]
-            materialType = request.form["materialType"]
-            materialFactory = request.form["materialFactory"]
 
-            mNum = request.form['mNum']
-            mDepartment = request.form['mDepartment']
-            m_price = request.form['m_price']
-            mDcNum = request.form['mDcNum']
-            isinorout = request.form['isinorout']
             if dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
                 print("入库成功")
                 message = "入库成功"
