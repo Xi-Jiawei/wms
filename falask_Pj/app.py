@@ -7,6 +7,7 @@ import os
 
 from form import MyForm, SelectForm, ChangeForm
 from product_management import product_management
+from procurement import procurement_list
 
 app = Flask(__name__)
 
@@ -111,7 +112,7 @@ def index_operator():
 @app.route('/', methods=['GET', 'POST'])
 def user_login():
     print(session)
-    if session:
+    if session.get('username'):
         username = session['username']
         # session.pop('username')
         print('session 不为空 ', username)
@@ -526,6 +527,7 @@ def material_outorin(mCode):
 # 添加“product_management.py”蓝本
 app.register_blueprint(product_management)
 
+app.register_blueprint(procurement_list)
 
 if __name__ == '__main__':
     pass

@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import StringField,SubmitField,SelectField
+from wtforms import StringField,SubmitField,SelectField,DateField
 from wtforms.validators import Required
 from wtforms.validators import DataRequired # 引入Form验证父类
 
@@ -43,6 +43,7 @@ class AddProductForm(Form):
         description="成品编号",
         # 附加选项,会自动在前端判别
         render_kw={
+            "id": "productCode",
             "class": "form-control",
             "placeholder": "请输入成品编号",
             "required": 'required'  # 表示输入框不能为空，并有提示信息
@@ -59,6 +60,7 @@ class AddProductForm(Form):
         description="成品类型",
         # 附加选项,会自动在前端判别
         render_kw={
+            "id": "productType",
             "class": "form-control",
             "placeholder": "请输入成品类型",
             "required": 'required'  # 表示输入框不能为空，并有提示信息
@@ -149,6 +151,23 @@ class AddProductForm(Form):
             "required": 'required'  # 表示输入框不能为空，并有提示信息
         }
     )
+    # 成品数量
+    productNum = StringField(
+        # 标签
+        label="成品数量",
+        # 验证器
+        validators=[
+            DataRequired('请输入成品数量')
+        ],
+        description="成品数量",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "productNum",
+            "class": "form-control",
+            "placeholder": "请输入成品数量",
+            "required": 'required'  # 表示输入框不能为空，并有提示信息
+        }
+    )
     # 录入员
     entryClerk = StringField(
         # 标签
@@ -174,7 +193,7 @@ class AddProductForm(Form):
         validators=[
             DataRequired('请输入物料编码')
         ],
-        description="录入员",
+        description="物料编码",
         # 附加选项,会自动在前端判别
         render_kw={
             "class": "form-control",
@@ -185,7 +204,7 @@ class AddProductForm(Form):
     # 物料数量
     materialNum = StringField(
         # 标签
-        label="录入员",
+        label="物料数量",
         # 验证器
         validators=[
             DataRequired('请输入物料数量')
@@ -206,7 +225,7 @@ class AddProductForm(Form):
         validators=[
             DataRequired('请输入物料单价')
         ],
-        description="录入员",
+        description="物料单价",
         # 附加选项,会自动在前端判别
         render_kw={
             "class": "form-control",
@@ -264,6 +283,13 @@ class AddProductForm(Form):
     # 删除
     delete_submit = SubmitField(
         label="删除",
+        render_kw={
+            "class": "btn btn-primary btn-block btn-flat"
+        }
+    )
+    # 确认
+    ok_submit = SubmitField(
+        label="确认",
         render_kw={
             "class": "btn btn-primary btn-block btn-flat"
         }
