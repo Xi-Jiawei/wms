@@ -66,9 +66,12 @@
                     </li>
 
                     <li class="menu-title">菜单</li><!-- /.menu-title -->
+
+                    {% if authority=="3" or authority=="2"%}
                     <li>
                         <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购清单</a>
                     </li>
+                    {% endif %}
 
                     <li class="active">
                         <a href="{{ url_for("procurement.procurement") }}  "><i class="menu-icon fa fa-cogs"></i>添加采购</a>

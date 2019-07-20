@@ -57,10 +57,11 @@
                     </li>
 
                     <li class="menu-title">菜单</li><!-- /.menu-title -->
+                    {% if authority=="3" or authority=="2"%}
                     <li class="active">
                         <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购清单</a>
                     </li>
-
+                    {% endif %}
                     <li>
                         <a href="{{ url_for("procurement.procurement") }}  "><i class="menu-icon fa fa-cogs"></i>添加采购</a>
                     </li>
@@ -214,13 +215,17 @@
                 console.log(table.rows);
                 //alert("删除");
                 var procurementArr=new Array();
+                var j=0;
                 for(var i=1; i<table.rows.length;i++){
                     console.log(table.rows[i].cells[0]);
                     var chkOrder = table.rows[i].cells[0].firstChild;
+                    console.log(chkOrder.checked);
                     if(chkOrder.type = "CHECKBOX") {
                         if (chkOrder.checked) {
-                            procurementArr[i-1] = {"id":table.rows[i].cells[2].innerHTML,
+                            console.log(table.rows[i].cells[8].innerHTML);
+                            procurementArr[j] = {"id":table.rows[i].cells[2].innerHTML,
                             "entryDate":table.rows[i].cells[8].innerHTML};
+                            j++;
                         }
                     }
                 }

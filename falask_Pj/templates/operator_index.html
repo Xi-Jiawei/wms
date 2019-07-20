@@ -95,9 +95,12 @@
                     <a href="{{ url_for("product_management.show_products") }}"> <i class="menu-icon fa fa-th"></i>成品管理</a>
                 </li>
                 {% endif %}
+                {% if Authority[2] == '0' %}
+                {% else  %}
                 <li>
                     <a href="{{ url_for("procurement.procurement_history") }}"> <i class="menu-icon fa fa-table"></i>采购管理</a>
                 </li>
+                {% endif %}
                  <li>
                     <a href="{{ url_for("cc_change_pass") }}"> <i class="menu-icon fa fa-table"></i>修改个人密码</a>
                 </li>
