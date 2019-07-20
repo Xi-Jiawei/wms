@@ -7,7 +7,7 @@ import os
 
 from form import MyForm, SelectForm, ChangeForm
 from product_management import product_management
-from procurement import procurement_list
+from procurement import procurement_app
 
 app = Flask(__name__)
 
@@ -527,7 +527,7 @@ def material_outorin(mCode):
 # 添加“product_management.py”蓝本
 app.register_blueprint(product_management)
 
-app.register_blueprint(procurement_list)
+app.register_blueprint(procurement_app)
 
 if __name__ == '__main__':
     pass

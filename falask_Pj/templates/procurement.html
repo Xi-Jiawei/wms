@@ -302,7 +302,7 @@
                 else productTypeArr=$("#productType").val().split("/");
                 if($("#productNum").val()=="")productNumArr=new Array();
                 else productNumArr=$("#productNum").val().split("/");
-                if(productNumArr.length!=productCodeArr.length){
+                if(productNumArr.length!=productCodeArr.length&&productNumArr.length!=productTypeArr.length){
                     alert("数量个数与编码个数不匹配！");
                     return;
                 }
@@ -315,7 +315,7 @@
 
                 console.log(data);
 
-                alert("提交");
+                //alert("提交");
 
                 $.ajax({
                     //url: "/procurement",
@@ -327,9 +327,9 @@
                     contentType: 'application/json; charset=UTF-8',
                     success: function (callback) {
                         console.log(callback);
-                        alert(callback['ok']);//不要用callback.valueOf('ok')
+                        //alert(callback['ok']);//不要用callback.valueOf('ok')
                         if(callback['ok']){
-                            alert('获取');
+                            alert('添加成功');
                             //var result=callback['result']
                             window.location.href="/procurement_history";//跳转地址
                         }else if(!callback['ok']){
@@ -412,7 +412,7 @@
             console.log(document.getElementById("procurement_table"));
         };
 
-        $("#productCode").change(function(e){
+        $("#productCodes").change(function(e){
             //alert('改变');
 
             var productCodeArr = $("#productCode").val().split("/"); //字符分割
@@ -464,7 +464,7 @@
             });
         });
 
-        $("#productType").change(function(e){
+        $("#productTypes").change(function(e){
             //alert('改变');
 
             /*var productNum;
@@ -514,7 +514,7 @@
             });
         });
 
-        $("#productNum").change(function(e){
+        $("#productNums").change(function(e){
             //alert('改变');
 
             var productCodeArr = $("#productCode").val().split("/"); //字符分割
@@ -566,43 +566,7 @@
             });
         });
 
-        $("#productCodes").on('input',function(e){
-            //var productCode=$("#productCode").val();
-            //console.log(productCode.indexOf('/'));
-            /*if(productCode.indexOf('/')==-1){
-                //alert('输入');
-                $.ajax({
-                    url: "/calculate_procurement",
-                    type: "POST",
-                    dataType: "json",
-                    //data:$(this).serialize(),
-                    data:JSON.stringify(data),
-                    contentType: 'application/json; charset=UTF-8',
-                    success: function (callback) {
-                        console.log(callback);
-                        //alert(callback['ok']);//不要用callback.valueOf('ok')
-                        if(callback['ok']){
-                            window.location.href="/product_management";//跳转地址
-                        }else if(!callback['ok']){
-                            alert("数据库中已存在此成品！");
-                        }
-                    },
-                    error: function(xhr, textStatus, errorThrown) {
-                        console.log(xhr.status);// 状态码
-                        console.log(xhr.readyState);// 状态
-                        console.log(textStatus);// 错误信息
-                        alert('返回值错误');
-                    }
-                });
-            }else {
-                var table=document.getElementById("procurement-table");
-                var tbody=table.getElementsByTagName("tbody");
-                console.log(table.getElementsByTagName("tbody"));
-                console.log(table.getElementsByTagName("tbody")[0]);
-                //$("#productType").val(231);
-            }*/
-
-            //var data={'productCodeArr':$("#productCode").val().split("/")};
+        $("#productCode").on('input',function(e){
             var productNumArr,productCodeArr,productTypeArr;
             if($("#productCode").val()=="")productCodeArr=new Array();
             else productCodeArr=$("#productCode").val().split("/");
@@ -676,11 +640,24 @@
             });
         });
 
-        $("#productTypes").on('input',function(e) {
+        $("#productType").on('input',function(e) {
             //alert("productType数值改变");
+            //var data={'productTypeArr':$("#productType").val().split("/")};
 
-            var data={'productTypeArr':$("#productType").val().split("/")};
-            $.ajax({
+            var productNumArr,productCodeArr,productTypeArr;
+            if($("#productCode").val()=="")productCodeArr=new Array();
+            else productCodeArr=$("#productCode").val().split("/");
+            if($("#productType").val()=="")productTypeArr=new Array();
+            else productTypeArr=$("#productType").val().split("/");
+            if($("#productNum").val()=="")productNumArr=new Array();
+            else productNumArr=$("#productNum").val().split("/");
+
+            var data={'productCodeArr':productCodeArr,
+                'productTypeArr':productTypeArr,
+                'productNumArr':productNumArr};
+            console.log(data);
+
+            /*$.ajax({
                 url: "/productCodeByType",
                 type: "POST",
                 dataType: "json",
@@ -703,6 +680,76 @@
                         //window.location.href="/product_management";//跳转地址
                     }else if(!callback['ok']){
                         alert("出错了！");
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });*/
+
+            $.ajax({
+                url: "/calculate_procurement2",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if(callback['ok']){
+                        //alert('获取');
+                        var result=callback['result']
+                        ShowData(result);
+                    }else if(!callback['ok']){
+                        alert("型号输入错误！");
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        });
+
+        $("#productNum").on('input',function(e) {
+            //alert("productType数值改变");
+            //var data={'productTypeArr':$("#productType").val().split("/")};
+
+            var productNumArr,productCodeArr,productTypeArr;
+            if($("#productCode").val()=="")productCodeArr=new Array();
+            else productCodeArr=$("#productCode").val().split("/");
+            if($("#productType").val()=="")productTypeArr=new Array();
+            else productTypeArr=$("#productType").val().split("/");
+            if($("#productNum").val()=="")productNumArr=new Array();
+            else productNumArr=$("#productNum").val().split("/");
+
+            var data={'productCodeArr':productCodeArr,
+                'productTypeArr':productTypeArr,
+                'productNumArr':productNumArr};
+            console.log(data);
+
+            $.ajax({
+                url: "/calculate_procurement2",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if(callback['ok']){
+                        //alert('获取');
+                        var result=callback['result']
+                        ShowData(result);
+                    }else if(!callback['ok']){
+                        //alert("数字输入错误！");
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {

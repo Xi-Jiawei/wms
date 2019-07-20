@@ -54,7 +54,7 @@ def add_product():
                 materialOfProductArr = data['materialOfProduct']
                 otherCostsArr = data['otherCostsArr']
 
-                if not check_productInfo(productCode):
+                if not check_productInfoByCode(productCode) and not check_productInfoByType(productType):
                     print("数据库中不存在此成品。")
                     insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate,
                                        materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost)
@@ -73,9 +73,11 @@ def add_product():
                     updateOfContent = "新加"
                     insert_productChange(productCode, entryClerk, updateOfContent, entryDate)
 
-                    return jsonify({'ok': True})
-                else:
-                    return jsonify({'ok': False})
+                    return jsonify({'ok': "ok"})
+                elif check_productInfoByCode(productCode):
+                    return jsonify({'ok': "code"})
+                elif check_productInfoByType(productType):
+                    return jsonify({'ok': "type"})
             elif request.method == 'GET':
                 create_materialsOfProduct_temp()
                 return render_template('edit_product.html', setting=0, form=addProductForm)

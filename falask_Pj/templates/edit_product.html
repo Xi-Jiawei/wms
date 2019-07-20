@@ -804,10 +804,16 @@ cript>
                 success: function (callback) {
                     console.log(callback);
                     //alert(callback['ok']);//不要用callback.valueOf('ok')
-                    if(callback['ok']){
+                    if(callback['ok']=='ok'){
                         window.location.href="/product_management";//跳转地址
-                    }else if(!callback['ok']){
+                    }
+                    /*else if(!callback['ok']){
                         alert("数据库中已存在此成品！");
+                    }*/
+                    else if(callback['ok']=='code'){
+                        alert("编码输入错误！");
+                    }else if(callback['ok']=='type'){
+                        alert("型号输入错误！");
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {

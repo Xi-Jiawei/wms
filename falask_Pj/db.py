@@ -356,9 +356,12 @@ def select_materialsOfProduct(productCodeArr):
 
         sql = "select materialCode,sum(materialNum*productNum),group_concat(remark) from materialsOfProduct where productCode in("
         for i in range(length - 1):
+            print(productCodeArr[i])
             sql += "'%s'," % productCodeArr[i]
+        print(productCodeArr[length - 1])
         sql += "'%s') group by materialCode;" % productCodeArr[length - 1]
         print(sql)
+    conn.ping(reconnect=True)
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -370,6 +373,7 @@ def update_productNum_materialsOfProduct(productCode,productNum):
     sql = "update materialsOfProduct set productNum='%d' where productCode='%s';" \
           % (productNum,productCode)
     try:
+        print(sql)
         conn.ping(reconnect=True)
         # 执行SQL语句
         cur.execute(sql)
@@ -377,9 +381,10 @@ def update_productNum_materialsOfProduct(productCode,productNum):
         conn.commit()
         print("语句已经提交")
         return True
-        conn.close()
-    except:
+    except Exception:
         conn.rollback()
+        conn.close()
+        print(Exception)
 
 # xijiawei
 # 查询成品其他成本组成信息
@@ -584,8 +589,17 @@ def check_materialsOfProduct(productCode,materialCode):
 
 # xijiawei
 # 检查成品表
-def check_productInfo(productCode):
+def check_productInfoByCode(productCode):
     sql = "select * from productInfo where productCode= '%s';"% (productCode)
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
+    conn.close()
+
+# xijiawei
+# 检查成品表
+def check_productInfoByType(productType):
+    sql = "select * from productInfo where productType= '%s';"% (productType)
     cur.execute(sql)
     result = cur.fetchall()
     return result
