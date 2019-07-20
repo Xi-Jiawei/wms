@@ -679,7 +679,7 @@ def select_materialOfInfo(materialCode):
 # 插入成品录入表
 def select_procurement():
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "select productCode,productType,productNum,client,entryClerk,entryDate from procurement ;"
+    sql = "select id,group_concat(productCode),group_concat(productType),group_concat(productNum),group_concat(client),group_concat(entryClerk),group_concat(entryDate) from procurement group by id;"
     try:
         cur.execute(sql)
         result = cur.fetchall()
@@ -690,10 +690,54 @@ def select_procurement():
 
 # xijiawei
 # 插入成品录入表
-def insert_procurement(productCode,productType,productNum,client,entryClerk,entryDate):
+def select_maxid_procurement():
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into procurement (productCode,productType,productNum,client,entryClerk,entryDate)value('%s','%s','%d','%s','%s','%s');" \
-          % (productCode,productType,productNum,client,entryClerk,entryDate)
+    sql = "select max(id) from procurement;"
+    try:
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 插入成品录入表
+def select_procurementByID(id):
+    sql = "select productCode,productNum from procurement where id='%d';"
+    try:
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 更新成品物料组成表
+def delete_procurementsByID(id,entryDate):
+    sql = "delete from procurement where id='%d'and entryDate='%s';" \
+          % (id,entryDate)
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("删除异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 插入成品录入表
+def insert_procurement(id,productCode,productType,productNum,client,entryClerk,entryDate):
+    # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    sql = "insert into procurement (id,productCode,productType,productNum,client,entryClerk,entryDate)value('%d','%s','%s','%d','%s','%s','%s');" \
+          % (id,productCode,productType,productNum,client,entryClerk,entryDate)
     try:
         # 执行SQL语句
         cur.execute(sql)

@@ -126,8 +126,9 @@
                                     <thead>
                                     <tr>
                                         {% if authority=='3' %}
-                                            <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                            <td><input type='checkbox' name='checkbox' value='checkbox' onclick="checkAll()"/></td>
                                         {% endif %}
+                                        <th>序号</th>
                                         <th>采购代号</th>
                                         <th>成品编码</th>
                                         <th>成品型号</th>
@@ -141,7 +142,7 @@
                                     {% for i in procurement_history %}
                                         <tr>
                                             {% if authority=='3' %}
-                                                <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                                <td><input type='checkbox' name='checkbox' value='checkbox'/></td>
                                             {% endif %}
                                             <td></td>
                                             <td>{{ i[0] }}</td>
@@ -150,6 +151,7 @@
                                             <td>{{ i[3] }}</td>
                                             <td>{{ i[4] }}</td>
                                             <td>{{ i[5] }}</td>
+                                            <td>{{ i[6] }}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -163,7 +165,7 @@
 
             {% if authority=='3' %}
                 <div class="footer">
-                    <form id="procurement_form" action="#" method="post" novalidate="novalidate">
+                    <form id="procurement_history_form" action="#" method="post" novalidate="novalidate">
                         <div class="row">
                             <div class="col-xs-12">
                                 {{ form.delete_submit }}
@@ -202,29 +204,116 @@
 
     <script src="/static/jquery/jquery-2.1.4.min.js"></script>
     <script>
-    /*为表格添加序号*/
-    window.onload = function() {
-        //var oTable = document.getElementsByTagName("table");
-        var oTable=document.getElementById('bootstrap-data-table');
-        console.log("mark");
-        console.log(oTable);
-        console.log(oTable.rows.length);
-        for ( var i = 1; i < oTable.rows.length; i++) {
-            console.log(i);
-            console.log(oTable.rows[i].cells[0]);
-            if(oTable.rows[i].cells[0].firstChild==null)
-                oTable.rows[i].cells[0].innerHTML = i;
-            else {
-                var tdInner=oTable.rows[i].cells[0].firstChild;
-                console.log(tdInner);
-                console.log(tdInner.type);
-                if (tdInner.type != "CHECKBOX")
-                    oTable.rows[i].cells[1].innerHTML = i;
+        $(function() {
+            $("#procurement_history_form").submit(function(e)
+            {
+                e.preventDefault();
+
+                var table=document.getElementById("bootstrap-data-table");
+                console.log(table);
+                console.log(table.rows);
+                //alert("删除");
+                var procurementArr=new Array();
+                for(var i=1; i<table.rows.length;i++){
+                    console.log(table.rows[i].cells[0]);
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder.type = "CHECKBOX") {
+                        if (chkOrder.checked) {
+                            procurementArr[i-1] = {"id":table.rows[i].cells[2].innerHTML,
+                            "entryDate":table.rows[i].cells[8].innerHTML};
+                        }
+                    }
+                }
+
+                var data={'procurementArr':procurementArr
+                };
+
+                console.log(data);
+                //alert("提交删除");
+
+                $.ajax({
+                    url: "/delete_procurements",
+                    type: "POST",
+                    dataType: "json",
+                    //data:$(this).serialize(),
+                    data:JSON.stringify(data),
+                    contentType: 'application/json; charset=UTF-8',
+                    success: function (callback) {
+                        console.log(callback);
+                        if(callback['ok']){
+                            window.location.href="/procurement_history";//跳转地址
+                        }else if(!callback['ok']){
+                            alert("出错了！");
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.log(xhr.status);// 状态码
+                        console.log(xhr.readyState);// 状态
+                        console.log(textStatus);// 错误信息
+                        alert('返回值错误');
+                    }
+                });
+            })
+        });
+
+        /*为表格添加序号*/
+        window.onload = function() {
+            //var oTable = document.getElementsByTagName("table");
+            var oTable=document.getElementById('bootstrap-data-table');
+            console.log("mark");
+            console.log(oTable);
+            console.log(oTable.rows.length);
+            for ( var i = 1; i < oTable.rows.length; i++) {
+                console.log(i);
+                console.log(oTable.rows[i].cells[0]);
+                if(oTable.rows[i].cells[0].firstChild==null)
+                    oTable.rows[i].cells[0].innerHTML = i;
+                else {
+                    var tdInner=oTable.rows[i].cells[0].firstChild;
+                    console.log(tdInner);
+                    console.log(tdInner.type);
+                    if (tdInner.type != "CHECKBOX")
+                        oTable.rows[i].cells[1].innerHTML = i;
+                }
+                if (i % 2 == 0)
+                    oTable.rows[i].className = "ys01";
             }
-            if (i % 2 == 0)
-                oTable.rows[i].className = "ys01";
+        };
+
+        /*全部勾选*/
+        function checkAll(){
+            var mckeckbox=document.activeElement;
+            var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
+            console.log(mckeckbox);
+            console.log(table);
+            console.log(table.rows);
+            console.log(table.label);
+            console.log(table.tagName);
+            console.log(mckeckbox.checked);
+            if(table.tagName=="TABLE"){
+                if(mckeckbox.checked){
+                    for(var i=1;i<table.rows.length;i++){
+                        var chkOrder = table.rows[i].cells[0].firstChild;
+                        if(chkOrder){
+                            if(chkOrder.type = "CHECKBOX"){
+                                chkOrder.checked=true;
+                                //chkOrder.setAttribute("checked", true);
+                            }
+                        }
+                    }
+                }else if(!mckeckbox.checked){
+                    for(var i=1;i<table.rows.length;i++){
+                        var chkOrder = table.rows[i].cells[0].firstChild;
+                        if(chkOrder){
+                            if(chkOrder.type = "CHECKBOX"){
+                                chkOrder.checked=false;
+                                //chkOrder.setAttribute("checked", false);
+                            }
+                        }
+                    }
+                }
+            }
         }
-    };
     </script>
 
 </body>

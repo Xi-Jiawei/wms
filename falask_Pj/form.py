@@ -266,6 +266,41 @@ class AddProductForm(Form):
         }
     )
 
+    productCodeOrTypeInput=StringField(
+        # 标签
+        label="产品编码/型号",
+        # 验证器
+        validators=[
+            DataRequired('请输入产品编码/型号')
+        ],
+        description="产品编码/型号",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "productCodeOrTypeInput",
+            "class": "form-control",
+            "placeholder": "请输入产品编码/型号",
+            "required": 'required'  # 表示输入框不能为空，并有提示信息
+        }
+    )
+
+    productCodeOrType=SelectField(
+        # 标签
+        label="产品编码/型号",
+        # 验证器
+        validators=[
+            DataRequired('产品编码/型号')
+        ],
+        description="产品编码/型号",
+        # 附加选项,会自动在前端判别
+        choices=[('0', '产品编码'), ('1', '产品型号')],
+        render_kw={
+            "id": "productCodeOrType",
+            "class": "form-control",
+            "placeholder": "产品编码/型号",
+            "required": 'required'  # 表示输入框不能为空，并有提示信息
+        }
+    )
+
     # 提交
     add_submit = SubmitField(
         label="添加",

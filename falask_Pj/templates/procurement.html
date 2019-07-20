@@ -43,6 +43,14 @@
         #wrap{
             display: flex;
             justify-content: flex-start;
+            vertical-align:bottom;
+        }
+        .vertical-align-span {
+            display:inline-block;
+            width:1px;
+            height:100%;
+            margin-left:-10px;
+            vertical-align:middle;
         }
     </style>
 </head>
@@ -110,57 +118,38 @@
 
 
 
-            <div class="content">
-                <form id="procurement_form" action="#" method="post" novalidate="novalidate">
-            <div>
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div  id="wrap" class="row">
-                                    <div class="col-xs-12">
-                                        <label for="productcode" class="control-label mb-1">成品编码</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
-                                        {{ form.productCode }}
+        <div class="content">
+            <form id="procurement_form" action="#" method="post" novalidate="novalidate">
+                <div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div id="wrap" class="row">
+                                        <div class="col-xs-12" style="vertical-align:bottom">
+                                            {{ form.productCodeOrType }}
+                                            <br/>
+                                            {{ form.productCodeOrTypeInput }}
+                                        </div>
+
+                                        <div class="col-xs-12"  style="vertical-align:bottom">
+                                            <label class="control-label mb-1">成品数量</label>
+                                            {{ form.productNum }}
+                                        </div>
+
+                                        <div class="col-xs-12"  style="vertical-align:bottom">
+                                            <label for="productcode" class="control-label mb-1">客户</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
+                                            {{ form.client }}
+                                        </div>
                                     </div>
 
-                                    <div class="col-xs-12">
-                                        <label class="control-label mb-1">成品型号</label>
-                                        {{ form.productType }}
-                                    </div>
-
-                                    <div class="col-xs-12">
-                                        <label class="control-label mb-1">成品数量</label>
-                                        {{ form.productNum }}
-                                    </div>
-                                </div>
-
-                                {#<div  id="wrap" class="row">
-                                    <div class="col-xs-12">
-                                        <label for="productcode" class="control-label mb-1">客户</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
-                                        {{ form.client }}
-                                    </div>
-
-                                    <!--<div class="col-xs-12">
-                                        <label class="control-label mb-1">录入员</label>
-                                        {{ form.entryClerk }}
-                                    </div>
-
-                                    <div class="col-xs-12">
-                                        <label class="control-label mb-1">日期</label>
-                                        <div><input id="meeting" type="date" value="2014-01-13"/></div>
-                                    </div>-->
-                                </div>#}
-                                <div>
-                                    <label for="productcode" class="control-label mb-1">客户</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
-                                    {{ form.client }}
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-                {#<div class="row">
+                <div class="row">
 
                     <div class="col-md-12">
                         <div class="card">
@@ -168,44 +157,9 @@
                                 <strong class="card-title">所有成品信息概览</strong>
                             </div>
                             <div class="card-body">
-                            <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
+                                <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
                                 <!--“ table table-striped table-bordered ”两行之前有不同的颜色且水平方向上有分割线和边框-->
                                 <!--id="bootstrap-data-table" 引用datatables.min.js API-->
-                                #}{#<table id="bootstrap-data-table" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                        <th>序号</th>
-                                        <th>物料编码</th>
-                                        <th>物料名称</th>
-                                        <th>规格型号</th>
-                                        <th>单位</th>
-                                        <th>库存数量</th>
-                                        <th>需出库数量</th>
-                                        <th>余库存数量</th>
-                                        <th>欠料数量</th>
-                                        <th>供货厂家</th>
-                                        <th>备注</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                     {% for i in procurementList %}
-                                       <!-- <tr>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[1] }}</td>
-                                            <td>{{ i[2] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                        </tr>-->
-                                    {% endfor %}
-                                    </tbody>
-                                </table>#}{#
-
                                 <table id="procurement_table" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
@@ -229,9 +183,9 @@
                         </div>
                     </div>
 
-                </div>#}
+                </div>
 
-                    <table id="procurement_table" class="table table-striped table-bordered">
+                {#<table id="procurement_table" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
                                         <th width="50px">序号</th>
@@ -249,17 +203,17 @@
                                     </thead>
                                     <tbody>
                                     </tbody>
-                                </table>
+                                </table>#}
 
-            <div class="footer">
+                <div class="footer">
                     <div class="row">
                         <div class="col-xs-12">
                             {{ form.ok_submit }}
                             {{ form.csrf_token }}
                         </div>
                     </div>
-            </div>
-                </form>
+                </div>
+            </form>
         </div><!-- .content -->
     </div>
     <!-- Scripts -->
@@ -295,19 +249,21 @@
                     alert("数量个数与编码个数不匹配！");
                     return;
                 }*/
-                var productNumArr,productCodeArr,productTypeArr;
-                if($("#productCode").val()=="")productCodeArr=new Array();
-                else productCodeArr=$("#productCode").val().split("/");
-                if($("#productType").val()=="")productTypeArr=new Array();
-                else productTypeArr=$("#productType").val().split("/");
+                var productNumArr,productCodeOrTypeInput,productCodeOrType;
+                productCodeOrType=$("#productCodeOrType").val();
+                if($("#productCodeOrTypeInput").val()==""){
+                    alert("请输入成品编码或成品型号");
+                    return;
+                }
+                else productCodeOrTypeInput=$("#productCodeOrTypeInput").val().split("/");
                 if($("#productNum").val()=="")productNumArr=new Array();
                 else productNumArr=$("#productNum").val().split("/");
-                if(productNumArr.length!=productCodeArr.length&&productNumArr.length!=productTypeArr.length){
+                if(productNumArr.length!=productCodeOrTypeInput.length){
                     alert("数量个数与编码个数不匹配！");
                     return;
                 }
-                var data={'productCodeArr':productCodeArr,
-                    'productTypeArr':productTypeArr,
+                var data={'productCodeOrTypeInput':productCodeOrTypeInput,
+                    'productCodeOrType':productCodeOrType,
                     'productNumArr':productNumArr,
                     'client':$("#client").val(),
                     'materialArr':materialArr
@@ -333,7 +289,7 @@
                             //var result=callback['result']
                             window.location.href="/procurement_history";//跳转地址
                         }else if(!callback['ok']){
-                            alert("数据库中已存在此成品！");
+                            alert("成品编码或成品型号输入错误！");
                         }
                     },
                     error: function(xhr, textStatus, errorThrown) {
@@ -351,38 +307,6 @@
     <script>
         function ShowData(resultArr) {
             console.log(resultArr);
-            {#var rowLength=resultArr.length;
-            var tableHtml = "";
-            for(var rowNum=0;rowNum<resultArr.length;rowNum++){
-                /*var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
-                    "<td>"+(rowNum+1)+"</td>\n" +
-                    "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
-                    "<td><input type='text' style='width:80px' class='otherCosts' placeholder='加工费'/></td>" +
-                    "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
-                    "<td><input type='text' style='width:80px' class='otherCosts' placeholder='管理费'/></td>" +
-                    "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
-                    "<td><input type='text' style='width:80px' class='otherCosts' placeholder='辅料费'/></td>" +
-                    "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
-                    "<td><input type='text' style='width:80px' class='otherCosts' placeholder='辅料费'/></td>" +
-                    "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
-                    "<td><input type='text' style='width:80px' class='otherCosts' placeholder='运营费'/></td></tr>";*/
-                var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
-                    "<td>"+(rowNum+1)+"</td>\n" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                    "<td>"+resultArr[rowNum]['materialCode']+"</td></tr>";
-                tableHtml += rowTemplate;
-            }
-            $("#bootstrap-data-table tbody").html(tableHtml);#}
-
-            /**/
             //var table=document.getElementById("bootstrap-data-table");
             var table=document.getElementById("procurement_table");
             var tbody=table.getElementsByTagName("tbody");
@@ -718,20 +642,24 @@
         });
 
         $("#productNum").on('input',function(e) {
-            //alert("productType数值改变");
-            //var data={'productTypeArr':$("#productType").val().split("/")};
-
-            var productNumArr,productCodeArr,productTypeArr;
-            if($("#productCode").val()=="")productCodeArr=new Array();
-            else productCodeArr=$("#productCode").val().split("/");
-            if($("#productType").val()=="")productTypeArr=new Array();
-            else productTypeArr=$("#productType").val().split("/");
+            var productNumArr,productCodeOrTypeInput,productCodeOrType;
+            productCodeOrType=$("#productCodeOrType").val();
+            if($("#productCodeOrTypeInput").val()==""){
+                alert("请输入成品编码或成品型号");
+                return;
+            }
+            else productCodeOrTypeInput=$("#productCodeOrTypeInput").val().split("/");
             if($("#productNum").val()=="")productNumArr=new Array();
             else productNumArr=$("#productNum").val().split("/");
+            /*if(productNumArr.length!=productCodeOrTypeInput.length){
+                alert("数量个数与编码个数不匹配！");
+                return;
+            }*/
+            var data={'productCodeOrTypeInput':productCodeOrTypeInput,
+                'productCodeOrType':productCodeOrType,
+                'productNumArr':productNumArr
+            };
 
-            var data={'productCodeArr':productCodeArr,
-                'productTypeArr':productTypeArr,
-                'productNumArr':productNumArr};
             console.log(data);
 
             $.ajax({
@@ -750,6 +678,51 @@
                         ShowData(result);
                     }else if(!callback['ok']){
                         //alert("数字输入错误！");
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        });
+
+
+        $("#productCodeOrTypeInput").on('input',function(e){
+            var productNumArr,productCodeOrTypeInput,productCodeOrType;
+            productCodeOrType=$("#productCodeOrType").val();
+            if($("#productCodeOrTypeInput").val()==""){
+                alert("请输入成品编码或成品型号");
+                return;
+            }
+            else productCodeOrTypeInput=$("#productCodeOrTypeInput").val().split("/");
+            if($("#productNum").val()=="")productNumArr=new Array();
+            else productNumArr=$("#productNum").val().split("/");
+            var data={'productCodeOrTypeInput':productCodeOrTypeInput,
+                'productCodeOrType':productCodeOrType,
+                'productNumArr':productNumArr
+            };
+
+            console.log(data);
+
+            $.ajax({
+                url: "/calculate_procurement2",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if(callback['ok']){
+                        //alert('获取');
+                        var result=callback['result']
+                        ShowData(result);
+                    }else if(!callback['ok']){
+                        alert("编码输入错误！");
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {
