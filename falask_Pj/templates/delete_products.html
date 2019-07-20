@@ -29,11 +29,21 @@
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
 
     <style>
-        .mbottom {
+        {#不起作用#}
+        {#.mbottom {
             position: absolute;
             bottom: 0;
             left: 50%;
             transform: translate(-50%, -50%);
+        }#}
+
+        .footer{
+            position:absolute;
+            bottom:0;
+            width:75%;
+            height:60px;
+            {#margin-left: 100px;
+            background-color: #ffc0cb;#}
         }
     </style>
 </head>
@@ -103,7 +113,7 @@
 
 
 
-            <div class="content">
+        <div class="content">
             <div class="animated fadeIn">
                 <div class="row">
 
@@ -164,29 +174,17 @@
             </div><!-- .animated -->
 
 
-                <!--<div class="mbottom">-->
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-            <br/>
-                <div>
-                    <form id="products_form" action="#" method="post" novalidate="novalidate">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                {{ form.delete_submit }}
-                                {{ form.csrf_token }}
-                            </div>
+            <!--<div class="mbottom">-->
+            <div class="footer">
+                <form id="products_form" action="#" method="post" novalidate="novalidate">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form.delete_submit }}
+                            {{ form.csrf_token }}
                         </div>
-                    </form>
-                </div>
+                    </div>
+                </form>
+            </div>
         </div><!-- .content -->
     </div>
     <!-- Scripts -->

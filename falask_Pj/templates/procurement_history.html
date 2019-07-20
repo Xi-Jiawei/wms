@@ -1,0 +1,231 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ela Admin - HTML5 Admin Template</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
+    <link rel="stylesheet" href="/static/bootstrap/pe-icon-7-filled.css">
+    <link rel="stylesheet" href="/static/bootstrap/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/bootstrap/style.css">
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+    <link href="/static/bootstrap/weather-icons.css" rel="stylesheet"/>
+    <link href="/static/bootstrap/fullcalendar.css" rel="stylesheet"/>
+
+    <link href="/static/bootstrap/chartist.min.css" rel="stylesheet">
+    <link href="/static/bootstrap/jqvmap.min.css" rel="stylesheet">
+    <link href="/static/bootstrap/dataTables.bootstrap.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+
+    <style>
+        .footer{
+            position:absolute;
+            bottom:0;
+            width:75%;
+            height:60px;
+            {#margin-left: 100px;
+            background-color: #ffc0cb;#}
+        }
+
+        #wrap{
+            display: flex;
+            justify-content: flex-start;
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Left Panel -->
+
+        <aside id="left-panel" class="left-panel">
+        <nav class="navbar navbar-expand-sm navbar-default">
+            <div id="main-menu" class="main-menu collapse navbar-collapse">
+                <ul class="nav navbar-nav">
+                    <li >
+                        <a href="{{ url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页</a>
+                    </li>
+
+                    <li class="menu-title">菜单</li><!-- /.menu-title -->
+                    <li class="active">
+                        <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购清单</a>
+                    </li>
+
+                    <li>
+                        <a href="{{ url_for("procurement.procurement") }}  "><i class="menu-icon fa fa-cogs"></i>添加采购</a>
+                    </li>
+                </ul>
+            </div><!-- /.navbar-collapse -->
+        </nav>
+    </aside>
+
+    <!-- Left Panel -->
+
+    <div id="right-panel" class="right-panel">
+
+        <!-- Header-->
+        <header id="header" class="header">
+            <div class="top-left">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="./"><img src="/static/images/logo.png" alt="Logo"></a>
+                    <a class="navbar-brand hidden" href="./"><img src="images/logo2.png" alt="Logo"></a>
+                    <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+                </div>
+            </div>
+            <div class="top-right">
+                <div class="header-menu">
+
+
+                    <div class="user-area dropdown float-right">
+                        <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="User Avatar">
+                        </a>
+
+                        <div class="user-menu dropdown-menu">
+                            <a class="nav-link" href="#"><i class="fa fa-user"></i>My Profile</a>
+
+                            <a class="nav-link" href="#"><i class="fa fa-bell-o"></i>Notifications <span class="count">13</span></a>
+
+                            <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+
+                            <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power-off"></i>Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header><!-- /header -->
+        <!-- Header-->
+
+
+
+        <div class="content">
+            <div class="animated fadeIn">
+
+                <div class="row">
+
+                    <div class="col-md-12" style="overflow: hidden">
+                        <div class="card">
+                            <div class="card-header">
+                                <strong class="card-title">采购清单</strong>
+                            </div>
+                            <div class="card-body">
+                                <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
+                                <!--“ table table-striped table-bordered ”两行之前有不同的颜色且水平方向上有分割线和边框-->
+                                <!--id="bootstrap-data-table" 引用datatables.min.js API-->
+                                <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        {% if authority=='3' %}
+                                            <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                        {% endif %}
+                                        <th>采购代号</th>
+                                        <th>成品编码</th>
+                                        <th>成品型号</th>
+                                        <th>成品数量</th>
+                                        <th>客户</th>
+                                        <th>录入员</th>
+                                        <th>日期</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for i in procurementList %}
+                                        <tr>
+                                            {% if authority=='3' %}
+                                                <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                            {% endif %}
+                                            <td></td>
+                                            <td>{{ i[0] }}</td>
+                                            <td>{{ i[1] }}</td>
+                                            <td>{{ i[2] }}</td>
+                                            <td>{{ i[3] }}</td>
+                                            <td>{{ i[4] }}</td>
+                                            <td>{{ i[5] }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div><!-- .animated -->
+
+            {% if authority=='3' %}
+                <div class="footer">
+                    <form id="procurement_form" action="#" method="post" novalidate="novalidate">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                {{ form.delete_submit }}
+                                {{ form.csrf_token }}
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            {% endif %}
+        </div><!-- .content -->
+    </div>
+    <!-- Scripts -->
+
+    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
+    <script src="/static/jquery/popper.min.js"></script>
+    <script src="/static/jquery/plugins.js"></script>
+    <script src="/static/jquery/main.js"></script>
+    <script src="/static/jquery/Chart.bundle.js"></script>
+
+    <script src="/static/lib/datatables.min.js"></script>           <!--jquery dataTables.min.js API-->
+    <script src="/static/lib/dataTables.bootstrap.min.js"></script>
+    <script src="/static/lib/dataTables.buttons.min.js"></script>
+    <script src="/static/lib/buttons.bootstrap.min.js"></script>
+    <script src="/static/lib/jszip.min.js"></script>
+    <script src="/static/lib/vfs_fonts.js"></script>
+    <script src="/static/lib/buttons.html5.min.js"></script>
+    <script src="/static/lib/buttons.print.min.js"></script>
+    <script src="/static/lib/buttons.colVis.min.js"></script>
+    <script src="/static/lib/datatables-init.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+          $('#bootstrap-data-table-export').DataTable();
+      } );
+    </script>
+
+    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
+    <script>
+    /*为表格添加序号*/
+    window.onload = function() {
+        //var oTable = document.getElementsByTagName("table");
+        var oTable=document.getElementById('bootstrap-data-table');
+        console.log("mark");
+        console.log(oTable);
+        console.log(oTable.rows.length);
+        for ( var i = 1; i < oTable.rows.length; i++) {
+            console.log(i);
+            console.log(oTable.rows[i].cells[0]);
+            if(oTable.rows[i].cells[0].firstChild==null)
+                oTable.rows[i].cells[0].innerHTML = i;
+            else {
+                var tdInner=oTable.rows[i].cells[0].firstChild;
+                console.log(tdInner);
+                console.log(tdInner.type);
+                if (tdInner.type != "CHECKBOX")
+                    oTable.rows[i].cells[1].innerHTML = i;
+            }
+            if (i % 2 == 0)
+                oTable.rows[i].className = "ys01";
+        }
+    };
+    </script>
+
+</body>
+</html>
