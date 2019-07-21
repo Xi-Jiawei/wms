@@ -53,7 +53,6 @@ def add_product():
                 operatingCost = data['operatingCost']
                 materialOfProductArr = data['materialOfProduct']
                 otherCostsArr = data['otherCostsArr']
-
                 if not check_productInfoByCode(productCode) and not check_productInfoByType(productType):
                     print("数据库中不存在此成品。")
                     insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate,
@@ -69,18 +68,21 @@ def add_product():
                     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
                     nowTime = datetime.now()
                     entryDate = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
-                    entryClerk = data['entryClerk']
+                    # entryClerk = data['entryClerk']
+                    entryClerk=username
                     updateOfContent = "新加"
                     insert_productChange(productCode, entryClerk, updateOfContent, entryDate)
 
                     return jsonify({'ok': "ok"})
                 elif check_productInfoByCode(productCode):
+                    print("数据库中已存在同编号的成品。")
                     return jsonify({'ok': "code"})
                 elif check_productInfoByType(productType):
+                    print("数据库中已存在同型号的成品。")
                     return jsonify({'ok': "type"})
             elif request.method == 'GET':
                 create_materialsOfProduct_temp()
-                return render_template('edit_product.html', setting=0, form=addProductForm)
+                return render_template('edit_product.html', setting=0, form=addProductForm) # setting为0表示新添，setting为1表示编辑
             else:
                 create_materialsOfProduct_temp()
                 return render_template('edit_product.html', form=addProductForm)
@@ -96,9 +98,7 @@ def edit_product(productCode):
         username = session['username']
         authority = login_Authority(username)
         if authority[1]=='1' or authority[1]=='2':
-            # do your things
             print("当前权限仅限查看")
-            # return render_template('test_fail.html')
 
             productInfo = select_productInfoByCode(productCode)
             addProductForm.productCode.data = productCode
@@ -123,12 +123,16 @@ def edit_product(productCode):
 
             materialOfProduct = select_materialsOfProductByCode(productCode)
             otherCosts = select_otherCostsByCode(productCode)
+
+            # setting为0表示新添，setting为1表示编辑
             return render_template('view_product.html', setting=1, form=addProductForm, productCode=productCode,
                                    materialCost=materialCost,
                                    processCost=processCost, adminstrationCost=adminstrationCost,
                                    supplementaryCost=supplementaryCost, operatingCost=operatingCost,
                                    materialOfProduct=materialOfProduct, otherCosts=otherCosts)
         elif authority[1]=='3':
+            print("当前权限可编辑")
+
             # if addProductForm.validate_on_submit():
             if request.method == "POST":
                 data = request.get_json()
@@ -148,13 +152,6 @@ def edit_product(productCode):
                 otherCostsArr = data['otherCostsArr']
                 update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost,
                                    processCost, adminstrationCost, supplementaryCost, operatingCost)
-
-                # if len(materialOfProductArr) > 0:
-                #     for materialOfProduct in materialOfProductArr:
-                #         if check_materialsOfProduct(productCode,materialOfProduct[0]):
-                #             update_materialsOfProduct(productCode, materialOfProduct[0], materialOfProduct[1], materialOfProduct[2],materialOfProduct[3], materialOfProduct[4], materialOfProduct[5],materialOfProduct[6])
-                #         else:
-                #             insert_materialsOfProduct(productCode, materialOfProduct[0], materialOfProduct[1], materialOfProduct[2],materialOfProduct[3], materialOfProduct[4], materialOfProduct[5],materialOfProduct[6])
                 delete_materialsOfProduct(productCode)
                 if len(materialOfProductArr) > 0:
                     for materialOfProduct in materialOfProductArr:
@@ -172,7 +169,8 @@ def edit_product(productCode):
                 # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
                 nowTime = datetime.now()
                 entryDate = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
-                entryClerk = data['entryClerk']
+                # entryClerk = data['entryClerk']
+                entryClerk=username
                 updateOfContent = "修改"
                 insert_productChange(productCode, entryClerk, updateOfContent, entryDate)
 
@@ -196,6 +194,8 @@ def edit_product(productCode):
 
                 materialOfProduct = select_materialsOfProductByCode(productCode)
                 otherCosts = select_otherCostsByCode(productCode)
+
+                # setting为0表示新添，setting为1表示编辑
                 return render_template('edit_product.html', setting=1, form=addProductForm, productCode=productCode, materialCost=materialCost,
                                        processCost=processCost, adminstrationCost=adminstrationCost,
                                        supplementaryCost=supplementaryCost, operatingCost=operatingCost,

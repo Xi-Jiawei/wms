@@ -96,9 +96,13 @@
                 </li>
                 {% endif %}
                 {% if Authority[2] == '0' %}
-                {% else  %}
+                {% elif  Authority[2] == '3' or Authority[2] == '2' %}
                 <li>
                     <a href="{{ url_for("procurement.procurement_history") }}"> <i class="menu-icon fa fa-table"></i>采购管理</a>
+                </li>
+                {% elif  Authority[2] == '1' %}
+                <li>
+                    <a href="{{ url_for("procurement.procurement") }}"> <i class="menu-icon fa fa-table"></i>采购管理</a>
                 </li>
                 {% endif %}
                  <li>

@@ -19,34 +19,31 @@ def procurement_history():
         if session.get('username'):
             username = session['username']
             authority = login_Authority(username)
-            if authority[2]=="3" or authority[2]=="2":
-                procurementResult = select_procurement()
-                procurement_history = [[0 for key in range(7)] for key in range(len(procurementResult))]
-                for i in range(len(procurementResult)):
-                    procurement_history[i][0] = procurementResult[i][0]
-                    procurement_history[i][1] = procurementResult[i][1].replace(',', '/')
-                    procurement_history[i][2] = procurementResult[i][2].replace(',', '/')
-                    procurement_history[i][3] = procurementResult[i][3].replace(',', '/')
-                    # procurement_history[i][4] = procurementResult[i][4][:procurementResult[i][4].index(',')]
-                    # procurement_history[i][5] = procurementResult[i][5][:procurementResult[i][5].index(',')]
-                    # procurement_history[i][6] = procurementResult[i][6][:procurementResult[i][6].index(',')]
-                    if not procurementResult[i][4].find(',') == -1:
-                        procurement_history[i][4] = procurementResult[i][4][:procurementResult[i][4].find(',')]
-                    else:
-                        procurement_history[i][4] = procurementResult[i][4]
-                    if not procurementResult[i][5].find(',') == -1:
-                        procurement_history[i][5] = procurementResult[i][5][:procurementResult[i][5].find(',')]
-                    else:
-                        procurement_history[i][5] = procurementResult[i][5]
-                    if not procurementResult[i][6].find(',') == -1:
-                        procurement_history[i][6] = procurementResult[i][6][:procurementResult[i][6].find(',')]
-                    else:
-                        procurement_history[i][6] = procurementResult[i][6]
-                return render_template('procurement_history.html', form=addProductForm,
-                                       procurement_history=procurement_history,
-                                       authority=authority[2])
-            else:
-                return render_template('procurement.html', form=addProductForm, authority=authority[2])
+            procurementResult = select_procurement()
+            procurement_history = [[0 for key in range(7)] for key in range(len(procurementResult))]
+            for i in range(len(procurementResult)):
+                procurement_history[i][0] = procurementResult[i][0]
+                procurement_history[i][1] = procurementResult[i][1].replace(',', '/')
+                procurement_history[i][2] = procurementResult[i][2].replace(',', '/')
+                procurement_history[i][3] = procurementResult[i][3].replace(',', '/')
+                # procurement_history[i][4] = procurementResult[i][4][:procurementResult[i][4].index(',')]
+                # procurement_history[i][5] = procurementResult[i][5][:procurementResult[i][5].index(',')]
+                # procurement_history[i][6] = procurementResult[i][6][:procurementResult[i][6].index(',')]
+                if not procurementResult[i][4].find(',') == -1:
+                    procurement_history[i][4] = procurementResult[i][4][:procurementResult[i][4].find(',')]
+                else:
+                    procurement_history[i][4] = procurementResult[i][4]
+                if not procurementResult[i][5].find(',') == -1:
+                    procurement_history[i][5] = procurementResult[i][5][:procurementResult[i][5].find(',')]
+                else:
+                    procurement_history[i][5] = procurementResult[i][5]
+                if not procurementResult[i][6].find(',') == -1:
+                    procurement_history[i][6] = procurementResult[i][6][:procurementResult[i][6].find(',')]
+                else:
+                    procurement_history[i][6] = procurementResult[i][6]
+            return render_template('procurement_history.html', form=addProductForm,
+                                   procurement_history=procurement_history,
+                                   authority=authority[2])
         else:
             return render_template('test_fail.html')
 

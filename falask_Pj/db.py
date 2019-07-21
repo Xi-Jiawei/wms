@@ -954,7 +954,7 @@ def dao_material_in(materialCode, materialName, materialType, m_price,materialFa
           "values('%s','%s','%s' ,'%s', '%lf', '%s')" % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory)
     #更新静态表余库存
     sql3 = " update materialofinfo set remainderAmount = remainderAmount + '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
-    sql4 = "select * from materialofinfo where materialName = '%s' " % (materialName)
+    sql4 = "select * from materialofinfo where materialCode = '%s' " % (materialCode)
     res = cur.execute(sql4)
 
     try:
@@ -963,11 +963,12 @@ def dao_material_in(materialCode, materialName, materialType, m_price,materialFa
         cur.execute(sql3)
         cur.execute(sql4)
         result = cur.fetchall()
-        sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
+        if result:
+            sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
                " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',0,'%s','%d','%lf')" % \
                (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
                 float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
-        cur.execute(sql2)
+            cur.execute(sql2)
         conn.commit()
         return True
         conn.close()

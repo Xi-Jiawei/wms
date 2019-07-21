@@ -105,16 +105,16 @@
                 </li>
 
                 {% if setting==0%}
-                <li class="active">
-                    <a href="{{ url_for("product_management.add_product") }}"> <i class="menu-icon fa fa-th"></i>添加成品</a>
-                </li>
+                    <li class="active">
+                        <a href="{{ url_for("product_management.add_product") }}"> <i class="menu-icon fa fa-th"></i>添加成品</a>
+                    </li>
                 {% elif setting==1 and productCode%}
-                <li>
-                    <a href="{{ url_for("product_management.add_product") }}"> <i class="menu-icon fa fa-th"></i>添加成品</a>
-                </li>
-                <li class="active">
-                    <a href="{{ url_for("product_management.edit_product",productCode=productCode) }}"> <i class="menu-icon fa fa-th"></i>编辑成品</a>
-                </li>
+                    <li>
+                        <a href="{{ url_for("product_management.add_product") }}"> <i class="menu-icon fa fa-th"></i>添加成品</a>
+                    </li>
+                    <li class="active">
+                        <a href="{{ url_for("product_management.edit_product",productCode=productCode) }}"> <i class="menu-icon fa fa-th"></i>编辑成品</a>
+                    </li>
                 {% endif %}
                 <li>
                     <a href="{{ url_for("product_management.delete_products") }}"> <i class="menu-icon fa fa-th"></i>删除成品</a>
@@ -252,12 +252,12 @@
                                                     </div>
                                                 </div>
 
-                                                <div class="right">
+                                                <!--<div class="right">
                                                     <label class="control-label mb-1">录入员姓名</label>
                                                     <div class="col-xs-12">
                                                         {{ form.entryClerk }}
                                                     </div>
-                                                </div>
+                                                </div>-->
                                             </div>
                                         </div>
                                     </div>
@@ -266,61 +266,61 @@
 
                             <br/>                                                                          <!--br空行-->
 
-                                <table id="Costs" class="table table-striped table-bordered">
-                                    <!--<caption><h3>费用组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
-                                    <thead>
-                                    <tr align="center">
-                                        <th>材料成本</th>
-                                        <th>加工成本</th>
-                                        <th>管理成本</th>
-                                        <th>辅料成本</th>
-                                        <th>运营成本</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        {% if materialCost%}
+                            <table id="Costs" class="table table-striped table-bordered">
+                                <!--<caption><h3>费用组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
+                                <thead>
+                                <tr align="center">
+                                    <th>材料成本</th>
+                                    <th>加工成本</th>
+                                    <th>管理成本</th>
+                                    <th>辅料成本</th>
+                                    <th>运营成本</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    {% if materialCost%}
                                         <td id="materialCost">
                                             {{ materialCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="materialCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if processCost%}
+                                    {% if processCost%}
                                         <td id="processCost">
                                             {{ processCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="processCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if adminstrationCost%}
+                                    {% if adminstrationCost%}
                                         <td id="adminstrationCost">
                                             {{ adminstrationCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="adminstrationCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if supplementaryCost%}
+                                    {% if supplementaryCost%}
                                         <td id="supplementaryCost">
                                             {{ supplementaryCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="supplementaryCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if operatingCost%}
+                                    {% if operatingCost%}
                                         <td id="operatingCost">
                                             {{ operatingCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="operatingCost">0.00</td>
-                                        {% endif %}
-                                    </tr>
-                                    </tbody>
-                                </table>
+                                    {% endif %}
+                                </tr>
+                                </tbody>
+                            </table>
 
                             <br/>                                                                          <!--br空行-->
 
@@ -513,7 +513,6 @@
 <script src="/static/jquery/moment.js"></script>
 <script src="/static/jquery/fullcalendar.min.js"></script>
 <script src="/static/jquery/fullcalendar-init.js"></script>
-cript>
 <script src="/static/jquery/weather-init.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/moment.min.js"></script>
@@ -724,6 +723,7 @@ cript>
         {
             e.preventDefault();
 
+            /*表格数据*/
             var materialOfProductArr =new Array();
             var trList = $("#materialOfProduct tbody").children("tr");
             console.log(trList);
@@ -786,7 +786,6 @@ cript>
                 'adminstrationCost':parseFloat(rows[1].cells[2].innerHTML),
                 'supplementaryCost':parseFloat(rows[1].cells[3].innerHTML),
                 'operatingCost':parseFloat(rows[1].cells[4].innerHTML),
-                'entryClerk':parseFloat(formData[7]['value']),
                 'materialOfProduct':materialOfProductArr,
                 'otherCostsArr':otherCostsArr
             };
