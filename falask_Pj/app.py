@@ -1,5 +1,7 @@
 from datetime import timedelta
+
 from flask import Flask, url_for, render_template, request, redirect, session
+
 from model import User, NewUser
 from db import *
 import config,datetime
@@ -534,4 +536,5 @@ app.register_blueprint(product_management)
 app.register_blueprint(procurement_app)
 
 if __name__ == '__main__':
-    pass
+    app.run()
+    #pass
