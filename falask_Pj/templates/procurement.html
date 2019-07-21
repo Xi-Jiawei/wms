@@ -723,8 +723,10 @@
                 //alert(callback['ok']);//不要用callback.valueOf('ok')
                 if(callback['ok']){
                     //alert('获取');
-                    var result=callback['result']
+                    var result=callback['result'];
                     ShowData(result);
+                    for(var i=0;i<result.length;i++)
+                        if(result[i]['exception'])alert(result[i]['exception']);
                 }else if(!callback['ok']){
                     alert("编码输入错误！");
                 }

@@ -74,10 +74,12 @@ def delete_procurements():
                 materialNum = int(material[1])
                 remark = material[2]
                 materialInfo = select_materialOfInfo(materialCode)
-                stockQuantity = materialInfo[0][5]
-                remainderQuantity = int(stockQuantity) + int(materialNum)  # 取消采购，相当于物料重新入库
-                update_materialOfInfo(materialCode, remainderQuantity)
-                insert_materialOfInOut(materialCode, ('取消采购，代号：%d'%id), materialNum,remainderQuantity,remainderQuantity * materialInfo[0][3])
+                if materialInfo:
+                    stockQuantity = materialInfo[0][5]
+                    remainderQuantity = int(stockQuantity) + int(materialNum)  # 取消采购，相当于物料重新入库
+                    update_materialOfInfo(materialCode, remainderQuantity)
+                    insert_materialOfInOut(materialCode, ('取消采购，代号：%d' % id), materialNum, remainderQuantity,
+                                           remainderQuantity * materialInfo[0][3])
             delete_procurementsByID(id,entryDate)
         return jsonify({'ok': True})
     else:
@@ -138,34 +140,37 @@ def calculate_procurement():
             materialNum = int(material[1])
             remark = material[2]
             materialInfo = select_materialOfInfo(materialCode)
-            stockQuantity = materialInfo[0][5]
-            remainderQuantity = int(stockQuantity) - int(materialNum)
-            if remainderQuantity < 0:
-                result[i] = {'materialCode': materialCode,
-                           'materialName': materialInfo[0][1],
-                           'materialType': materialInfo[0][2],
-                           'department': materialInfo[0][4],
-                           'stockQuantity': materialInfo[0][5],
-                           'materialNum': materialNum,
-                           'remainderQuantity': 0,
-                           'lackQuantity': remainderQuantity,
-                           'supplierFactory': materialInfo[0][6],
-                           'remark': remark}
-                i += 1
-                # materialCode,sum(materialNum),remark
-                # materialCode, materialName,type,price, department, remainderAmount,supplierFactory
+            if materialInfo:
+                stockQuantity = materialInfo[0][5]
+                remainderQuantity = int(stockQuantity) - int(materialNum)
+                if remainderQuantity < 0:
+                    result[i] = {'materialCode': materialCode,
+                                 'materialName': materialInfo[0][1],
+                                 'materialType': materialInfo[0][2],
+                                 'department': materialInfo[0][4],
+                                 'stockQuantity': materialInfo[0][5],
+                                 'materialNum': materialNum,
+                                 'remainderQuantity': 0,
+                                 'lackQuantity': remainderQuantity,
+                                 'supplierFactory': materialInfo[0][6],
+                                 'remark': remark}
+                    # materialCode,sum(materialNum),remark
+                    # materialCode, materialName,type,price, department, remainderAmount,supplierFactory
+                else:
+                    result[i] = {'materialCode': materialCode,
+                                 'materialName': materialInfo[0][1],
+                                 'materialType': materialInfo[0][2],
+                                 'department': materialInfo[0][4],
+                                 'stockQuantity': materialInfo[0][5],
+                                 'materialNum': materialNum,
+                                 'remainderQuantity': remainderQuantity,
+                                 'lackQuantity': 0,
+                                 'supplierFactory': materialInfo[0][6],
+                                 'remark': remark}
             else:
                 result[i] = {'materialCode': materialCode,
-                             'materialName': materialInfo[0][1],
-                             'materialType': materialInfo[0][2],
-                             'department': materialInfo[0][4],
-                             'stockQuantity': materialInfo[0][5],
-                             'materialNum': materialNum,
-                             'remainderQuantity': remainderQuantity,
-                             'lackQuantity': 0,
-                             'supplierFactory': materialInfo[0][6],
-                             'remark': remark}
-                i += 1
+                             'exception': ("物料库中不存在物料%s！" % materialCode)}
+            i+=1
         return jsonify({'ok': True, 'result': result})
     else: return jsonify({'ok': -1})
 
@@ -242,31 +247,35 @@ def calculate_procurement2():
                 materialNum = int(material[1])
                 remark = material[2]
                 materialInfo = select_materialOfInfo(materialCode)
-                print("物料信息", materialInfo)
-                stockQuantity = materialInfo[0][5]
-                remainderQuantity = int(stockQuantity) - int(materialNum)
-                if remainderQuantity < 0:
-                    result[i] = {'materialCode': materialCode,
-                                 'materialName': materialInfo[0][1],
-                                 'materialType': materialInfo[0][2],
-                                 'department': materialInfo[0][4],
-                                 'stockQuantity': materialInfo[0][5],
-                                 'materialNum': materialNum,
-                                 'remainderQuantity': 0,
-                                 'lackQuantity': remainderQuantity,
-                                 'supplierFactory': materialInfo[0][6],
-                                 'remark': remark}
+                if materialInfo:
+                    print("物料信息", materialInfo)
+                    stockQuantity = materialInfo[0][5]
+                    remainderQuantity = int(stockQuantity) - int(materialNum)
+                    if remainderQuantity < 0:
+                        result[i] = {'materialCode': materialCode,
+                                     'materialName': materialInfo[0][1],
+                                     'materialType': materialInfo[0][2],
+                                     'department': materialInfo[0][4],
+                                     'stockQuantity': materialInfo[0][5],
+                                     'materialNum': materialNum,
+                                     'remainderQuantity': 0,
+                                     'lackQuantity': remainderQuantity,
+                                     'supplierFactory': materialInfo[0][6],
+                                     'remark': remark}
+                    else:
+                        result[i] = {'materialCode': materialCode,
+                                     'materialName': materialInfo[0][1],
+                                     'materialType': materialInfo[0][2],
+                                     'department': materialInfo[0][4],
+                                     'stockQuantity': materialInfo[0][5],
+                                     'materialNum': materialNum,
+                                     'remainderQuantity': remainderQuantity,
+                                     'lackQuantity': 0,
+                                     'supplierFactory': materialInfo[0][6],
+                                     'remark': remark}
                 else:
                     result[i] = {'materialCode': materialCode,
-                                 'materialName': materialInfo[0][1],
-                                 'materialType': materialInfo[0][2],
-                                 'department': materialInfo[0][4],
-                                 'stockQuantity': materialInfo[0][5],
-                                 'materialNum': materialNum,
-                                 'remainderQuantity': remainderQuantity,
-                                 'lackQuantity': 0,
-                                 'supplierFactory': materialInfo[0][6],
-                                 'remark': remark}
+                                 'exception':("物料库中不存在物料%s！"%materialCode)}
                 i += 1
         return jsonify({'ok': True, 'result': result})
     else: return jsonify({'ok': -1})
@@ -356,9 +365,10 @@ def procurement():
                 print(int(material['remainderAmount']))
                 update_materialOfInfo(material['materialCode'], int(material['remainderAmount']))
                 materialOfInfo = select_materialOfInfo(material['materialCode'])
-                insert_materialOfInOut(material['materialCode'], '出库', int(material['materialAmount']),
-                                       int(material['remainderAmount']),
-                                       int(material['remainderAmount']) * materialOfInfo[0][3])
+                if materialOfInfo:
+                    insert_materialOfInOut(material['materialCode'], '出库', int(material['materialAmount']),
+                                           int(material['remainderAmount']),
+                                           int(material['remainderAmount']) * materialOfInfo[0][3])
             return jsonify({'ok': True})
         elif request.method == 'GET':
             addProductForm = AddProductForm()
