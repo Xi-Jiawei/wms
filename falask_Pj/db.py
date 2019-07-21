@@ -165,6 +165,30 @@ def cc_changeAuthority(id,authority):
         print(e)
         conn.rollback()
 
+# cc 查询密码
+def select_pass(name):
+    sql = "select password from authority where personName='%s'" % (name)
+    conn.ping(reconnect=True)
+    cur.execute(sql)
+    result = cur.fetchall()
+    for record in result:
+        return record
+    conn.close()
+
+# cc 修改用户密码
+def update_pass(name, pwd):
+    sql = "update authority set password= '%s'  where personName='%s'" % (pwd, name)
+    print(sql)
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        # print("语句已经提交")
+    except:
+        conn.rollback()
+    conn.close()
+
 # Bill学生打卡记录
 def add_register(name):
     sql = "insert into register (accountingid,type,time) values(%s,%s,now())" % (name, 1)
@@ -930,8 +954,8 @@ def dao_material_out(materialCode, materialName, materialType, m_price,materialF
     # sql = "delete from materialofinfo where materialName = '%s' "%( materialName )
     # print("sql语句: "+sql)
     # 更新余库存
-    sql3 = " update materialofinfo set remainderAmount = remainderAmount - '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
-    sql4 = "select * from materialofinfo where materialName = '%s' " % (materialName)
+    sql3 = " update materialofinfo set remainderAmount = remainderAmount - '%d',remainderMoney = remainderMoney + '%lf'   where materialCode = '%s'" % (int(mNum), float(m_price) * int(mNum), materialCode)
+    sql4 = "select * from materialofinfo where materialCode = '%s' " % (materialCode)
 
     try:
         cur.execute(sql3)

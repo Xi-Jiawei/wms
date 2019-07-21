@@ -112,13 +112,13 @@ def index_operator():
 @app.route('/', methods=['GET', 'POST'])
 def user_login():
     print(session)
+    # if session:
     if session.get('username'):
         username = session['username']
         # session.pop('username')
         print('session 不为空 ', username)
         print("开始调用函数获取用户类型")
         Authority = login_Authority(username)
-        print("Authority", Authority)
         if Authority == '888':
             print("admin login!")
             return redirect(url_for('index_adm'))
@@ -128,6 +128,7 @@ def user_login():
 
     # print(session[0])
     if request.method == "POST":
+        session.clear()
         print(request.form)
         user = User()
         stu_id = user.id = request.form["user_id"]
@@ -146,6 +147,7 @@ def user_login():
                 return redirect(url_for('index_operator'))
         else:
             message = "用户名或者密码错误"
+            session.clear()
             return render_template('user_login.html', message=message)
         print("name:  pwd:", user.name, user.pwd)
         return redirect(url_for("user_login"))  # 跳到主页
@@ -192,6 +194,7 @@ def changepassword():
             # return 'ok'
             message = "密码修改成功，请重新登陆"
             # session.pop(user.name)
+            # session.clear()
             return redirect(url_for("user_login"))  # 跳到主页
             # return render_template('user_login.html', message=message)
         else:
@@ -345,8 +348,9 @@ def cc_change_pass():
             # return 'ok'
             message = "密码修改成功，请重新登陆"
             # session.pop(user.name)
-            # return redirect(url_for("user_login"))  # 跳到主页
-            return render_template('user_login.html', message=message)
+            session.clear()
+            return redirect(url_for("user_login"))  # 跳到主页
+            # return render_template('user_login.html', message=message)
         else:
             message = "旧密码有误，请重新输入"
             print("旧密码有误，请重新输入")
