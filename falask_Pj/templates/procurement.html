@@ -68,7 +68,7 @@
 
                 {% if authority=="3" or authority=="2"%}
                     <li>
-                        <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购清单</a>
+                        <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购记录</a>
                     </li>
                 {% endif %}
 
@@ -154,9 +154,9 @@
             <div class="row">
 
                 <div class="col-md-12">
-                    <div class="card" style="overflow: hidden">
+                    <div id="procurement_div" class="card" style="overflow: hidden">
                         <div class="card-header">
-                            <strong class="card-title">所有成品信息概览</strong>
+                            <strong class="card-title">采购清单</strong>
                         </div>
                         <div class="card-body">
                             <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
@@ -181,8 +181,11 @@
                                 <tbody>
                                 </tbody>
                             </table>
+
                         </div>
                     </div>
+
+                    <button type="button" onclick="printpage()">打印采购清单</button>
                 </div>
 
             </div>
@@ -739,6 +742,20 @@
             }
         });
     });
+
+    function printpage(){
+        var newstr = document.getElementById("procurement_div").innerHTML;
+        var oldstr = document.body.innerHTML;
+        document.body.innerHTML = newstr;
+        window.print();
+        document.body.innerHTML = oldstr;
+        return false;
+
+        /*var printHtml = document.getElementById("procurement_div").innerHTML;
+        var wind = window.open("",'newwindow', 'height=300, width=700, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=n o, status=no');
+        wind.document.body.innerHTML = printHtml;
+        wind.print();*/
+    }
 </script>
 
 </body>
