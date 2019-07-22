@@ -66,7 +66,7 @@
 
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
 
-                {% if authority=="3" or authority=="2"%}
+                {% if authority=="3" or authority=="2" or authority=="8"%}
                     <li>
                         <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购记录</a>
                     </li>

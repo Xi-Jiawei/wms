@@ -44,7 +44,7 @@
                     <li class="active">
                         <a href="{{ url_for("product_management.show_products") }}  "><i class="menu-icon fa fa-cogs"></i>成品列表</a>
                     </li>
-                    {% if authority=='3'%}
+                    {% if authority=='3' or authority=="8"%}
                     <li>
                         <a href="{{ url_for("product_management.add_product") }}"> <i class="menu-icon fa fa-th"></i>添加成品</a>
                     </li>
@@ -114,7 +114,7 @@
                                             <th>成品编码</th>
                                             <th>成品型号</th>
                                             <th>交易客户</th>
-                                            {% elif authority=='2' or authority=='3'%}
+                                            {% elif authority=='2' or authority=='3' or authority=="8"%}
                                             <th>成品编码</th>
                                             <th>成品型号</th>
                                             <th>交易客户</th>
@@ -132,7 +132,7 @@
                                             <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
                                             </tr>
                                     {% endfor %}
-                                            {% elif authority=='2' or authority=='3'%}
+                                            {% elif authority=='2' or authority=='3' or authority=="8"%}
                                     {% for i in products %}
                                             <tr>
                                             <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>

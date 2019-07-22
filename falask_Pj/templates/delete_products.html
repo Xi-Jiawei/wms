@@ -131,7 +131,7 @@
                                             <th>成品编码</th>
                                             <th>成品型号</th>
                                             <th>交易客户</th>
-                                        {% elif authority=='2' or authority=='3'%}
+                                        {% elif authority=='2' or authority=='3' or authority=="8"%}
                                             <th width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
                                             <th>成品编码</th>
                                             <th>成品型号</th>
@@ -151,7 +151,7 @@
                                                 <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
                                             </tr>
                                         {% endfor %}
-                                    {% elif authority=='2' or authority=='3'%}
+                                    {% elif authority=='2' or authority=='3' or authority=="8"%}
                                         {% for i in products %}
                                             <tr>
                                                 <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
