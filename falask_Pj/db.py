@@ -20,6 +20,7 @@ def select(table, conf):
 # 登录
 def loginCheck(name, pwd):
     sql = "select * from authority where personName='%s' and password='%s'" % (name, pwd)
+    conn.ping(reconnect=True)
     cur.execute(sql)
     result = cur.fetchall()
     if (len(result)) == 0:
@@ -28,7 +29,6 @@ def loginCheck(name, pwd):
         return True
     conn.close()
 
-
 # 登录查询返回用户类型
 def login_Authority(id):
     conn.ping(reconnect=True)
@@ -36,10 +36,10 @@ def login_Authority(id):
     # sql = "select authority from  authority where personName='"+id+"';"
     cur.execute(sql)
     result = cur.fetchone()
-    for record in result:
-        return record
+    if result != None:
+        for record in result:
+            return record
     conn.close()
-
 
 # 登录查询返回用户密码
 def select_pwd(name):
@@ -1005,9 +1005,13 @@ def dao_material_edit(materialCode, materialName, materialType, mDepartment,m_pr
     sql = "update materialofinfo " \
           "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialCode='%s'" \
           % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory,mCode)
-    print("sql语句: "+sql)
+    sql2 = "update materialofinout " \
+          "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialCode='%s'" \
+          % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory, mCode)
+    # print("sql语句: "+sql)
     try:
         cur.execute(sql)
+        cur.execute(sql2)
         conn.commit()
         return True
         conn.close()

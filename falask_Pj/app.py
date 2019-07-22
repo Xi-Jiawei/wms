@@ -518,7 +518,7 @@ def material_outorin(mCode):
                 return render_template('material_outorin.html', message=message)
 
     else:
-        print(material_init)
+        # print(material_init)
         for i in material_init:
             materialCode = i[0]
             materialName = i[1]
@@ -526,8 +526,10 @@ def material_outorin(mCode):
             mDepartment = i[3]
             m_price = i[4]
             materialFactory = i[7]
+        materialinfoAll = dao_show_materialinfo()
         return render_template('material_outorin.html',materialCode=materialCode,materialName=materialName,
-                               materialType=materialType,mDepartment=mDepartment,m_price=m_price,materialFactory=materialFactory,personName=personName)
+                               materialType=materialType,mDepartment=mDepartment,m_price=m_price,
+                               materialFactory=materialFactory,personName=personName,materialinfoAll=materialinfoAll)
 
 # xijiawei
 # 添加“product_management.py”蓝本
