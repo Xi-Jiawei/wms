@@ -98,7 +98,7 @@
                                     <label>物料编码</label>
                                     <input type="text" id="materialCode" name="materialCode" class="form-control"
                                             {% if materialCode == '' %}
-                                           placeholder="CODE1"
+                                           placeholder="出库必填"
                                             {% else %}
                                            value={{ materialCode }}
                                             {% endif %}>
@@ -108,7 +108,7 @@
                                     <label>物料名称</label>
                                     <br>
                                     <input type="text" id=" materialName" name="materialName" class="form-control"
-                                           placeholder="出库必填"
+                                           placeholder="物料名称"
                                             {% if materialName == '' %}
                                            placeholder="物料1号"
                                             {% else %}
