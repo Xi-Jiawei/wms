@@ -91,14 +91,47 @@
 
                 <div class="col-md-12">
                     <div class="card">
+
+                     <div class="card-body">
+                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>物料编码</th>
+                                    <th>物料名称</th>
+                                    <th>物料型号规格</th>
+                                    <th>单位</th>
+                                    <th>单价</th>
+                                    <th>余库存数量</th>
+                                    <th>余库存金额</th>
+                                    <th>供货厂家</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for i in materialinfoAll %}
+                                    <tr>
+                                        <td><a href="{{ url_for('material_outorin',mCode= i[0]) }}">{{ i[0] }}</a></td>
+                                        <td>{{ i[1] }}</td>
+                                        <td>{{ i[2] }}</td>
+                                        <td>{{ i[3] }}</td>
+                                        <td>{{ i[4] }}</td>
+                                        <td>{{ i[5] }}</td>
+                                        <td>{{ i[6] }}</td>
+                                        <td>{{ i[7] }}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+
+
                         <div class="card" style="height:65px">
                             <form role="form" method="post">
-
                             <div class="col-md-2">
                                     <label>物料编码</label>
                                     <input type="text" id="materialCode" name="materialCode" class="form-control"
                                             {% if materialCode == '' %}
-                                           placeholder="CODE1"
+                                           placeholder="出库必填"
                                             {% else %}
                                            value={{ materialCode }}
                                             {% endif %}>
@@ -108,7 +141,7 @@
                                     <label>物料名称</label>
                                     <br>
                                     <input type="text" id=" materialName" name="materialName" class="form-control"
-                                           placeholder="出库必填"
+                                           placeholder="物料名称"
                                             {% if materialName == '' %}
                                            placeholder="物料1号"
                                             {% else %}

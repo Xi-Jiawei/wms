@@ -1,1 +1,1 @@
-# WareHouseManageSystem
+# WarehouseManagementSystem
