@@ -35,7 +35,7 @@ def add_product():
         authority = login_Authority(username)
         if authority[1] == '1' or authority[1] == '2':
             return render_template('test_fail.html')
-        elif authority[1]=='3':
+        elif authority[1]=='3' or authority[1]=='8':
             # if addProductForm.validate_on_submit():
             if request.method == "POST":
                 data = request.get_json()
@@ -130,7 +130,7 @@ def edit_product(productCode):
                                    processCost=processCost, adminstrationCost=adminstrationCost,
                                    supplementaryCost=supplementaryCost, operatingCost=operatingCost,
                                    materialOfProduct=materialOfProduct, otherCosts=otherCosts)
-        elif authority[1]=='3':
+        elif authority[1]=='3' or authority[1]=='8':
             print("当前权限可编辑")
 
             # if addProductForm.validate_on_submit():
