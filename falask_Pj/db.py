@@ -930,6 +930,7 @@ def dao_show_material(materialCode, materialName, materialTime, materialType, ma
 def dao_show_materialinfo():
     conf = []
     result = select('materialofinfo',conf)
+    conn.ping(reconnect=True)
     return result
     conn.close()
 
