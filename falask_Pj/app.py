@@ -455,6 +455,7 @@ def show_material():
 @app.route('/material_outorin/<mCode>', methods=['GET', 'POST'])
 def material_outorin(mCode):
     material_init = dao_show_materialoutorin(mCode)
+    materialinfoAll = dao_show_materialinfo()
     materialCode = ''
     materialName = ''
     materialType = ''
@@ -483,11 +484,11 @@ def material_outorin(mCode):
            if dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
                 print("出库成功")
                 message = "出库成功"
-                return render_template('material_outorin.html', message=message)
+                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
            else:
                 message = "出库失败,请重新填写"
                 print("出库失败,请重新填写")
-                return render_template('material_outorin.html', message=message)
+                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
                 #   session.pop(user.name)
         elif isinorout == '0':
             # print("入库！")
@@ -495,11 +496,11 @@ def material_outorin(mCode):
             if dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
                 print("入库成功")
                 message = "入库成功"
-                return render_template('material_outorin.html', message=message)
+                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
             else:
                 message = "入库失败,请重新填写"
                 print("入库失败,请重新填写")
-                return render_template('material_outorin.html', message=message)
+                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
                 #   session.pop(user.name)
         else :
             materialCode = request.form["materialCode"]
@@ -512,10 +513,10 @@ def material_outorin(mCode):
             if dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price, materialFactory,mCode):
                 print("修改成功")
                 message = "修改成功"
-                return render_template('material_outorin.html', message=message)
+                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
             else:
                 message = "修改成功,请重新填写"
-                return render_template('material_outorin.html', message=message)
+                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
 
     else:
         # print(material_init)
@@ -526,7 +527,7 @@ def material_outorin(mCode):
             mDepartment = i[3]
             m_price = i[4]
             materialFactory = i[7]
-        materialinfoAll = dao_show_materialinfo()
+
         return render_template('material_outorin.html',materialCode=materialCode,materialName=materialName,
                                materialType=materialType,mDepartment=mDepartment,m_price=m_price,
                                materialFactory=materialFactory,personName=personName,materialinfoAll=materialinfoAll)
