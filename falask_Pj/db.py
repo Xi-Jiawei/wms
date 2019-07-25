@@ -728,7 +728,7 @@ def select_maxid_procurement():
 # xijiawei
 # 插入成品录入表
 def select_procurementByID(id):
-    sql = "select productCode,productNum from procurement where id='%d';"
+    sql = "select productCode,productNum,productType,client from procurement where id='%d';"%(id)
     try:
         cur.execute(sql)
         result = cur.fetchall()
@@ -739,7 +739,26 @@ def select_procurementByID(id):
 
 # xijiawei
 # 更新成品物料组成表
-def delete_procurementsByID(id,entryDate):
+def delete_procurementsByID(id):
+    sql = "delete from procurement where id='%d';" \
+          % (id)
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("删除异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 更新成品物料组成表
+def delete_procurementsByIDAndDate(id,entryDate):
     sql = "delete from procurement where id='%d'and entryDate='%s';" \
           % (id,entryDate)
     try:
@@ -762,6 +781,23 @@ def insert_procurement(id,productCode,productType,productNum,client,entryClerk,e
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
     sql = "insert into procurement (id,productCode,productType,productNum,client,entryClerk,entryDate)value('%d','%s','%s','%d','%s','%s','%s');" \
           % (id,productCode,productType,productNum,client,entryClerk,entryDate)
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 插入成品录入表
+def update_procurement(id,productCode,productType,productNum,client,entryClerk,entryDate):
+    # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    sql = "update procurement set productCode='%s',productType='%s',productNum='%d',client='%s',entryClerk='%s',entryDate='%s' where id='%d';" \
+          % (productCode,productType,productNum,client,entryClerk,entryDate,id)
     try:
         # 执行SQL语句
         cur.execute(sql)

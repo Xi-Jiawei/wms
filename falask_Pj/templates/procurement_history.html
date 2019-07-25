@@ -146,13 +146,13 @@
                                             <td><input type='checkbox' name='checkbox' value='checkbox'/></td>
                                         {% endif %}
                                         <td></td>
-                                        <td>{{ i[0] }}</td>
-                                        <td>{{ i[1] }}</td>
-                                        <td>{{ i[2] }}</td>
-                                        <td>{{ i[3] }}</td>
-                                        <td>{{ i[4] }}</td>
-                                        <td>{{ i[5] }}</td>
-                                        <td>{{ i[6] }}</td>
+                                        <td><a href="{{ url_for("procurement.edit_procurement",id=i[0])}}">{{ i[0] }}</a></td>
+                                        <td><a href="{{ url_for("procurement.edit_procurement",id=i[0])}}">{{ i[1] }}</a></td>
+                                        <td><a href="{{ url_for("procurement.edit_procurement",id=i[0])}}">{{ i[2] }}</a></td>
+                                        <td><a href="{{ url_for("procurement.edit_procurement",id=i[0])}}">{{ i[3] }}</a></td>
+                                        <td><a href="{{ url_for("procurement.edit_procurement",id=i[0])}}">{{ i[4] }}</a></td>
+                                        <td><a href="{{ url_for("procurement.edit_procurement",id=i[0])}}">{{ i[5] }}</a></td>
+                                        <td><a href="{{ url_for("procurement.edit_procurement",id=i[0])}}">{{ i[6] }}</a></td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -225,8 +225,10 @@
                 if(chkOrder.type = "CHECKBOX") {
                     if (chkOrder.checked) {
                         console.log(table.rows[i].cells[8].innerHTML);
-                        procurementArr[j] = {"id":table.rows[i].cells[2].innerHTML,
-                            "entryDate":table.rows[i].cells[8].innerHTML};
+                        /*procurementArr[j] = {"id":table.rows[i].cells[2].innerHTML,
+                            "entryDate":table.rows[i].cells[8].innerHTML};*/
+                        procurementArr[j] = {"id":table.rows[i].cells[2].firstChild.innerHTML,
+                            "entryDate":table.rows[i].cells[8].firstChild.innerHTML};
                         j++;
                     }
                 }
@@ -283,7 +285,7 @@
                     oTable.rows[i].cells[1].innerHTML = i;
             }
             if (i % 2 == 0)
-                oTable.rows[i].className = "ys01";
+                oTable.rows[i].className = "ot";
         }
     };
 

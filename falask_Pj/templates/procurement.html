@@ -72,9 +72,20 @@
                     </li>
                 {% endif %}
 
-                <li class="active">
-                    <a href="{{ url_for("procurement.procurement") }}  "><i class="menu-icon fa fa-cogs"></i>添加采购</a>
-                </li>
+                {% if setting==0 %}
+                    <li class="active">
+                        <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
+                    </li>
+                {% endif %}
+
+                {% if setting==1 %}
+                    <li>
+                        <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
+                    </li>
+                    <li class="active">
+                        <a href=""><i class="menu-icon fa fa-cogs"></i>修改采购</a>
+                    </li>
+                {% endif %}
 
             </ul>
         </div><!-- /.navbar-collapse -->
@@ -179,6 +190,23 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                {% if procurement %}
+                                {% for i in procurement %}
+                                <tr>
+                                <td></td>
+                                <td>{{ i[0] }}</td>
+                                <td>{{ i[1] }}</td>
+                                <td>{{ i[2] }}</td>
+                                <td>{{ i[3] }}</td>
+                                <td>{{ i[4] }}</td>
+                                <td>{{ i[5] }}</td>
+                                <td>{{ i[6] }}</td>
+                                <td>{{ i[7] }}</td>
+                                <td>{{ i[8] }}</td>
+                                <td>{{ i[9] }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
                                 </tbody>
                             </table>
 
@@ -278,7 +306,35 @@
             console.log(data);
 
             //alert("提交");
-
+            var url=document.URL;
+            if(url.indexOf("edit_procurement")>=0) {
+                $.ajax({
+                    //url: '/edit_procurement',
+                    url:url.substring(url.indexOf("/edit_procurement"),url.length),
+                    type: "POST",
+                    dataType: "json",
+                    //data:$(this).serialize(),
+                    data:JSON.stringify(data),
+                    contentType: 'application/json; charset=UTF-8',
+                    success: function (callback) {
+                        console.log(callback);
+                        //alert(callback['ok']);//不要用callback.valueOf('ok')
+                        if(callback['ok']){
+                            alert('更新成功');
+                            //var result=callback['result']
+                            window.location.href="/procurement_history";//跳转地址
+                        }else if(!callback['ok']){
+                            alert("成品编码或成品型号输入错误！");
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.log(xhr.status);// 状态码
+                        console.log(xhr.readyState);// 状态
+                        console.log(textStatus);// 错误信息
+                        alert('返回值错误');
+                    }
+                });
+            }else {
             $.ajax({
                 //url: "/procurement",
                 url: '/procurement',
@@ -305,6 +361,7 @@
                     alert('返回值错误');
                 }
             });
+            }
         });
     })
 </script>
@@ -742,6 +799,30 @@
             }
         });
     });
+
+    /*为表格添加序号*/
+    window.onload = function() {
+        //var oTable = document.getElementsByTagName("table");
+        var oTable=document.getElementById('procurement_table');
+        console.log("mark");
+        console.log(oTable);
+        console.log(oTable.rows.length);
+        for ( var i = 1; i < oTable.rows.length; i++) {
+            console.log(i);
+            console.log(oTable.rows[i].cells[0]);
+            if(oTable.rows[i].cells[0].firstChild==null)
+                oTable.rows[i].cells[0].innerHTML = i;
+            else {
+                var tdInner=oTable.rows[i].cells[0].firstChild;
+                console.log(tdInner);
+                console.log(tdInner.type);
+                if (tdInner.type != "CHECKBOX")
+                    oTable.rows[i].cells[1].innerHTML = i;
+            }
+            if (i % 2 == 0)
+                oTable.rows[i].className = "ot";
+        }
+    };
 
     function printpage(){
         var newstr = document.getElementById("procurement_div").innerHTML;
