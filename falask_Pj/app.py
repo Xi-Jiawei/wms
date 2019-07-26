@@ -243,6 +243,7 @@ def person_management():
 # cc 人员管理_查看人员
 @app.route('/show_person',methods=['GET', 'POST'])
 def show_person():
+    personName = session['username']
     temp = list(show_allperson())
     person = []
     for i in temp:
@@ -259,7 +260,7 @@ def show_person():
             i[3] = sa + "、" + sb + "、" + sc
         person.append(i)
     # print(person)
-    return render_template('person_management_show.html',person =person)
+    return render_template('person_management_show.html', person=person, personName=personName)
 
 # cc 查看人员管理的数字映射权限
 def person_authority(auth):
@@ -293,7 +294,21 @@ def add_person():
 @app.route('/delete_person',methods=['GET', 'POST'])
 def delete_person():
     result = cc_findname()
-    person = show_allperson()
+    temp = list(show_allperson())
+    person = []
+    for i in temp:
+        i = list(i)
+        if i[3] == '888':
+            i[3] = "管理员"
+        else:
+            a = i[3][0]
+            b = i[3][1]
+            c = i[3][2]
+            sa = "物料" + person_authority(a)
+            sb = "成品" + person_authority(b)
+            sc = "采购" + person_authority(c)
+            i[3] = sa + "、" + sb + "、" + sc
+        person.append(i)
     form = SelectForm()
     if request.method == "POST":
         print("删除人员: ")
@@ -306,7 +321,21 @@ def delete_person():
 # cc 人员管理_权限管理
 @app.route('/change_person',methods=['GET', 'POST'])
 def change_person():
-    person = show_allperson()
+    temp = list(show_allperson())
+    person = []
+    for i in temp:
+        i = list(i)
+        if i[3] == '888':
+            i[3] = "管理员"
+        else:
+            a = i[3][0]
+            b = i[3][1]
+            c = i[3][2]
+            sa = "物料" + person_authority(a)
+            sb = "成品" + person_authority(b)
+            sc = "采购" + person_authority(c)
+            i[3] = sa + "、" + sb + "、" + sc
+        person.append(i)
     form = ChangeForm()
     if request.method == "POST":
         print("修改人员权限")
