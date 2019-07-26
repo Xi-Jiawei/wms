@@ -23,7 +23,7 @@ def show_products():
         username = session['username']
         authority = login_Authority(username)
         products = select_all_products()
-        return render_template('show_products.html', authority=authority[1], products=products)
+        return render_template('show_products.html', authority=authority[1], products=products,username=username)
     else:
         return render_template('test_fail.html')
 
@@ -82,10 +82,10 @@ def add_product():
                     return jsonify({'ok': "type"})
             elif request.method == 'GET':
                 create_materialsOfProduct_temp()
-                return render_template('edit_product.html', setting=0, form=addProductForm) # setting为0表示新添，setting为1表示编辑
+                return render_template('edit_product.html', setting=0, form=addProductForm,username=username) # setting为0表示新添，setting为1表示编辑
             else:
                 create_materialsOfProduct_temp()
-                return render_template('edit_product.html', form=addProductForm)
+                return render_template('edit_product.html', form=addProductForm,username=username)
         else:
             return render_template('test_fail.html')
     else:
@@ -129,7 +129,8 @@ def edit_product(productCode):
                                    materialCost=materialCost,
                                    processCost=processCost, adminstrationCost=adminstrationCost,
                                    supplementaryCost=supplementaryCost, operatingCost=operatingCost,
-                                   materialOfProduct=materialOfProduct, otherCosts=otherCosts)
+                                   materialOfProduct=materialOfProduct, otherCosts=otherCosts,
+                                   username=username)
         elif authority[1]=='3' or authority[1]=='8':
             print("当前权限可编辑")
 
@@ -199,10 +200,11 @@ def edit_product(productCode):
                 return render_template('edit_product.html', setting=1, form=addProductForm, productCode=productCode, materialCost=materialCost,
                                        processCost=processCost, adminstrationCost=adminstrationCost,
                                        supplementaryCost=supplementaryCost, operatingCost=operatingCost,
-                                       materialOfProduct=materialOfProduct, otherCosts=otherCosts)
+                                       materialOfProduct=materialOfProduct, otherCosts=otherCosts,
+                                       username=username)
             else:
                 create_materialsOfProduct_temp()
-                return render_template('edit_product.html', form=addProductForm)
+                return render_template('edit_product.html', form=addProductForm,username=username)
         else:
             return render_template('test_fail.html')
     else:
@@ -226,9 +228,9 @@ def delete_products():
                 # delete_otherCosts(productCode)
             return jsonify({'ok': True})
         elif request.method == "GET":
-            return render_template('delete_products.html', authority=authority[1], form=addProductForm, products=products)
+            return render_template('delete_products.html', authority=authority[1], form=addProductForm, products=products,username=username)
         else:
-            return render_template('delete_products.html', authority=authority[1], form=addProductForm, products=products)
+            return render_template('delete_products.html', authority=authority[1], form=addProductForm, products=products,username=username)
     else:
         return render_template('test_fail.html')
 

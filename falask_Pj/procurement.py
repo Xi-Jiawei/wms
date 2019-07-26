@@ -43,7 +43,8 @@ def procurement_history():
                     procurement_history[i][6] = procurementResult[i][6]
             return render_template('procurement_history.html', form=addProductForm,
                                    procurement_history=procurement_history,
-                                   authority=authority[2])
+                                   authority=authority[2],
+                                   username=username)
         else:
             return render_template('test_fail.html')
 
@@ -372,7 +373,7 @@ def procurement():
             return jsonify({'ok': True})
         elif request.method == 'GET':
             addProductForm = AddProductForm()
-            return render_template('procurement.html', setting=0, form=addProductForm, authority=authority[2])
+            return render_template('procurement.html', setting=0, form=addProductForm, authority=authority[2],username=username)
     else:
         return render_template('test_fail.html')
 
@@ -491,6 +492,6 @@ def edit_procurement(id):
             addProductForm.productCodeOrTypeInput.data = productCodeStr[1:]
             addProductForm.productNum.data = productNumStr[1:]
             addProductForm.client.data = client
-            return render_template('procurement.html', setting=1,form=addProductForm,procurement=procurement, authority=authority[2])
+            return render_template('procurement.html', setting=1,form=addProductForm,procurement=procurement, authority=authority[2],username=username)
     else:
         return render_template('test_fail.html')
