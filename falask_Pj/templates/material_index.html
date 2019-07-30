@@ -99,16 +99,6 @@
                             <form role="form" method="post">
 
                                 <div class="col-md-2">
-                                    <label>时间</label>
-                                    <input type="text" id="materialTime" name="materialTime" class="form-control"
-                                            {% if materialTime == '' %}
-                                           placeholder="20190706"
-                                            {% else %}
-                                           value={{ materialTime }}
-                                            {% endif %}>
-                                </div>
-
-                                <div class="col-md-2">
                                     <label>物料编码</label>
                                     <input type="text" id="materialCode" name="materialCode" class="form-control"
                                             {% if materialCode == '' %}
@@ -135,7 +125,7 @@
                                             {% if materialType == '' %}
                                            placeholder="型号1号"
                                             {% else %}
-                                           value={{ materialName }}
+                                           value={{ materialType }}
                                             {% endif %}>
                                 </div>
                                 <div class="col-md-2">

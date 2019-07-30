@@ -939,20 +939,7 @@ def update_materialsOfProduct_temp(id,materialCode):
         conn.rollback()
 
 # lh1  查看物料
-def dao_show_material(materialCode, materialName, materialTime, materialType, materialFactory):
-    conf = []
-    # if materialTime == '':
-    #     conf.append(' and DATE_FORMAT(BehaviorTime,\'%Y%m%d\') >= \'20180102\'')
-    # else:
-    #     conf.append(' and DATE_FORMAT(BehaviorTime,\'%Y%m%d\') >= \'' + materialName + '\'')
-    if materialCode != '':
-        conf.append(' and materialCode = \'' + materialCode + '\'')
-    if materialName != '':
-        conf.append(' and materialName = \'' + materialName + '\'')
-    if materialType != '':
-        conf.append(' and type = ' + materialType)
-    if materialFactory != '':
-        conf.append(' and supplierFactory =\'' + materialFactory + '\'')
+def dao_show_material(materialCode, materialName, materialType, materialFactory):
 
     sql = 'select t1.materialCode,t1.materialName,t1.type,t1.department,t2.afterAmount,t2.afterMoney,' \
           't1.supplierFactory,t2.isInOrOut,t1.price,t2.amount,t2.totalPrice,t2.documentNumber,t2.time,t2.personName' \
