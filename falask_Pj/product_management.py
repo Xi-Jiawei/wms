@@ -23,9 +23,9 @@ def show_products():
         username = session['username']
         authority = login_Authority(username)
         products = select_all_products()
-        return render_template('show_products.html', authority=authority[1], products=products,username=username)
+        return render_template('products_show.html', authority=authority[1], products=products, username=username)
     else:
-        return render_template('test_fail.html')
+        return render_template('access_fail.html')
 
 @product_management.route('/add_product', methods=['GET', 'POST'])
 def add_product():
@@ -34,7 +34,7 @@ def add_product():
         username = session['username']
         authority = login_Authority(username)
         if authority[1] == '1' or authority[1] == '2':
-            return render_template('test_fail.html')
+            return render_template('access_fail.html')
         elif authority[1]=='3' or authority[1]=='8':
             # if addProductForm.validate_on_submit():
             if request.method == "POST":
@@ -82,14 +82,14 @@ def add_product():
                     return jsonify({'ok': "type"})
             elif request.method == 'GET':
                 create_materialsOfProduct_temp()
-                return render_template('edit_product.html', setting=0, form=addProductForm,username=username) # setting为0表示新添，setting为1表示编辑
+                return render_template('product_edit.html', setting=0, form=addProductForm, username=username) # setting为0表示新添，setting为1表示编辑
             else:
                 create_materialsOfProduct_temp()
-                return render_template('edit_product.html', form=addProductForm,username=username)
+                return render_template('product_edit.html', form=addProductForm, username=username)
         else:
-            return render_template('test_fail.html')
+            return render_template('access_fail.html')
     else:
-        return render_template('test_fail.html')
+        return render_template('access_fail.html')
 
 @product_management.route('/edit_product/<productCode>', methods=['GET', 'POST'])
 def edit_product(productCode):
@@ -97,7 +97,7 @@ def edit_product(productCode):
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
-        if authority[1]=='1' or authority[1]=='2':
+        if authority[1]=='2':
             print("当前权限仅限查看")
 
             productInfo = select_productInfoByCode(productCode)
@@ -125,7 +125,7 @@ def edit_product(productCode):
             otherCosts = select_otherCostsByCode(productCode)
 
             # setting为0表示新添，setting为1表示编辑
-            return render_template('view_product.html', setting=1, form=addProductForm, productCode=productCode,
+            return render_template('product_view.html', setting=1, form=addProductForm, productCode=productCode,
                                    materialCost=materialCost,
                                    processCost=processCost, adminstrationCost=adminstrationCost,
                                    supplementaryCost=supplementaryCost, operatingCost=operatingCost,
@@ -197,18 +197,18 @@ def edit_product(productCode):
                 otherCosts = select_otherCostsByCode(productCode)
 
                 # setting为0表示新添，setting为1表示编辑
-                return render_template('edit_product.html', setting=1, form=addProductForm, productCode=productCode, materialCost=materialCost,
+                return render_template('product_edit.html', setting=1, form=addProductForm, productCode=productCode, materialCost=materialCost,
                                        processCost=processCost, adminstrationCost=adminstrationCost,
                                        supplementaryCost=supplementaryCost, operatingCost=operatingCost,
                                        materialOfProduct=materialOfProduct, otherCosts=otherCosts,
                                        username=username)
             else:
                 create_materialsOfProduct_temp()
-                return render_template('edit_product.html', form=addProductForm,username=username)
+                return render_template('product_edit.html', form=addProductForm, username=username)
         else:
-            return render_template('test_fail.html')
+            return render_template('access_fail.html')
     else:
-        return render_template('test_fail.html')
+        return render_template('access_fail.html')
 
 # xijiawei
 # jQuery测试
@@ -228,41 +228,11 @@ def delete_products():
                 # delete_otherCosts(productCode)
             return jsonify({'ok': True})
         elif request.method == "GET":
-            return render_template('delete_products.html', authority=authority[1], form=addProductForm, products=products,username=username)
+            return render_template('products_delete.html', authority=authority[1], form=addProductForm, products=products, username=username)
         else:
-            return render_template('delete_products.html', authority=authority[1], form=addProductForm, products=products,username=username)
+            return render_template('products_delete.html', authority=authority[1], form=addProductForm, products=products, username=username)
     else:
-        return render_template('test_fail.html')
-
-# xijiawei
-# jQuery测试
-@product_management.route('/test', methods=['GET', 'POST'], defaults={"param": 15679182096})
-def test(param):
-    if request.method == "POST":
-        # val = request.form.get('username','')
-        # print(val)
-        data = request.get_data()
-        print("data: %s" %(data))
-        json_data = request.get_json()
-        print("json_data: %s" %(json_data))
-        return jsonify({'ok': True})
-    else: return render_template('test.html',telephone=param)
-
-@product_management.route('/test2', methods=['GET', 'POST'])
-def test2():
-    if request.method == "POST":
-        val = request.form
-        print(val)
-        return jsonify({'ok': True})
-    else: return render_template('test.html')
-
-@product_management.route('/test_table', methods=['GET', 'POST'])
-def tabledata():
-    if request.method == "POST":
-        val = request.form
-        print(val)
-        return render_template('test_table.html')
-    else: return render_template('test_table.html')
+        return render_template('access_fail.html')
 
 # xijiawei
 # 创建物料组成临时表

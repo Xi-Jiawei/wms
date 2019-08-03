@@ -96,13 +96,9 @@
                 </li>
                 {% endif %}
                 {% if Authority[2] == '0' %}
-                {% elif  Authority[2] == '3' or Authority[2] == '2' %}
+                {% else %}
                 <li>
                     <a href="{{ url_for("procurement.procurement_history") }}"> <i class="menu-icon fa fa-table"></i>采购管理</a>
-                </li>
-                {% elif  Authority[2] == '1' %}
-                <li>
-                    <a href="{{ url_for("procurement.procurement") }}"> <i class="menu-icon fa fa-table"></i>采购管理</a>
                 </li>
                 {% endif %}
                  <li>
@@ -130,7 +126,7 @@
                 <div class="user-area dropdown float-right">
                     <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
                        aria-expanded="false">
-                        <img class="user-avatar rounded-circle" src="images/admin.jpg" alt="{{ personName }}">
+                        <img class="user-avatar rounded-circle" src="/static/images/admin.jpg" alt="{{ personName }}">
                     </a>
 
                     <div class="user-menu dropdown-menu">

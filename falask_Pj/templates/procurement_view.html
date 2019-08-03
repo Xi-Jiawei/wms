@@ -66,27 +66,12 @@
 
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
 
-                {% if authority=="3" or authority=="2" or authority=="8"%}
-                    <li>
-                        <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购记录</a>
-                    </li>
-                {% endif %}
-
-                {% if setting==0 %}
-                    <li class="active">
-                        <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
-                    </li>
-                {% endif %}
-
-                {% if setting==1 %}
-                    <li>
-                        <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
-                    </li>
-                    <li class="active">
-                        <a href=""><i class="menu-icon fa fa-cogs"></i>修改采购</a>
-                    </li>
-                {% endif %}
-
+                <li>
+                    <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购记录</a>
+                </li>
+                <li class="active">
+                    <a href=""><i class="menu-icon fa fa-cogs"></i>采购清单</a>
+                </li>
             </ul>
         </div><!-- /.navbar-collapse -->
     </nav>
@@ -220,14 +205,16 @@
 
             </div>
 
-            <div class="footer">
-                <div class="row">
-                    <div class="col-xs-12">
-                        {{ form.ok_submit }}
-                        {{ form.csrf_token }}
+            {% if authority=='3' or authority=='8' %}
+                <div class="footer">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form.ok_submit }}
+                            {{ form.csrf_token }}
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </form>
     </div><!-- .content -->
 </div>
@@ -256,234 +243,6 @@
 
 <script src="/static/jquery/jquery-2.1.4.min.js"></script>
 <script>
-    $(function() {
-        $("#procurement_form").submit(function(e){
-            e.preventDefault();//重要，防止重复提交
-
-            var rows=document.getElementById("procurement_table").rows;
-            console.log(rows);
-            var materialArr=new Array();
-            for(var i=1;i<rows.length;i++){
-                console.log(rows[i].cells[1]);
-                materialArr[i-1]={
-                    "materialCode":rows[i].cells[1].innerHTML,
-                    "stockQuantity":rows[i].cells[5].innerHTML,
-                    "materialNum":rows[i].cells[6].innerHTML,
-                    "remainderQuantity":rows[i].cells[7].innerHTML,
-                    "lackQuantity":rows[i].cells[8].innerHTML
-                }
-            }
-
-            var productNumArr,productCodeOrTypeInputArr,productCodeOrType;
-            productCodeOrType=$("#productCodeOrType").val();
-            if($("#productCodeOrTypeInput").val()==""){
-                alert("请输入成品编码或成品型号");
-                return;
-            }
-            else productCodeOrTypeInputArr=$("#productCodeOrTypeInput").val().split("/");
-            if($("#productNum").val()=="")productNumArr=new Array();
-            else productNumArr=$("#productNum").val().split("/");
-            if(productNumArr.length!=productCodeOrTypeInputArr.length){
-                alert("数量个数与编码个数不匹配！");
-                return;
-            }
-            var data={'productCodeOrTypeInputArr':productCodeOrTypeInputArr,
-                'productCodeOrType':productCodeOrType,
-                'productNumArr':productNumArr,
-                'client':$("#client").val(),
-                'materialArr':materialArr
-            };
-
-            console.log(data);
-
-            //alert("提交");
-            var url=document.URL;
-            if(url.indexOf("edit_procurement")>=0) {
-                $.ajax({
-                    url:url.substring(url.indexOf("/edit_procurement"),url.length),
-                    type: "POST",
-                    dataType: "json",
-                    //data:$(this).serialize(),
-                    data:JSON.stringify(data),
-                    contentType: 'application/json; charset=UTF-8',
-                    success: function (callback) {
-                        console.log(callback);
-                        //alert(callback['ok']);//不要用callback.valueOf('ok')
-                        if(callback['ok']){
-                            alert('更新成功');
-                            //var result=callback['result']
-                            window.location.href="/procurement_history";//跳转地址
-                        }else if(!callback['ok']){
-                            alert("成品编码或成品型号输入错误！");
-                        }
-                    },
-                    error: function(xhr, textStatus, errorThrown) {
-                        console.log(xhr.status);// 状态码
-                        console.log(xhr.readyState);// 状态
-                        console.log(textStatus);// 错误信息
-                        alert('返回值错误');
-                    }
-                });
-            }else {
-            $.ajax({
-                url: '/procurement',
-                type: "POST",
-                dataType: "json",
-                //data:$(this).serialize(),
-                data:JSON.stringify(data),
-                contentType: 'application/json; charset=UTF-8',
-                success: function (callback) {
-                    console.log(callback);
-                    //alert(callback['ok']);//不要用callback.valueOf('ok')
-                    if(callback['ok']){
-                        alert('添加成功');
-                        //var result=callback['result']
-                        window.location.href="/procurement_history";//跳转地址
-                    }else if(!callback['ok']){
-                        alert("成品编码或成品型号输入错误！");
-                    }
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    console.log(xhr.status);// 状态码
-                    console.log(xhr.readyState);// 状态
-                    console.log(textStatus);// 错误信息
-                    alert('返回值错误');
-                }
-            });
-            }
-        });
-    })
-</script>
-
-<script src="/static/jquery/jquery-2.1.4.min.js"></script>
-<script>
-    function ShowData(resultArr) {
-        console.log(resultArr);
-        //var table=document.getElementById("bootstrap-data-table");
-        var table=document.getElementById("procurement_table");
-        var tbody=table.getElementsByTagName("tbody");
-        console.log(table);
-        console.log(table.children);
-        console.log(table.getElementsByTagName("tbody"));
-        console.log(table.getElementsByTagName("tbody")[0]);
-        var tableHtml = "";
-        for(var rowNum=0;rowNum<resultArr.length;rowNum++){
-            var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
-                "<td>"+(rowNum+1)+"</td>\n" +
-                "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                "<td>"+resultArr[rowNum]['materialName']+"</td>" +
-                "<td>"+resultArr[rowNum]['materialType']+"</td>" +
-                "<td>"+resultArr[rowNum]['department']+"</td>" +
-                "<td>"+resultArr[rowNum]['stockQuantity']+"</td>" +
-                "<td>"+resultArr[rowNum]['materialNum']+"</td>" +
-                "<td>"+resultArr[rowNum]['remainderQuantity']+"</td>" +
-                "<td>"+resultArr[rowNum]['lackQuantity']+"</td>" +
-                "<td>"+resultArr[rowNum]['supplierFactory']+"</td>" +
-                "<td>"+resultArr[rowNum]['remark']+"</td></tr>";
-            tableHtml += rowTemplate;
-        }
-        //tbody[0].innerHTML=tableHtml;
-        $("#procurement_table tbody").html(tableHtml);
-        console.log("mark");
-        console.log(document.getElementById("procurement_table"));
-    };
-
-    $("#productNum").on('input',function(e){
-        var productNumArr,productCodeOrTypeInputArr,productCodeOrType;
-        productCodeOrType=$("#productCodeOrType").val();
-        if($("#productCodeOrTypeInput").val()==""){
-            //alert("请输入成品编码或成品型号");
-            productCodeOrTypeInputArr=new Array();
-            return;
-        }
-        else productCodeOrTypeInputArr=$("#productCodeOrTypeInput").val().split("/");
-        if($("#productNum").val()=="")productNumArr=new Array();
-        else productNumArr=$("#productNum").val().split("/");
-        var data={'productCodeOrTypeInputArr':productCodeOrTypeInputArr,
-            'productCodeOrType':productCodeOrType,
-            'productNumArr':productNumArr,
-            'url':document.URL
-        };
-
-        console.log(data);
-
-        $.ajax({
-            url: "/calculate_procurement2",
-            type: "POST",
-            dataType: "json",
-            //data:$(this).serialize(),
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=UTF-8',
-            success: function (callback) {
-                console.log(callback);
-                //alert(callback['ok']);//不要用callback.valueOf('ok')
-                if (callback['ok']) {
-                    //alert('获取');
-                    var result = callback['result'];
-                    ShowData(result);
-                    for (var i = 0; i < result.length; i++)
-                        if (result[i]['exception']) alert(result[i]['exception']);
-                } else if (!callback['ok']) {
-                    alert("编码输入错误！");
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                console.log(xhr.status);// 状态码
-                console.log(xhr.readyState);// 状态
-                console.log(textStatus);// 错误信息
-                alert('返回值错误');
-            }
-        });
-    });
-
-    $("#productCodeOrTypeInput").on('input',function(e){
-        var productNumArr,productCodeOrTypeInputArr,productCodeOrType;
-        productCodeOrType=$("#productCodeOrType").val();
-        if($("#productCodeOrTypeInput").val()==""){
-            //alert("请输入成品编码或成品型号");
-            productCodeOrTypeInputArr=new Array();
-            return;
-        }
-        else productCodeOrTypeInputArr=$("#productCodeOrTypeInput").val().split("/");
-        if($("#productNum").val()=="")productNumArr=new Array();
-        else productNumArr=$("#productNum").val().split("/");
-        var data={'productCodeOrTypeInputArr':productCodeOrTypeInputArr,
-            'productCodeOrType':productCodeOrType,
-            'productNumArr':productNumArr,
-            'url':document.URL
-        };
-
-        console.log(data);
-
-        $.ajax({
-            url: "/calculate_procurement2",
-            type: "POST",
-            dataType: "json",
-            //data:$(this).serialize(),
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=UTF-8',
-            success: function (callback) {
-                console.log(callback);
-                //alert(callback['ok']);//不要用callback.valueOf('ok')
-                if (callback['ok']) {
-                    //alert('获取');
-                    var result = callback['result'];
-                    ShowData(result);
-                    for (var i = 0; i < result.length; i++)
-                        if (result[i]['exception']) alert(result[i]['exception']);
-                } else if (!callback['ok']) {
-                    alert("编码输入错误！");
-                }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                console.log(xhr.status);// 状态码
-                console.log(xhr.readyState);// 状态
-                console.log(textStatus);// 错误信息
-                alert('返回值错误');
-            }
-        });
-    });
-
     /*为表格添加序号*/
     window.onload = function() {
         //var oTable = document.getElementsByTagName("table");

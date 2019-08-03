@@ -120,23 +120,23 @@
                                     </thead>
                                     <tbody>
                                     {% if authority=='1'%}
-                                    {% for i in products %}
+                                        {% for i in products %}
                                             <tr>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
+                                                <td>{{ i[0] }}</td>
+                                                <td>{{ i[1] }}</td>
+                                                <td>{{ i[2] }}</td>
                                             </tr>
-                                    {% endfor %}
-                                            {% elif authority=='2' or authority=='3' or authority=="8"%}
-                                    {% for i in products %}
+                                        {% endfor %}
+                                    {% elif authority=='2' or authority=='3' or authority=="8"%}
+                                        {% for i in products %}
                                             <tr>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[3] }}</a></td>
-                                            <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[4] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[3] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[4] }}</a></td>
                                             </tr>
-                                    {% endfor %}
+                                        {% endfor %}
                                         {% endif %}
                                     </tbody>
                                 </table>

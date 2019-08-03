@@ -672,10 +672,10 @@ def insert_materialOfInfo(materialCode, price, remainderAmount, supplierFactory)
 
 # xijiawei
 # 插入成品录入表
-def insert_materialOfInOut(materialCode, type,amount,afterAmount,afterMoney):
+def insert_materialOfInOut(materialCode, isInOrOut,price,amount,totalPrice,afterAmount,afterMoney,documentNumber,time):
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into materialOfInOut (materialCode, type,amount,afterAmount,afterMoney)value('%s','%s','%d','%d','%f');" \
-          % (materialCode, type,amount,afterAmount,afterMoney)
+    sql = "insert into materialOfInOut (materialCode, isInOrOut,price,amount,totalPrice,afterAmount,afterMoney,documentNumber,time)value('%s','%d','%f','%d','%f','%d','%f','%s','%s');" \
+          % (materialCode, isInOrOut,price,amount,totalPrice,afterAmount,afterMoney,documentNumber,time)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -700,10 +700,50 @@ def select_materialOfInfo(materialCode):
         conn.rollback()
 
 # xijiawei
+# 查询物料表
+def select_materialOfInfo_temp(materialCode):
+    sql = "select materialCode, materialName,type,price, department, remainderAmount,supplierFactory from materialOfInfo_temp where materialCode= '%s';"% (materialCode)
+    try:
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 查询物料表
+def copy_materialOfInfo():
+    sql = "insert into materialOfInfo_temp select * from materialOfInfo;"
+    try:
+        cur.execute(sql)
+        conn.commit()
+        return True
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 检查物料表
+def update_materialOfInfo_temp(materialCode,remainderAmount):
+    sql = "update materialOfInfo_temp set remainderAmount='%d' where materialCode='%s';" % (remainderAmount,materialCode)
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
 # 插入成品录入表
 def select_procurement():
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "select id,group_concat(productCode),group_concat(productType),group_concat(productNum),group_concat(client),group_concat(entryClerk),group_concat(entryDate) from procurement group by id;"
+    # sql = "select id,group_concat(productCode),group_concat(productType),group_concat(productNum),group_concat(client),group_concat(entryClerk),group_concat(entryDate) from procurement group by id;"
+    sql = "select id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate from procurement order by id;"
     try:
         cur.execute(sql)
         result = cur.fetchall()
@@ -728,7 +768,7 @@ def select_maxid_procurement():
 # xijiawei
 # 插入成品录入表
 def select_procurementByID(id):
-    sql = "select productCode,productNum,productType,client from procurement where id='%d';"%(id)
+    sql = "select materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client from procurement where id='%d';"%(id)
     try:
         cur.execute(sql)
         result = cur.fetchall()
@@ -777,10 +817,10 @@ def delete_procurementsByIDAndDate(id,entryDate):
 
 # xijiawei
 # 插入成品录入表
-def insert_procurement(id,productCode,productType,productNum,client,entryClerk,entryDate):
+def insert_procurement(id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate):
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into procurement (id,productCode,productType,productNum,client,entryClerk,entryDate)value('%d','%s','%s','%d','%s','%s','%s');" \
-          % (id,productCode,productType,productNum,client,entryClerk,entryDate)
+    sql = "insert into procurement (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate)value('%d','%s','%d','%d','%s','%s','%s','%s','%s','%s');" \
+          % (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -789,7 +829,10 @@ def insert_procurement(id,productCode,productType,productNum,client,entryClerk,e
         print("语句已经提交")
         return True
         conn.close()
-    except:
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("删除异常：",e)
         conn.rollback()
 
 # xijiawei

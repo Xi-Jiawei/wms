@@ -19,75 +19,59 @@ def procurement_history():
         if session.get('username'):
             username = session['username']
             authority = login_Authority(username)
-            procurementResult = select_procurement()
-            procurement_history = [[0 for key in range(7)] for key in range(len(procurementResult))]
-            for i in range(len(procurementResult)):
-                procurement_history[i][0] = procurementResult[i][0]
-                procurement_history[i][1] = procurementResult[i][1].replace(',', '/')
-                procurement_history[i][2] = procurementResult[i][2].replace(',', '/')
-                procurement_history[i][3] = procurementResult[i][3].replace(',', '/')
-                # procurement_history[i][4] = procurementResult[i][4][:procurementResult[i][4].index(',')]
-                # procurement_history[i][5] = procurementResult[i][5][:procurementResult[i][5].index(',')]
-                # procurement_history[i][6] = procurementResult[i][6][:procurementResult[i][6].index(',')]
-                if not procurementResult[i][4].find(',') == -1:
-                    procurement_history[i][4] = procurementResult[i][4][:procurementResult[i][4].find(',')]
+            procurementResults = select_procurement() # id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate
+            procurements = []
+            procurement = []
+            if len(procurementResults)>0:
+                id=procurementResults[0][0]
+            for procurementResult in procurementResults:
+                if procurementResult[0]!=id:
+                    id=procurementResult[0]
+                    procurements.append(procurement)
+                    procurement = []
                 else:
-                    procurement_history[i][4] = procurementResult[i][4]
-                if not procurementResult[i][5].find(',') == -1:
-                    procurement_history[i][5] = procurementResult[i][5][:procurementResult[i][5].find(',')]
-                else:
-                    procurement_history[i][5] = procurementResult[i][5]
-                if not procurementResult[i][6].find(',') == -1:
-                    procurement_history[i][6] = procurementResult[i][6][:procurementResult[i][6].find(',')]
-                else:
-                    procurement_history[i][6] = procurementResult[i][6]
+                    procurement.append([procurementResult[0],procurementResult[1],procurementResult[2],procurementResult[3],procurementResult[4],procurementResult[5],procurementResult[6],procurementResult[7],procurementResult[8],procurementResult[9]])
+            if len(procurement)>0:
+                procurements.append(procurement) # add last procurement
             return render_template('procurement_history.html', form=addProductForm,
-                                   procurement_history=procurement_history,
+                                   procurements=procurements,
                                    authority=authority[2],
                                    username=username)
         else:
-            return render_template('test_fail.html')
+            return render_template('access_fail.html')
 
 # xijiawei
-# 成品管理
+#
+@procurement_app.route('/test_table', methods=['GET', 'POST'])
+def test_table():
+    return render_template('test_table.html')
+
+# xijiawei
+#
 @procurement_app.route('/delete_procurements', methods=['GET', 'POST'])
 def delete_procurements():
     if request.method == "POST":
         data = request.get_json()
         procurementArr = data['procurementArr']
+        date = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
         for procurement in procurementArr:
             id=int(procurement['id'])
             entryDate=procurement['entryDate']
-            productResult=select_procurementByID(id)
-            # productCodeArr = productResult[0, :]
-            # productCodeArr = productResult[:, 0]
-            productCodeArr = [0 for key in range(len(productResult))]
-            i=0
-            for product in productResult:
-                productCode= product[0]
-                productNum = product[1]
-                update_productNum_materialsOfProduct(productCode,productNum)
-                productCodeArr[i]=productCode
-                i+=1
-            materials=select_materialsOfProduct(productCodeArr)
+            materials = select_procurementByID(int(id)) # materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client
             for material in materials:
                 materialCode = material[0]
-                materialNum = int(material[1])
-                remark = material[2]
-                materialInfo = select_materialOfInfo(materialCode)
-                if materialInfo:
-                    stockQuantity = materialInfo[0][5]
-                    remainderQuantity = int(stockQuantity) + int(materialNum)  # 取消采购，相当于物料重新入库
-                    update_materialOfInfo(materialCode, remainderQuantity)
-                    insert_materialOfInOut(materialCode, ('取消采购，代号：%d' % id), materialNum, remainderQuantity,
-                                           remainderQuantity * materialInfo[0][3])
+                materialOfInfo = select_materialOfInfo(materialCode) # materialCode, materialName,type,price, department, remainderAmount,supplierFactory
+                update_materialOfInfo(materialCode, materialOfInfo[0][5] + material[1] - material[2])
+                # materialCode, isInOrOut, price, amount, totalPrice, afterAmount, afterMoney, documentNumber, time
+                insert_materialOfInOut(materialCode, 0,materialOfInfo[0][3], material[1] - material[2],(material[1] - material[2])*materialOfInfo[0][3], materialOfInfo[0][5] + material[1] - material[2],
+                                       (materialOfInfo[0][5] + material[1] - material[2]) * materialOfInfo[0][3],("pmt-%d" % id), date)
             delete_procurementsByIDAndDate(id,entryDate)
         return jsonify({'ok': True})
     else:
         return jsonify({'ok': False})
 
 # xijiawei
-# 成品管理
+#
 @procurement_app.route('/calculate_procurement', methods=['GET', 'POST'])
 def calculate_procurement():
     if request.method == "POST":
@@ -181,21 +165,26 @@ def calculate_procurement():
 def calculate_procurement2():
     if request.method == "POST":
         data = request.get_json()
-        # productCodeArr = data['productCodeArr']  # 不要写成productCode=request.data["productcode"]
-        # productTypeArr = data['productTypeArr']  # 不要写成productCode=request.data["productcode"]
-        # productNumArr = data['productNumArr']  # 不要写成productCode=request.data["productcode"]
-        productCodeOrTypeInput = data['productCodeOrTypeInput']
+        productCodeOrTypeInputArr = data['productCodeOrTypeInputArr']
         productCodeOrType = data['productCodeOrType']
         productNumArr = data['productNumArr']
+        url=data['url']
+
+        # materials
         materials=[]
-        if len(productCodeOrTypeInput)>0 and productCodeOrType=="0":
-            productCodeArr=productCodeOrTypeInput
+        if len(productCodeOrTypeInputArr)>0 and productCodeOrType=="0":
+            productCodeArr=productCodeOrTypeInputArr
+
+            # pNumArr
             if len(productNumArr)>len(productCodeArr):
                 pNumArr=productNumArr[:len(productCodeArr)]
             else:
                 pNumArr = productNumArr
                 for i in range(len(productCodeArr)-len(productNumArr)):
                     pNumArr.append("0")
+
+            # 1.checkout productCodeArr[:len(productCodeArr)-2]
+            # 2.insert productNum into table materialsOfProduct
             for i in range(len(productCodeArr)-1):
                 if not select_productTypeByCode(productCodeArr[i]):
                     return jsonify({'ok': False})
@@ -207,15 +196,21 @@ def calculate_procurement2():
                 update_productNum_materialsOfProduct(productCodeArr[len(productCodeArr)-1], int(pNumArr[len(productCodeArr)-1]))
             else:
                 update_productNum_materialsOfProduct(productCodeArr[len(productCodeArr)-1], 0)
-            materials=select_materialsOfProduct(productCodeArr)
-        elif len(productCodeOrTypeInput)>0 and productCodeOrType=="1":
-            productTypeArr=productCodeOrTypeInput
+            materials=select_materialsOfProduct(productCodeArr) # materials
+        elif len(productCodeOrTypeInputArr)>0 and productCodeOrType=="1":
+            productTypeArr=productCodeOrTypeInputArr
+
+            # pNumArr
             if len(productNumArr)>len(productTypeArr):
                 pNumArr=productNumArr[:len(productTypeArr)]
             else:
                 pNumArr = productNumArr
                 for i in range(len(productTypeArr)-len(productNumArr)):
                     pNumArr.append("0")
+
+            # 1.checkout productTypeArr[:len(productTypeArr)-2]
+            # 2.get productCodeArr by productTypeArr
+            # 3.insert productNum into table materialsOfProduct
             productCodeArr=[0 for key in range(len(productTypeArr))]
             for i in range(len(productTypeArr)-1):
                 productCode_temp = select_productCodeByType(productTypeArr[i])
@@ -235,10 +230,11 @@ def calculate_procurement2():
                                                          int(pNumArr[len(productTypeArr) - 1]))
                 else:
                     update_productNum_materialsOfProduct(productCodeArr[len(productTypeArr) - 1], 0)
-            materials=select_materialsOfProduct(productCodeArr)
+            materials=select_materialsOfProduct(productCodeArr) # materials
         else:
             return jsonify({'ok': False})
-        print("采购物料",materials)
+
+        # result
         result=[]
         if materials:
             result = [0 for key in range(len(materials))]
@@ -247,7 +243,10 @@ def calculate_procurement2():
                 materialCode = material[0]
                 materialNum = int(material[1])
                 remark = material[2]
-                materialInfo = select_materialOfInfo(materialCode)
+                if url.find('edit_procurement')==-1:
+                    materialInfo = select_materialOfInfo(materialCode)
+                else:
+                    materialInfo = select_materialOfInfo_temp(materialCode)
                 if materialInfo:
                     print("物料信息", materialInfo)
                     stockQuantity = materialInfo[0][5]
@@ -321,7 +320,7 @@ def procurement():
             # data=request.get_data()
             # data=json.load(request.get_data(as_text=True))
             data = request.get_json()
-            productCodeOrTypeInput = data['productCodeOrTypeInput']
+            productCodeOrTypeInputArr = data['productCodeOrTypeInputArr']
             productCodeOrType = data['productCodeOrType']
             productNumArr = data['productNumArr']
             client = data['client']
@@ -329,53 +328,60 @@ def procurement():
             if session.get('username'):
                 entryClerk = session['username']
             else:
-                entryClerk = "admin"
+                entryClerk = "unknown"
+            id=0
             entryDate = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+
+            # productCode and productType
+            productCodeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
+            productTypeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
             if productCodeOrType == "0":
-                productCodeArr = productCodeOrTypeInput
+                productCodeArr = productCodeOrTypeInputArr
                 if not select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
                     return jsonify({'ok': False})
                 else:
-                    maxid = select_maxid_procurement()
-                    if not maxid[0][0] == None:
-                        id = int(maxid[0][0]) + 1
-                    else:
-                        id = 0
                     for i in range(len(productCodeArr)):
                         productType = select_productTypeByCode(productCodeArr[i])
-                        insert_procurement(id, productCodeArr[i], productType[0][0], int(productNumArr[i]), client,
-                                           entryClerk,
-                                           entryDate)
+                        productTypeArr[i]=productType[0][0]
             elif productCodeOrType == "1":
-                productTypeArr = productCodeOrTypeInput
+                productTypeArr = productCodeOrTypeInputArr
                 if not select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
                     return jsonify({'ok': False})
                 else:
-                    maxid = select_maxid_procurement()
-                    if not maxid[0][0] == None:
-                        id = int(maxid[0][0]) + 1
-                    else:
-                        id = 0
                     for i in range(len(productTypeArr)):
                         productCode = select_productCodeByType(productTypeArr[i])
-                        insert_procurement(id, productCode[0][0], productTypeArr[i], int(productNumArr[i]), client,
-                                           entryClerk,
-                                           entryDate)
+                        productCodeArr[i] = productCode[0][0]
+            splitStr='/'
+            productCodeStr=splitStr.join(productCodeArr)
+            productTypeStr=splitStr.join(productTypeArr)
+            productNumStr=splitStr.join(productNumArr)
+
+            # id
+            maxid = select_maxid_procurement()
+            if not maxid[0][0] == None:
+                id = int(maxid[0][0]) + 1
+            else:
+                id = 0
+
+            # material
             for material in materialArr:
-                print(material['materialCode'])
-                print(int(material['remainderAmount']))
-                update_materialOfInfo(material['materialCode'], int(material['remainderAmount']))
+                insert_procurement(id, material['materialCode'], int(material['materialNum']), -int(material['lackQuantity']), productCodeStr, productTypeStr,
+                                   productNumStr, client, entryClerk, entryDate)
+                update_materialOfInfo(material['materialCode'], int(material['remainderQuantity']))
                 materialOfInfo = select_materialOfInfo(material['materialCode'])
                 if materialOfInfo:
-                    insert_materialOfInOut(material['materialCode'], '出库', int(material['materialAmount']),
-                                           int(material['remainderAmount']),
-                                           int(material['remainderAmount']) * materialOfInfo[0][3])
+                    insert_materialOfInOut(material['materialCode'], 1, materialOfInfo[0][3],
+                                           int(material['stockQuantity']),
+                                           int(material['stockQuantity']) * materialOfInfo[0][3],
+                                           int(material['remainderQuantity']),
+                                           int(material['remainderQuantity'])* materialOfInfo[0][3],
+                                           ("pmt-%d"%id),entryDate)
             return jsonify({'ok': True})
         elif request.method == 'GET':
             addProductForm = AddProductForm()
             return render_template('procurement.html', setting=0, form=addProductForm, authority=authority[2],username=username)
     else:
-        return render_template('test_fail.html')
+        return render_template('access_fail.html')
 
 # xijiawei
 #
@@ -388,9 +394,11 @@ def edit_procurement(id):
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
+
+        # POST
         if request.method == "POST":
             data = request.get_json()
-            productCodeOrTypeInput = data['productCodeOrTypeInput']
+            productCodeOrTypeInputArr = data['productCodeOrTypeInputArr']
             productCodeOrType = data['productCodeOrType']
             productNumArr = data['productNumArr']
             client = data['client']
@@ -398,100 +406,152 @@ def edit_procurement(id):
             if session.get('username'):
                 entryClerk = session['username']
             else:
-                entryClerk = "admin"
+                entryClerk = "unknown"
             entryDate = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-            delete_procurementsByID(int(id)) # 清空
+
+            # if productCodeOrType == "0":
+            #     productCodeArr = productCodeOrTypeInput
+            #     if not select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
+            #         return jsonify({'ok': False})
+            #     else:
+            #         for i in range(len(productCodeArr)):
+            #             productType = select_productTypeByCode(productCodeArr[i])
+            #             insert_procurement(int(id), productCodeArr[i], productType[0][0], int(productNumArr[i]), client,
+            #                                entryClerk,
+            #                                entryDate)
+            # elif productCodeOrType == "1":
+            #     productTypeArr = productCodeOrTypeInput
+            #     if not select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
+            #         return jsonify({'ok': False})
+            #     else:
+            #         for i in range(len(productTypeArr)):
+            #             productCode = select_productCodeByType(productTypeArr[i])
+            #             insert_procurement(int(id), productCode[0][0], productTypeArr[i], int(productNumArr[i]), client,
+            #                                entryClerk,
+            #                                entryDate)
+            # # 更新物料信息
+            # for material in materialArr:
+            #     flag=False
+            #     for i in procurement:
+            #         if material['materialCode'] == i[0]:
+            #             flag=True
+            #             materialOfInfo = select_materialOfInfo(material['materialCode'])
+            #             if materialOfInfo:
+            #                 materialAmount = int(material['materialAmount']) - i[5]
+            #                 remainderAmount = i[4] - materialAmount
+            #                 update_materialOfInfo(material['materialCode'], max(remainderAmount, 0))  #
+            #                 if materialAmount < 0:
+            #                     # 插入物料入库记录
+            #                     insert_materialOfInOut(material['materialCode'], 0, materialOfInfo[0][3],
+            #                                            materialAmount,
+            #                                            materialAmount * materialOfInfo[0][3],
+            #                                            remainderAmount,
+            #                                            remainderAmount * materialOfInfo[0][3],
+            #                                            ("pmt-%s" % id), entryDate)
+            #                 elif materialAmount > 0:
+            #                     # 插入物料出库记录
+            #                     insert_materialOfInOut(material['materialCode'], 1, materialOfInfo[0][3],
+            #                                            materialAmount,
+            #                                            materialAmount * materialOfInfo[0][3],
+            #                                            remainderAmount,
+            #                                            remainderAmount * materialOfInfo[0][3],
+            #                                            ("pmt-%s" % id), entryDate)
+            #             break
+            #     if not flag:
+            #         update_materialOfInfo(material['materialCode'], int(material['remainderAmount']))  # 更新物料库存量
+            #         materialOfInfo = select_materialOfInfo(material['materialCode'])
+            #         if materialOfInfo:
+            #             # 插入物料出库记录
+            #             insert_materialOfInOut(material['materialCode'], 1, materialOfInfo[0][3],
+            #                                    int(material['materialAmount']),
+            #                                    int(material['materialAmount']) * materialOfInfo[0][3],
+            #                                    int(material['remainderAmount']),
+            #                                    int(material['remainderAmount']) * materialOfInfo[0][3],
+            #                                    ("pmt-%s" % id), entryDate)
+            # return jsonify({'ok': True})
+
+            # productCode and productType
+            productCodeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
+            productTypeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
             if productCodeOrType == "0":
-                productCodeArr = productCodeOrTypeInput
+                productCodeArr = productCodeOrTypeInputArr
                 if not select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
                     return jsonify({'ok': False})
                 else:
                     for i in range(len(productCodeArr)):
                         productType = select_productTypeByCode(productCodeArr[i])
-                        # update_procurement(id, productCodeArr[i], productType[0][0], int(productNumArr[i]), client,
-                        #                    entryClerk,
-                        #                    entryDate)
-                        insert_procurement(int(id), productCodeArr[i], productType[0][0], int(productNumArr[i]), client,
-                                           entryClerk,
-                                           entryDate)
+                        productTypeArr[i]=productType[0][0]
             elif productCodeOrType == "1":
-                productTypeArr = productCodeOrTypeInput
+                productTypeArr = productCodeOrTypeInputArr
                 if not select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
                     return jsonify({'ok': False})
                 else:
                     for i in range(len(productTypeArr)):
                         productCode = select_productCodeByType(productTypeArr[i])
-                        # update_procurement(id, productCode[0][0], productTypeArr[i], int(productNumArr[i]), client,
-                        #                    entryClerk,
-                        #                    entryDate)
-                        insert_procurement(int(id), productCode[0][0], productTypeArr[i], int(productNumArr[i]), client,
-                                           entryClerk,
-                                           entryDate)
+                        productCodeArr[i] = productCode[0][0]
+            splitStr='/'
+            productCodeStr=splitStr.join(productCodeArr)
+            productTypeStr=splitStr.join(productTypeArr)
+            productNumStr=splitStr.join(productNumArr)
+
+            # update procurement and update materialOfInfo
+            delete_procurementsByID(int(id)) # 清空
             for material in materialArr:
-                print(material['materialCode'])
-                print(int(material['remainderAmount']))
-                update_materialOfInfo(material['materialCode'], int(material['remainderAmount'])) # 更新物料静态库
+                insert_procurement(int(id), material['materialCode'], int(material['materialNum']), -int(material['lackQuantity']), productCodeStr, productTypeStr,
+                                   productNumStr, client, entryClerk, entryDate)
+                update_materialOfInfo(material['materialCode'], int(material['remainderQuantity']))
                 materialOfInfo = select_materialOfInfo(material['materialCode'])
                 if materialOfInfo:
-                    # 插入物料出入库记录
-                    insert_materialOfInOut(material['materialCode'], '采购更新', int(material['materialAmount']),
-                                           int(material['remainderAmount']),
-                                           int(material['remainderAmount']) * materialOfInfo[0][3])
+                    insert_materialOfInOut(material['materialCode'], 1, materialOfInfo[0][3],
+                                           int(material['stockQuantity']),
+                                           int(material['stockQuantity']) * materialOfInfo[0][3],
+                                           int(material['remainderQuantity']),
+                                           int(material['remainderQuantity'])* materialOfInfo[0][3],
+                                           ("pmt-%s"%id),entryDate)
             return jsonify({'ok': True})
         elif request.method == 'GET':
-            productResult=select_procurementByID(int(id))
-            productCodeArr = [0 for key in range(len(productResult))]
-            productCodeStr=''
-            productTypeStr=''
-            productNumStr=''
-            i=0
-            for product in productResult:
-                productCode= product[0]
-                productNum = product[1]
-                productType = product[2]
-                client = product[3]
-                productCodeArr[i]=productCode
-                productCodeStr+='/'+productCode
-                productTypeStr+='/'+productType
-                productNumStr+='/'+str(productNum)
-                i+=1
-            materials=select_materialsOfProduct(productCodeArr)
-            procurement=[[0 for key in range(10)] for key in range(len(materials))]
+
+            # return to the status of materialOfInfo before this procurement of id
+            copy_materialOfInfo()
+            materials = select_procurementByID(int(id)) # materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client
+            procurement = [[0 for key in range(10)] for key in range(len(materials))]
             i=0
             for material in materials:
                 materialCode = material[0]
-                materialNum = int(material[1])
-                remark = material[2]
-                materialInfo = select_materialOfInfo(materialCode)
-                stockQuantity = materialInfo[0][5]
-                remainderQuantity = int(stockQuantity) - int(materialNum)
-                if remainderQuantity < 0:
-                    procurement[i][0]=materialCode
-                    procurement[i][1] = materialInfo[0][1]
-                    procurement[i][2]=materialInfo[0][2]
-                    procurement[i][3]=materialInfo[0][4]
-                    procurement[i][4]=materialInfo[0][5]
-                    procurement[i][5]=materialNum
-                    procurement[i][6]=0
-                    procurement[i][7]=remainderQuantity
-                    procurement[i][8]=materialInfo[0][6]
-                    procurement[i][9]=remark
-                else:
-                    procurement[i][0] = materialCode
-                    procurement[i][1] = materialInfo[0][1]
-                    procurement[i][2] = materialInfo[0][2]
-                    procurement[i][3] = materialInfo[0][4]
-                    procurement[i][4] = materialInfo[0][5]
-                    procurement[i][5] = materialNum
-                    procurement[i][6] = remainderQuantity
-                    procurement[i][7] = 0
-                    procurement[i][8] = materialInfo[0][6]
-                    procurement[i][9] = remark
+                materialOfInfo = select_materialOfInfo(materialCode) # materialCode, materialName,type,price, department, remainderAmount,supplierFactory
+                # if material[2]!=0:
+                #     update_materialOfInfo(materialCode, materialOfInfo[0][5] + material[1] - material[2])
+                # else:
+                #     update_materialOfInfo(materialCode, materialOfInfo[0][5] + material[1])
+                update_materialOfInfo_temp(materialCode, materialOfInfo[0][5] + material[1] - material[2])
+
+                # procurement
+                procurement[i][0]=material[0] # materialCode
+                procurement[i][1]=materialOfInfo[0][1] # materialName
+                procurement[i][2]=materialOfInfo[0][2] # materialType
+                procurement[i][3]=materialOfInfo[0][4] # department
+                procurement[i][4]=materialOfInfo[0][5] + material[1] - material[2] # stockQuantity
+                procurement[i][5]=material[1] # materialNum
+                procurement[i][6]=materialOfInfo[0][5] # remainderQuantity
+                procurement[i][7]=-material[2] # lackQuantity
+                procurement[i][8]=materialOfInfo[0][6] # supplierFactory
+                procurement[i][9]="" # remark
                 i+=1
+
+            # form data
             addProductForm.productCodeOrType.data = 0
-            addProductForm.productCodeOrTypeInput.data = productCodeStr[1:]
-            addProductForm.productNum.data = productNumStr[1:]
-            addProductForm.client.data = client
-            return render_template('procurement.html', setting=1,form=addProductForm,procurement=procurement, authority=authority[2],username=username)
+            addProductForm.productCodeOrTypeInput.data = materials[0][3]
+            addProductForm.productNum.data = materials[0][5]
+            addProductForm.client.data = materials[0][6]
+            if authority[2]=='1' or authority[2]=='2':
+                addProductForm.productCodeOrType.render_kw = {"class": "form-control", "readonly": 'true'}
+                addProductForm.productCodeOrTypeInput.render_kw = {"class": "form-control", "readonly": 'true'}
+                addProductForm.productNum.render_kw = {"class": "form-control", "readonly": 'true'}
+                addProductForm.client.render_kw = {"class": "form-control", "readonly": 'true'}
+                return render_template('procurement_view.html', form=addProductForm, procurement=procurement,
+                                       authority=authority[2], username=username)
+            elif authority[2]=='3' or authority[2]=='8':
+                return render_template('procurement.html', setting=1, form=addProductForm, procurement=procurement,
+                                       authority=authority[2], username=username)
     else:
-        return render_template('test_fail.html')
+        return render_template('access_fail.html')
