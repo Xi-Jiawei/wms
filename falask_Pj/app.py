@@ -244,7 +244,6 @@ def cc_change_pass():
 def show_material():
     materialCode = ''
     materialName = ''
-    materialTime = ''
     materialType = ''
     materialFactory = ''
     personName = session['username']
@@ -253,15 +252,14 @@ def show_material():
     if request.method == "POST":
         materialCode = request.form["materialCode"]
         materialName = request.form["materialName"]
-        materialTime = request.form["materialTime"]
         materialType = request.form["materialType"]
         materialFactory = request.form["materialFactory"]
-    materialAll = dao_show_material(materialCode, materialName, materialTime, materialType, materialFactory)
+    materialAll = dao_show_material(materialCode, materialName, materialType, materialFactory)
     materialinfoAll = dao_show_materialinfo()
     materialoutinAll = dao_show_materialoutin()
     # print(materialAll)
     return render_template('material_index.html', materialAll=materialAll, materialCode=materialCode,
-                           materialName=materialName, materialTime=materialTime, materialType=materialType,
+                           materialName=materialName, materialType=materialType,
                            materialFactory=materialFactory,Authority=Authority,personName=personName)
 
 # lh 物料出入库
