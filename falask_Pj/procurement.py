@@ -8,7 +8,13 @@ import json
 procurement_app=Blueprint('procurement',__name__)
 
 # xijiawei
-# 成品管理
+#
+@procurement_app.route('/test', methods=['GET', 'POST'])
+def test():
+    return render_template('test_tablepage.html')
+
+# xijiawei
+#
 @procurement_app.route('/procurement_history', methods=['GET', 'POST'])
 def procurement_history():
     addProductForm = AddProductForm()
@@ -29,6 +35,9 @@ def procurement_history():
                     id=procurementResult[0]
                     procurements.append(procurement)
                     procurement = []
+                    procurement.append([procurementResult[0], procurementResult[1], procurementResult[2], procurementResult[3],
+                         procurementResult[4], procurementResult[5], procurementResult[6], procurementResult[7],
+                         procurementResult[8], procurementResult[9]])
                 else:
                     procurement.append([procurementResult[0],procurementResult[1],procurementResult[2],procurementResult[3],procurementResult[4],procurementResult[5],procurementResult[6],procurementResult[7],procurementResult[8],procurementResult[9]])
             if len(procurement)>0:
@@ -39,12 +48,6 @@ def procurement_history():
                                    username=username)
         else:
             return render_template('access_fail.html')
-
-# xijiawei
-#
-@procurement_app.route('/test_table', methods=['GET', 'POST'])
-def test_table():
-    return render_template('test_table.html')
 
 # xijiawei
 #
@@ -69,95 +72,6 @@ def delete_procurements():
         return jsonify({'ok': True})
     else:
         return jsonify({'ok': False})
-
-# xijiawei
-#
-@procurement_app.route('/calculate_procurement', methods=['GET', 'POST'])
-def calculate_procurement():
-    if request.method == "POST":
-        data = request.get_json()
-        productCodeArr = data['productCodeArr']  # 不要写成productCode=request.data["productcode"]
-        productTypeArr = data['productTypeArr']  # 不要写成productCode=request.data["productcode"]
-        productNumArr = data['productNumArr']  # 不要写成productCode=request.data["productcode"]
-        if len(productCodeArr)>0:
-            if len(productNumArr)>len(productCodeArr):
-                pNumArr=productNumArr[:len(productCodeArr)]
-            else:
-                pNumArr = productNumArr
-                for i in range(len(productCodeArr)-len(productNumArr)):
-                    pNumArr.append("0")
-            for i in range(len(productCodeArr)):
-                # update_productNum_materialsOfProduct(productCodeArr[i], pNumArr[i])
-                #if(isinstance(pNumArr[i],int)):
-                if not select_productTypeByCode(productCodeArr[i]):
-                    return jsonify({'ok': False})
-                if (pNumArr[i].isdigit()):
-                    update_productNum_materialsOfProduct(productCodeArr[i], int(pNumArr[i]))
-                else:
-                    update_productNum_materialsOfProduct(productCodeArr[i], 0)
-            materials=select_materialsOfProduct(productCodeArr)
-        else:
-            if len(productNumArr)>len(productTypeArr):
-                pNumArr=productNumArr[:len(productTypeArr)]
-            else:
-                pNumArr = productNumArr
-                for i in range(len(productTypeArr)-len(productNumArr)):
-                    pNumArr.append("0")
-            productCodeArr=[0 for key in range(len(productTypeArr))]
-            for i in range(len(productTypeArr)):
-                # productCodeArr[i]=select_productCodeByType(productTypeArr[i])
-                productCode_temp = select_productCodeByType(productTypeArr[i])
-                if productCode_temp:
-                    productCodeArr[i] = productCode_temp
-                else:
-                    return jsonify({'ok': False})
-                # update_productNum_materialsOfProduct(productCodeArr[i], pNumArr[i])
-                # if(isinstance(pNumArr[i],int)):
-                if (pNumArr[i].isdigit()):
-                    update_productNum_materialsOfProduct(productCodeArr[i], int(pNumArr[i]))
-                else:
-                    update_productNum_materialsOfProduct(productCodeArr[i], 0)
-            materials=select_materialsOfProduct(productTypeArr)
-        result=[0 for key in range(len(materials))]
-        i=0
-        for material in materials:
-            materialCode = material[0]
-            materialNum = int(material[1])
-            remark = material[2]
-            materialInfo = select_materialOfInfo(materialCode)
-            if materialInfo:
-                stockQuantity = materialInfo[0][5]
-                remainderQuantity = int(stockQuantity) - int(materialNum)
-                if remainderQuantity < 0:
-                    result[i] = {'materialCode': materialCode,
-                                 'materialName': materialInfo[0][1],
-                                 'materialType': materialInfo[0][2],
-                                 'department': materialInfo[0][4],
-                                 'stockQuantity': materialInfo[0][5],
-                                 'materialNum': materialNum,
-                                 'remainderQuantity': 0,
-                                 'lackQuantity': remainderQuantity,
-                                 'supplierFactory': materialInfo[0][6],
-                                 'remark': remark}
-                    # materialCode,sum(materialNum),remark
-                    # materialCode, materialName,type,price, department, remainderAmount,supplierFactory
-                else:
-                    result[i] = {'materialCode': materialCode,
-                                 'materialName': materialInfo[0][1],
-                                 'materialType': materialInfo[0][2],
-                                 'department': materialInfo[0][4],
-                                 'stockQuantity': materialInfo[0][5],
-                                 'materialNum': materialNum,
-                                 'remainderQuantity': remainderQuantity,
-                                 'lackQuantity': 0,
-                                 'supplierFactory': materialInfo[0][6],
-                                 'remark': remark}
-            else:
-                result[i] = {'materialCode': materialCode,
-                             'exception': ("物料库中不存在物料%s！" % materialCode)}
-            i+=1
-        return jsonify({'ok': True, 'result': result})
-    else: return jsonify({'ok': -1})
 
 # xijiawei
 #
@@ -408,67 +322,6 @@ def edit_procurement(id):
             else:
                 entryClerk = "unknown"
             entryDate = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-
-            # if productCodeOrType == "0":
-            #     productCodeArr = productCodeOrTypeInput
-            #     if not select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
-            #         return jsonify({'ok': False})
-            #     else:
-            #         for i in range(len(productCodeArr)):
-            #             productType = select_productTypeByCode(productCodeArr[i])
-            #             insert_procurement(int(id), productCodeArr[i], productType[0][0], int(productNumArr[i]), client,
-            #                                entryClerk,
-            #                                entryDate)
-            # elif productCodeOrType == "1":
-            #     productTypeArr = productCodeOrTypeInput
-            #     if not select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
-            #         return jsonify({'ok': False})
-            #     else:
-            #         for i in range(len(productTypeArr)):
-            #             productCode = select_productCodeByType(productTypeArr[i])
-            #             insert_procurement(int(id), productCode[0][0], productTypeArr[i], int(productNumArr[i]), client,
-            #                                entryClerk,
-            #                                entryDate)
-            # # 更新物料信息
-            # for material in materialArr:
-            #     flag=False
-            #     for i in procurement:
-            #         if material['materialCode'] == i[0]:
-            #             flag=True
-            #             materialOfInfo = select_materialOfInfo(material['materialCode'])
-            #             if materialOfInfo:
-            #                 materialAmount = int(material['materialAmount']) - i[5]
-            #                 remainderAmount = i[4] - materialAmount
-            #                 update_materialOfInfo(material['materialCode'], max(remainderAmount, 0))  #
-            #                 if materialAmount < 0:
-            #                     # 插入物料入库记录
-            #                     insert_materialOfInOut(material['materialCode'], 0, materialOfInfo[0][3],
-            #                                            materialAmount,
-            #                                            materialAmount * materialOfInfo[0][3],
-            #                                            remainderAmount,
-            #                                            remainderAmount * materialOfInfo[0][3],
-            #                                            ("pmt-%s" % id), entryDate)
-            #                 elif materialAmount > 0:
-            #                     # 插入物料出库记录
-            #                     insert_materialOfInOut(material['materialCode'], 1, materialOfInfo[0][3],
-            #                                            materialAmount,
-            #                                            materialAmount * materialOfInfo[0][3],
-            #                                            remainderAmount,
-            #                                            remainderAmount * materialOfInfo[0][3],
-            #                                            ("pmt-%s" % id), entryDate)
-            #             break
-            #     if not flag:
-            #         update_materialOfInfo(material['materialCode'], int(material['remainderAmount']))  # 更新物料库存量
-            #         materialOfInfo = select_materialOfInfo(material['materialCode'])
-            #         if materialOfInfo:
-            #             # 插入物料出库记录
-            #             insert_materialOfInOut(material['materialCode'], 1, materialOfInfo[0][3],
-            #                                    int(material['materialAmount']),
-            #                                    int(material['materialAmount']) * materialOfInfo[0][3],
-            #                                    int(material['remainderAmount']),
-            #                                    int(material['remainderAmount']) * materialOfInfo[0][3],
-            #                                    ("pmt-%s" % id), entryDate)
-            # return jsonify({'ok': True})
 
             # productCode and productType
             productCodeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
