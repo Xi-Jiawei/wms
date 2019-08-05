@@ -46,6 +46,10 @@ function firstPage(){
     currentPageFirstRowArrIndex=0;
     currentPageLastRow=index-rowCountArr[i];
     currentPageFirstRow=1;
+    console.log("currentPageFirstRowArrIndex: "+currentPageFirstRowArrIndex);
+    console.log("currentPageFirstRow: "+currentPageFirstRow);
+    console.log("currentPageLastRowArrIndex: "+currentPageLastRowArrIndex);
+    console.log("currentPageLastRow: "+currentPageLastRow);
 
     if(pageNum>1){
         firstText();
@@ -53,16 +57,6 @@ function firstPage(){
         nextLink();
         lastLink();
     }
-
-    console.log("currentPageFirstRowArrIndex: "+currentPageFirstRowArrIndex);
-    console.log("currentPageFirstRow: "+currentPageFirstRow);
-    console.log("currentPageLastRowArrIndex: "+currentPageLastRowArrIndex);
-    console.log("currentPageLastRow: "+currentPageLastRow);
-    /*console.log(firstSpan.innerHTML);
-    console.log(preSpan.innerHTML);
-    console.log(nextSpan.innerHTML);
-    console.log(lastSpan.innerHTML);*/
-    //alert("mark");
 }
 
 function prePage(){
@@ -124,7 +118,6 @@ function nextPage(){
         blockTable.rows[i].style.display = "";
     }*/
 
-    //alert("mark");
     console.log("currentPageFirstRowArrIndex: "+currentPageFirstRowArrIndex);
     console.log("currentPageFirstRow: "+currentPageFirstRow);
     console.log("currentPageLastRowArrIndex: "+currentPageLastRowArrIndex);
@@ -183,9 +176,10 @@ function lastPage(){
     console.log("pageNum: "+pageNum);
     var index=0,pageN=1;
     for(var i=0;i<rowCountArr.length;i++){
-        console.log(index);
         index+=rowCountArr[i];
-        if(Math.floor(index/pageCount)+1>pageN)pageN=Math.floor(index/pageCount)+1;
+        console.log(index);
+        //if(Math.floor(index/pageCount)+1>pageN)pageN=Math.floor(index/pageCount)+1;
+        if(Math.ceil(index/pageCount)>pageN)pageN=Math.ceil(index/pageCount);
         console.log("pageN: "+pageN);
         console.log(pageN==pageNum);
         if(pageN==pageNum){
@@ -242,14 +236,14 @@ function hide(){
 }
 
 //控制首页等功能的显示与不显示
-function firstLink(){firstSpan.innerHTML = "<a href='javascript:firstPage();'>First</a>";}
-function firstText(){firstSpan.innerHTML = "First";}
+function firstLink(){firstSpan.innerHTML = "<a href='javascript:firstPage();'>首页</a>";}
+function firstText(){firstSpan.innerHTML = "首页";}
 
-function preLink(){preSpan.innerHTML = "<a href='javascript:prePage();'>Pre</a>";}
-function preText(){preSpan.innerHTML = "Pre";}
+function preLink(){preSpan.innerHTML = "<a href='javascript:prePage();'>上一页</a>";}
+function preText(){preSpan.innerHTML = "上一页";}
 
-function nextLink(){nextSpan.innerHTML = "<a href='javascript:nextPage();'>Next</a>";}
-function nextText(){nextSpan.innerHTML = "Next";}
+function nextLink(){nextSpan.innerHTML = "<a href='javascript:nextPage();'>下一页</a>";}
+function nextText(){nextSpan.innerHTML = "下一页";}
 
-function lastLink(){lastSpan.innerHTML = "<a href='javascript:lastPage();'>Last</a>";}
-function lastText(){lastSpan.innerHTML = "Last";}
+function lastLink(){lastSpan.innerHTML = "<a href='javascript:lastPage();'>末页</a>";}
+function lastText(){lastSpan.innerHTML = "末页";}

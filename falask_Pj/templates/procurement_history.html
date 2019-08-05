@@ -63,13 +63,8 @@
         table tr:hover{
             background: #eeeeee;
         }
-        .span6{
-            /*width:500px;*/
-            float:inherit;
-            margin:10px;
-        }
         #pagiDiv span{
-            background:#1e90ff;
+            background:#A5D6D9;
             border-radius: .2em;
             padding:5px;
         }
@@ -353,6 +348,7 @@
     var pageCount;      //每页显示的数量
     var pageNum;        //总页数
     var currPageNum ;   //当前页数
+
     //页面标签变量
     var blockTable;
     var preSpan;
@@ -362,39 +358,11 @@
     var pageNumSpan;
     var currPageSpan;
 
-    /*为表格添加序号*/
-    /*window.onload = function() {
-        //var oTable = document.getElementsByTagName("table");
-        var oTable=document.getElementById('procurement-history-table');
-        console.log("mark");
-        console.log(oTable);
-        console.log(oTable.rows.length);
-        for ( var i = 1; i < oTable.rows.length; i++) {
-            console.log(i);
-            console.log(oTable.rows[i].cells[0]);
-            if(oTable.rows[i].cells[0].firstChild==null)
-                oTable.rows[i].cells[0].innerHTML = i;
-            else {
-                var tdInner=oTable.rows[i].cells[0].firstChild;
-                console.log(tdInner);
-                console.log(tdInner.type);
-                if (tdInner.type != "CHECKBOX")
-                    oTable.rows[i].cells[1].innerHTML = i;
-            }
-            if (i % 2 == 0)
-                oTable.rows[i].className = "ot";
-        }
-    };*/
+    /*为表格添加序号、分页功能*/
     window.onload = function() {
         var oTable=document.getElementById('procurement-history-table');
-        /*console.log("mark");
-        console.log(oTable);
-        console.log(oTable.rows.length);*/
         var j=1;
         for ( var i = 1; i < oTable.rows.length;i++) {
-            /*console.log(i);
-            console.log(oTable.rows[i].cells[0]);
-            console.log(oTable.rows[i].cells[1]);*/
             if(oTable.rows[i].cells[0].firstChild==null) {
                 oTable.rows[i].cells[0].innerHTML = j;
                 j+=1;
@@ -414,8 +382,6 @@
         pageNumSpan = document.getElementById("spanTotalPage");
         currPageSpan = document.getElementById("spanPageNum");
 
-        //numCount = document.getElementById("procurement-history-table").rows.length - 1;       //取table的行数作为数据总数量（减去标题行1）
-
         columnsCounts = blockTable.rows[0].cells.length;
         pageCount = 5;
         /*pageNum = parseInt(numCount/pageCount);
@@ -432,12 +398,9 @@
             numCount+=1;
             var chkOrder = blockTable.rows[i].cells[0].firstChild;
             console.log(chkOrder);
-            if(chkOrder.type) {
-                console.log(chkOrder.type);
-                console.log(chkOrder.type == "CHECKBOX");
-                console.log(chkOrder.type == "checkbox");
-                console.log(chkOrder.type = "CHECKBOX");
-                if (chkOrder.type == "checkbox") {
+            console.log("chkOrder.nodeName: "+chkOrder.nodeName);
+            if(chkOrder){
+                if (chkOrder.type == "checkbox" || chkOrder.nodeName=="#text") {
                     console.log("j: "+j);
                     rowCountArr[j]=numCount;
                     numCount=0;
@@ -448,10 +411,9 @@
             }
         }
         rowCountArr[j]=rowCount-index;
-
         rowCountArr=rowCountArr.slice(1,rowCountArr.length);
         console.log(rowCountArr);
-        //alert(pageNum);
+
         firstPage();
     };
 
@@ -470,6 +432,10 @@
                 for(var i=1;i<table.rows.length;i++){
                     var chkOrder = table.rows[i].cells[0].firstChild;
                     if(chkOrder){
+                        console.log(chkOrder.type);
+                        console.log(chkOrder.type == "CHECKBOX");
+                        console.log(chkOrder.type == "checkbox");
+                        console.log(chkOrder.type = "CHECKBOX");
                         if(chkOrder.type == "checkbox"){
                             chkOrder.checked=true;
                             //chkOrder.setAttribute("checked", true);
