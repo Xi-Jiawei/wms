@@ -392,27 +392,40 @@
         rowCount = document.getElementById("procurement-history-table").rows.length;
         rowCountArr=new Array();
         var j=0,index=0;
-        pageNum=1;
         numCount=0;
         for(var i=1;i<rowCount;i++){
             numCount+=1;
             var chkOrder = blockTable.rows[i].cells[0].firstChild;
-            console.log(chkOrder);
-            console.log("chkOrder.nodeName: "+chkOrder.nodeName);
+            /*console.log(chkOrder);
+            console.log("chkOrder.nodeName: "+chkOrder.nodeName);*/
             if(chkOrder){
                 if (chkOrder.type == "checkbox" || chkOrder.nodeName=="#text") {
-                    console.log("j: "+j);
+                    console.log("i: "+i);
                     rowCountArr[j]=numCount;
                     numCount=0;
                     j+=1;
                     index=i;
-                    if(Math.floor(i/pageCount)+1>pageNum)pageNum=Math.floor(i/pageCount)+1;
+                    /*console.log("pageNum: "+pageNum);
+                    console.log(Math.ceil(index/pageCount));
+                    console.log(Math.ceil(index/pageCount)>pageNum);
+                    if(Math.floor(i/pageCount)+1>pageNum)pageNum=Math.floor(i/pageCount)+1;*/
                 }
             }
         }
         rowCountArr[j]=rowCount-index;
         rowCountArr=rowCountArr.slice(1,rowCountArr.length);
         console.log(rowCountArr);
+        var pageRowCount=0;
+        pageNum=1;
+        for(var i=0;i<rowCountArr.length;i++){
+            pageRowCount+=rowCountArr[i];
+            console.log("pageRowCount: "+pageRowCount);
+            if(pageRowCount>pageCount) {
+                pageNum += 1;
+                pageRowCount=rowCountArr[i];
+            }
+        }
+        console.log("pageNum: "+pageNum);
 
         firstPage();
     };

@@ -174,12 +174,17 @@ function lastPage(){
     }*/
 
     console.log("pageNum: "+pageNum);
-    var index=0,pageN=1;
+    var index=0,pageN=1,pageRowCount=0;
     for(var i=0;i<rowCountArr.length;i++){
         index+=rowCountArr[i];
         console.log(index);
         //if(Math.floor(index/pageCount)+1>pageN)pageN=Math.floor(index/pageCount)+1;
-        if(Math.ceil(index/pageCount)>pageN)pageN=Math.ceil(index/pageCount);
+        pageRowCount+=rowCountArr[i];
+        console.log("pageRowCount: "+pageRowCount);
+        if(pageRowCount>pageCount) {
+            pageN += 1;
+            pageRowCount=rowCountArr[i];
+        }
         console.log("pageN: "+pageN);
         console.log(pageN==pageNum);
         if(pageN==pageNum){
