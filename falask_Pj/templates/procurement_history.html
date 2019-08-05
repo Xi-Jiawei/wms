@@ -343,11 +343,10 @@
     });
 
     //全局变量
-    var numCount;       //数据总数量
-    var columnsCounts;  //数据列数量
+    var rowsLength;     //数据总数量
     var pageCount;      //每页显示的数量
     var pageNum;        //总页数
-    var currPageNum ;   //当前页数
+    var currPageNum;   //当前页数
 
     //页面标签变量
     var blockTable;
@@ -384,20 +383,15 @@
 
         columnsCounts = blockTable.rows[0].cells.length;
         pageCount = 5;
-        /*pageNum = parseInt(numCount/pageCount);
-        if(0 != numCount%pageCount){
-            pageNum += 1;
-        }*/
 
-        rowCount = document.getElementById("procurement-history-table").rows.length;
+        /*rowCountArr*/
+        rowsLength = document.getElementById("procurement-history-table").rows.length;
         rowCountArr=new Array();
         var j=0,index=0;
         numCount=0;
-        for(var i=1;i<rowCount;i++){
+        for(var i=1;i<rowsLength;i++){
             numCount+=1;
             var chkOrder = blockTable.rows[i].cells[0].firstChild;
-            /*console.log(chkOrder);
-            console.log("chkOrder.nodeName: "+chkOrder.nodeName);*/
             if(chkOrder){
                 if (chkOrder.type == "checkbox" || chkOrder.nodeName=="#text") {
                     console.log("i: "+i);
@@ -405,27 +399,35 @@
                     numCount=0;
                     j+=1;
                     index=i;
-                    /*console.log("pageNum: "+pageNum);
-                    console.log(Math.ceil(index/pageCount));
-                    console.log(Math.ceil(index/pageCount)>pageNum);
-                    if(Math.floor(i/pageCount)+1>pageNum)pageNum=Math.floor(i/pageCount)+1;*/
                 }
             }
         }
-        rowCountArr[j]=rowCount-index;
+        rowCountArr[j]=rowsLength-index;
         rowCountArr=rowCountArr.slice(1,rowCountArr.length);
         console.log(rowCountArr);
+
+        /*
+        * pageNum
+        * pageRowCountArrIndexArr*/
         var pageRowCount=0;
-        pageNum=1;
+        pageNum=1,pageRowCountArrIndexArr=new Array(),pageRowIndexArr=new Array();
+        index=1,pageRowCountArrIndexArr[0]=0,pageRowIndexArr[0]=1;
         for(var i=0;i<rowCountArr.length;i++){
+            index+=rowCountArr[i];
             pageRowCount+=rowCountArr[i];
             console.log("pageRowCount: "+pageRowCount);
-            if(pageRowCount>pageCount) {
+            if(pageRowCount>pageCount){
+                pageRowCountArrIndexArr[pageNum]=i;
+                pageRowIndexArr[pageNum]=index-rowCountArr[i];
                 pageNum += 1;
                 pageRowCount=rowCountArr[i];
             }
         }
         console.log("pageNum: "+pageNum);
+        console.log("pageRowCountArrIndexArr: ");
+        console.log(pageRowCountArrIndexArr);
+        console.log("pageRowIndexArr: ");
+        console.log(pageRowIndexArr);
 
         firstPage();
     };
