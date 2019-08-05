@@ -281,9 +281,9 @@
 <script src="/static/lib/datatables-init.js"></script>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    /*$(document).ready(function() {
         $('#bootstrap-data-table-export').DataTable();
-    } );
+    } );*/
 </script>
 
 <script type="text/javascript" src="/static/lib/test_tablepage.js"></script>
@@ -304,7 +304,7 @@
                 console.log(table.rows[i].cells[0]);
                 var chkOrder = table.rows[i].cells[0].firstChild;
                 console.log(chkOrder.checked);
-                if(chkOrder.type = "CHECKBOX") {
+                if(chkOrder.type == "checkbox") {
                     if (chkOrder.checked) {
                         console.log(table.rows[i].cells[8].innerHTML);
                         /*procurementArr[j] = {"id":table.rows[i].cells[2].innerHTML,
@@ -361,6 +361,7 @@
     var lastSpan;
     var pageNumSpan;
     var currPageSpan;
+
     /*为表格添加序号*/
     /*window.onload = function() {
         //var oTable = document.getElementsByTagName("table");
@@ -386,14 +387,14 @@
     };*/
     window.onload = function() {
         var oTable=document.getElementById('procurement-history-table');
-        console.log("mark");
+        /*console.log("mark");
         console.log(oTable);
-        console.log(oTable.rows.length);
+        console.log(oTable.rows.length);*/
         var j=1;
         for ( var i = 1; i < oTable.rows.length;i++) {
-            console.log(i);
+            /*console.log(i);
             console.log(oTable.rows[i].cells[0]);
-            console.log(oTable.rows[i].cells[1]);
+            console.log(oTable.rows[i].cells[1]);*/
             if(oTable.rows[i].cells[0].firstChild==null) {
                 oTable.rows[i].cells[0].innerHTML = j;
                 j+=1;
@@ -413,15 +414,44 @@
         pageNumSpan = document.getElementById("spanTotalPage");
         currPageSpan = document.getElementById("spanPageNum");
 
-        numCount = document.getElementById("procurement-history-table").rows.length - 1;       //取table的行数作为数据总数量（减去标题行1）
-        //alert(numCount);
+        //numCount = document.getElementById("procurement-history-table").rows.length - 1;       //取table的行数作为数据总数量（减去标题行1）
+
         columnsCounts = blockTable.rows[0].cells.length;
         pageCount = 5;
-        pageNum = parseInt(numCount/pageCount);
+        /*pageNum = parseInt(numCount/pageCount);
         if(0 != numCount%pageCount){
             pageNum += 1;
-        }
+        }*/
 
+        rowCount = document.getElementById("procurement-history-table").rows.length;
+        rowCountArr=new Array();
+        var j=0,index=0;
+        pageNum=1;
+        numCount=0;
+        for(var i=1;i<rowCount;i++){
+            numCount+=1;
+            var chkOrder = blockTable.rows[i].cells[0].firstChild;
+            console.log(chkOrder);
+            if(chkOrder.type) {
+                console.log(chkOrder.type);
+                console.log(chkOrder.type == "CHECKBOX");
+                console.log(chkOrder.type == "checkbox");
+                console.log(chkOrder.type = "CHECKBOX");
+                if (chkOrder.type == "checkbox") {
+                    console.log("j: "+j);
+                    rowCountArr[j]=numCount;
+                    numCount=0;
+                    j+=1;
+                    index=i;
+                    if(Math.floor(i/pageCount)+1>pageNum)pageNum=Math.floor(i/pageCount)+1;
+                }
+            }
+        }
+        rowCountArr[j]=rowCount-index;
+
+        rowCountArr=rowCountArr.slice(1,rowCountArr.length);
+        console.log(rowCountArr);
+        //alert(pageNum);
         firstPage();
     };
 
@@ -440,7 +470,7 @@
                 for(var i=1;i<table.rows.length;i++){
                     var chkOrder = table.rows[i].cells[0].firstChild;
                     if(chkOrder){
-                        if(chkOrder.type = "CHECKBOX"){
+                        if(chkOrder.type == "checkbox"){
                             chkOrder.checked=true;
                             //chkOrder.setAttribute("checked", true);
                         }
@@ -450,7 +480,7 @@
                 for(var i=1;i<table.rows.length;i++){
                     var chkOrder = table.rows[i].cells[0].firstChild;
                     if(chkOrder){
-                        if(chkOrder.type = "CHECKBOX"){
+                        if(chkOrder.type == "checkbox"){
                             chkOrder.checked=false;
                             //chkOrder.setAttribute("checked", false);
                         }
