@@ -359,21 +359,25 @@
 
     /*为表格添加序号、分页功能*/
     window.onload = function() {
-        var oTable=document.getElementById('procurement-history-table');
+        //var oTable=document.getElementById('procurement-history-table');
+        blockTable = document.getElementById("procurement-history-table");
         var j=1;
-        for ( var i = 1; i < oTable.rows.length;i++) {
-            if(oTable.rows[i].cells[0].firstChild==null) {
-                oTable.rows[i].cells[0].innerHTML = j;
+
+        console.log(blockTable.rows.length);
+
+        //第二列填入序号，区分第一列是否为复选框
+        for ( var i = 1; i < blockTable.rows.length;i++) {
+            if(blockTable.rows[i].cells[0].firstChild==null) {
+                blockTable.rows[i].cells[0].innerHTML = j;
                 j+=1;
             }
-            else if(oTable.rows[i].cells[1].firstChild==null) {
-                oTable.rows[i].cells[1].innerHTML = j;
+            else if(blockTable.rows[i].cells[1].firstChild==null) {
+                blockTable.rows[i].cells[1].innerHTML = j;
                 j+=1;
             }
         }
 
         //页面标签变量
-        blockTable = document.getElementById("procurement-history-table");
         preSpan = document.getElementById("spanPre");
         firstSpan = document.getElementById("spanFirst");
         nextSpan = document.getElementById("spanNext");
@@ -384,7 +388,7 @@
         columnsCounts = blockTable.rows[0].cells.length;
         pageCount = 5;
 
-        /*rowCountArr*/
+        /*rowCountArr，将每次采购的行数以列表存储。*/
         rowsLength = document.getElementById("procurement-history-table").rows.length;
         rowCountArr=new Array();
         var j=0,index=0;
@@ -392,6 +396,8 @@
         for(var i=1;i<rowsLength;i++){
             numCount+=1;
             var chkOrder = blockTable.rows[i].cells[0].firstChild;
+            console.log("chkOrder: ");
+            console.log(chkOrder);
             if(chkOrder){
                 if (chkOrder.type == "checkbox" || chkOrder.nodeName=="#text") {
                     console.log("i: "+i);
@@ -404,11 +410,12 @@
         }
         rowCountArr[j]=rowsLength-index;
         rowCountArr=rowCountArr.slice(1,rowCountArr.length);
+        console.log("rowCountArr: ");
         console.log(rowCountArr);
 
         /*
         * pageNum
-        * pageRowCountArrIndexArr*/
+        * pageRowCountArrIndexArr，记录每页首行的行索引*/
         var pageRowCount=0;
         pageNum=1,pageRowCountArrIndexArr=new Array(),pageRowIndexArr=new Array();
         index=1,pageRowCountArrIndexArr[0]=0,pageRowIndexArr[0]=1;

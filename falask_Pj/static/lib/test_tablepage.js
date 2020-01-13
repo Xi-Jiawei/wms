@@ -4,7 +4,11 @@ function firstPage(){
     showCurrPage(currPageNum);
     showTotalPage();
 
-    for(var i=0;i<pageRowIndexArr[1];i++){
+    //console.log("pageNum: "+pageNum);
+    if(pageNum>1)
+        for(var i=0;i<pageRowIndexArr[1];i++){
+        blockTable.rows[i].style.display = "";
+    }else for(var i=0;i<blockTable.rows.length;i++){
         blockTable.rows[i].style.display = "";
     }
 
