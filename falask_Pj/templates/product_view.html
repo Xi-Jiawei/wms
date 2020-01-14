@@ -166,266 +166,317 @@
                             </div>
 
                             {% if authority=='2'%}
-                            <!--
-                            1、col是column简写：列；
-                            2、xs是maxsmall简写：超小， sm是small简写：小，  md是medium简写：中等， lg是large简写：大；
-                            3、-* 表示占列数，即占每行row分12列栅格系统比；
-                            4、.col-xs-* 超小屏幕如手机 （<768px）时使用；
-                                col-sm-* 小屏幕如平板 （768px ≤ 宽度 ＜992px）时使用；
-                                col-md-* 中等屏幕如普通显示器 （992px ≤ 宽度 ＜ 1200px）时使用；
-                                col-lg-* 大屏幕如大显示器 （≥1200px）时使用。-->
-                            <div class="row">
-                                <div class="left">
-                                    <label for="productcode" class="control-label mb-1">成品编码</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
-                                    <div class="col-xs-12">
-                                        {{ form.productCode }}
-                                    </div>
-                                </div>
+                                <div class="row">
+                                    <div class="col-md-12" >
+                                        <div class="card" style="height:370px">
+                                            <div class="card-body">
+                                                <!--
+                                                1、col是column简写：列；
+                                                2、xs是maxsmall简写：超小， sm是small简写：小，  md是medium简写：中等， lg是large简写：大；
+                                                3、-* 表示占列数，即占每行row分12列栅格系统比；
+                                                4、.col-xs-* 超小屏幕如手机 （<768px）时使用；
+                                                    col-sm-* 小屏幕如平板 （768px ≤ 宽度 ＜992px）时使用；
+                                                    col-md-* 中等屏幕如普通显示器 （992px ≤ 宽度 ＜ 1200px）时使用；
+                                                    col-lg-* 大屏幕如大显示器 （≥1200px）时使用。-->
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label for="productcode" class="control-label mb-1">成品编码</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
+                                                        <div class="col-xs-12">
+                                                            {{ form.productCode }}
+                                                        </div>
+                                                    </div>
 
-                                <div class="right">
-                                    <label class="control-label mb-1">成品型号</label>
-                                    <div class="col-xs-12">
-                                        {{ form.productType }}
-                                    </div>
-                                </div>
-                            </div>
+                                                    <div class="right">
+                                                        <label class="control-label mb-1">成品型号</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.productType }}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                            <div class="row">
-                                <div class="left">
-                                    <label class="control-label mb-1">客户</label>
-                                    <div class="col-xs-12">
-                                        {{ form.client }}
-                                    </div>
-                                </div>
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label class="control-label mb-1">客户</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.client }}
+                                                        </div>
+                                                    </div>
 
-                                <div class="right">
-                                    <label class="control-label mb-1">售价</label>
-                                    <div class="col-xs-12">
-                                        {{ form.price }}
-                                    </div>
-                                </div>
-                            </div>
+                                                    <div class="right">
+                                                        <label class="control-label mb-1">售价</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.price }}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                            <div class="row">
-                                <div class="left">
-                                    <label class="control-label mb-1">利润</label>
-                                    <div class="col-xs-12">
-                                        {{ form.profit }}
-                                    </div>
-                                </div>
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label class="control-label mb-1">利润</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.profit }}
+                                                        </div>
+                                                    </div>
 
-                                <div class="right">
-                                    <label class="control-label mb-1">税率</label>
-                                    <div class="col-xs-12">
-                                        {{ form.taxRate }}
-                                    </div>
-                                </div>
-                            </div>
+                                                    <div class="right">
+                                                        <label class="control-label mb-1">税率</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.taxRate }}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                            <div class="row">
-                                <div class="left">
-                                    <label class="control-label mb-1">总成本</label>
-                                    <div class="col-xs-12">
-                                        {{ form.totalCost }}
-                                    </div>
-                                </div>
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label class="control-label mb-1">总成本</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.totalCost }}
+                                                        </div>
+                                                    </div>
 
-                                <div class="right">
-                                    <label class="control-label mb-1">录入员姓名</label>
-                                    <div class="col-xs-12">
-                                        {{ form.entryClerk }}
+                                                    <div class="right">
+                                                        <label class="control-label mb-1">录入员</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.entryClerk }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label class="control-label mb-1">备注</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.remark }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
                             {% elif authority=='1'%}
-                            <div class="row">
-                                <div class="left">
-                                    <label for="productcode" class="control-label mb-1">成品编码</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
-                                    <div class="col-xs-12">
-                                        {{ form.productCode }}
-                                    </div>
-                                </div>
+                                <div class="row">
+                                    <div class="col-md-12" >
+                                        <div class="card" style="height:310px">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label for="productcode" class="control-label mb-1">成品编码</label>  <!--for 属性规定 label 与哪个表单元素绑定。-->
+                                                        <div class="col-xs-12">
+                                                            {{ form.productCode }}
+                                                        </div>
+                                                    </div>
 
-                                <div class="right">
-                                    <label class="control-label mb-1">成品型号</label>
-                                    <div class="col-xs-12">
-                                        {{ form.productType }}
-                                    </div>
-                                </div>
-                            </div>
+                                                    <div class="right">
+                                                        <label class="control-label mb-1">成品型号</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.productType }}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                            <div class="row">
-                                <div class="left">
-                                    <label class="control-label mb-1">客户</label>
-                                    <div class="col-xs-12">
-                                        {{ form.client }}
-                                    </div>
-                                </div>
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label class="control-label mb-1">客户</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.client }}
+                                                        </div>
+                                                    </div>
 
-                                <div class="right">
-                                    <label class="control-label mb-1">税率</label>
-                                    <div class="col-xs-12">
-                                        {{ form.taxRate }}
-                                    </div>
-                                </div>
-                            </div>
+                                                    <div class="right">
+                                                        <label class="control-label mb-1">税率</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.taxRate }}
+                                                        </div>
+                                                    </div>
+                                                </div>
 
-                            <div class="row">
-                                <div class="left">
-                                    <label class="control-label mb-1">总成本</label>
-                                    <div class="col-xs-12">
-                                        {{ form.totalCost }}
-                                    </div>
-                                </div>
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label class="control-label mb-1">总成本</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.totalCost }}
+                                                        </div>
+                                                    </div>
 
-                                <div class="right">
-                                    <label class="control-label mb-1">录入员姓名</label>
-                                    <div class="col-xs-12">
-                                        {{ form.entryClerk }}
+                                                    <div class="right">
+                                                        <label class="control-label mb-1">录入员姓名</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.entryClerk }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="left">
+                                                        <label class="control-label mb-1">备注</label>
+                                                        <div class="col-xs-12">
+                                                            {{ form.remark }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
                             {% endif %}
 
                             <br/>                                                                          <!--br空行-->
 
-                                <table id="Costs" class="table table-striped table-bordered">
-                                    <!--<caption><h3>费用组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
-                                    <thead>
-                                    <tr align="center">
-                                        <th>材料成本</th>
-                                        <th>加工成本</th>
-                                        <th>管理成本</th>
-                                        <th>辅料成本</th>
-                                        <th>运营成本</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <tr>
-                                        {% if materialCost%}
+                            <table id="Costs" class="table table-striped table-bordered">
+                                <!--<caption><h3>费用组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
+                                <thead>
+                                <tr align="center">
+                                    <th>材料成本</th>
+                                    <th>加工成本</th>
+                                    <th>管理成本</th>
+                                    <th>辅料成本</th>
+                                    <th>运营成本</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    {% if materialCost%}
                                         <td id="materialCost">
                                             {{ materialCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="materialCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if processCost%}
+                                    {% if processCost%}
                                         <td id="processCost">
                                             {{ processCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="processCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if adminstrationCost%}
+                                    {% if adminstrationCost%}
                                         <td id="adminstrationCost">
                                             {{ adminstrationCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="adminstrationCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if supplementaryCost%}
+                                    {% if supplementaryCost%}
                                         <td id="supplementaryCost">
                                             {{ supplementaryCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="supplementaryCost">0.00</td>
-                                        {% endif %}
+                                    {% endif %}
 
-                                        {% if operatingCost%}
+                                    {% if operatingCost%}
                                         <td id="operatingCost">
                                             {{ operatingCost }}
                                         </td>
-                                        {% else %}
+                                    {% else %}
                                         <td id="operatingCost">0.00</td>
-                                        {% endif %}
-                                    </tr>
-                                    </tbody>
-                                </table>
+                                    {% endif %}
+                                </tr>
+                                </tbody>
+                            </table>
 
                             <br/>                                                                          <!--br空行-->
 
-                            <label>物料组成</label>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card" style="overflow: hidden">
+                                        <div class="card-header">
+                                            <strong class="card-title">物料组成</strong>
+                                        </div>
 
-                            <div class="card-body">
-                                <br/>
-                                <table id="materialOfProduct" class="table table-striped table-bordered">
-                                <!--<caption><h3>物料组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
-                                <br/>
-                                    <thead>
-                                        <tr align="center" bgcolor="deepskyblue">
-                                            <th>物料编码</th>
-                                            <th>物料数量</th>
-                                            <th>物料单价</th>
-                                            <th>贴片数量</th>
-                                            <th>贴片单价</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% if materialOfProduct%}
-                                    {% for i in materialOfProduct %}
-                                        <tr class='tr_i'>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[1] }}</td>
-                                            <td>{{ i[2] }}</td>
-                                            <td>{{ i[4] }}</td>
-                                            <td>{{ i[5] }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                    {% endif %}
-                                    </tbody>
-                                </table>
+                                        <div class="card-body">
+                                            <table id="materialOfProduct" class="table table-striped table-bordered">
+                                                <!--<caption><h3>物料组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
+                                                <br/>
+                                                <thead>
+                                                <tr align="center" bgcolor="deepskyblue">
+                                                    <th>物料编码</th>
+                                                    <th>物料数量</th>
+                                                    <th>物料单价</th>
+                                                    <th>贴片数量</th>
+                                                    <th>贴片单价</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if materialOfProduct%}
+                                                    {% for i in materialOfProduct %}
+                                                        <tr class='tr_i'>
+                                                            <td>{{ i[0] }}</td>
+                                                            <td>{{ i[1] }}</td>
+                                                            <td>{{ i[2] }}</td>
+                                                            <td>{{ i[4] }}</td>
+                                                            <td>{{ i[5] }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <br/>                                                                          <!--br空行-->
 
-                            <label>其他费用</label>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card" style="overflow: hidden">
+                                        <div class="card-header">
+                                            <strong class="card-title">其他费用</strong>
+                                        </div>
 
-                            <div class="card-body">
-                                <br/>
-                                <table id="otherCosts" class="table table-striped table-bordered">
-                                <!--<caption><h3>物料组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
-                                <br/>
-                                    <thead>
-                                        <tr align="center" bgcolor="deepskyblue">
-                                            <th rowspan="2" width=20px>序号</th>
-                                            <th colspan="2">加工费</th>
-                                            <th colspan="2">管理费</th>
-                                            <th colspan="2">辅料费</th>
-                                            <th colspan="2">运营费</th>
-                                        </tr>
-                                        <tr align="center" bgcolor="deepskyblue">
-                                            <th>项目</th>
-                                            <th>费用</th>
-                                            <th>项目</th>
-                                            <th>费用</th>
-                                            <th>项目</th>
-                                            <th>费用</th>
-                                            <th>项目</th>
-                                            <th>费用</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    {% if otherCosts%}
-                                    {% for i in otherCosts %}
-                                        <tr>
-                                            <td></td>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[1] }}</td>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[2] }}</td>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[4] }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                    {% endif %}
-                                    </tbody>
-                                </table>
+                                        <div class="card-body">
+                                            <table id="otherCosts" class="table table-striped table-bordered">
+                                                <!--<caption><h3>物料组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
+                                                <br/>
+                                                <thead>
+                                                <tr align="center" bgcolor="deepskyblue">
+                                                    <th rowspan="2" width=20px>序号</th>
+                                                    <th colspan="2">加工费</th>
+                                                    <th colspan="2">管理费</th>
+                                                    <th colspan="2">辅料费</th>
+                                                    <th colspan="2">运营费</th>
+                                                </tr>
+                                                <tr align="center" bgcolor="deepskyblue">
+                                                    <th>项目</th>
+                                                    <th>费用</th>
+                                                    <th>项目</th>
+                                                    <th>费用</th>
+                                                    <th>项目</th>
+                                                    <th>费用</th>
+                                                    <th>项目</th>
+                                                    <th>费用</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if otherCosts%}
+                                                    {% for i in otherCosts %}
+                                                        <tr>
+                                                            <td></td>
+                                                            <td>{{ i[0] }}</td>
+                                                            <td>{{ i[1] }}</td>
+                                                            <td>{{ i[0] }}</td>
+                                                            <td>{{ i[2] }}</td>
+                                                            <td>{{ i[0] }}</td>
+                                                            <td>{{ i[3] }}</td>
+                                                            <td>{{ i[0] }}</td>
+                                                            <td>{{ i[4] }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>

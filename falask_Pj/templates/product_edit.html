@@ -188,7 +188,7 @@
 
                             <div class="row">
                                 <div class="col-md-12" >
-                                    <div class="card" style="height:300px">
+                                    <div class="card" style="height:370px">
                                         <div class="card-body">
                                             <!--
                                             1、col是column简写：列；
@@ -255,11 +255,20 @@
                                                 </div>
 
                                                 <!--<div class="right">
-                                                    <label class="control-label mb-1">录入员姓名</label>
+                                                    <label class="control-label mb-1">录入员</label>
                                                     <div class="col-xs-12">
                                                         {{ form.entryClerk }}
                                                     </div>
                                                 </div>-->
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="left">
+                                                    <label class="control-label mb-1">备注</label>
+                                                    <div class="col-xs-12">
+                                                        {{ form.remark }}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -770,12 +779,12 @@
             console.log($(this).serialize());
             console.log($(this).serializeArray());
             var formData=$(this).serializeArray();
-            console.log(formData[7]);
-            //alert(formData[7]['value']);
+            /*console.log(formData[7]);
+            alert(formData[7]['value']);
             if(formData[7]['value']==""){
                 alert("请输入录入员姓名！");
                 return;
-            }
+            }*/
             var data={'productCode':formData[0]['value'],
                 'productType':formData[1]['value'],
                 'client':formData[2]['value'],
@@ -783,6 +792,7 @@
                 'profit':parseFloat(formData[4]['value']),
                 'taxRate':parseFloat(formData[5]['value']),
                 'totalCost':parseFloat(formData[6]['value']),
+                'remark':formData[7]['value'],
                 'materialCost':parseFloat(rows[1].cells[0].innerHTML),
                 'processCost':parseFloat(rows[1].cells[1].innerHTML),
                 'adminstrationCost':parseFloat(rows[1].cells[2].innerHTML),
@@ -1109,7 +1119,7 @@
         $("#price").val(price);
     });
     /*数据绑定*/
-    $("#otherCosts").on('input', '.project', function () {
+    {#$("#otherCosts").on('input', '.project', function () {
         document.activeElement.setAttribute("value", $(this).val());
         console.log(document.activeElement);
 
@@ -1130,7 +1140,7 @@
         tdElementsArr[6].getElementsByTagName("input")[0].setAttribute("value", $(this).val());
         tdElementsArr[8].getElementsByTagName("input")[0].setAttribute("value", $(this).val());
         console.log(document.activeElement.parentElement.parentElement);
-    });
+    });#}
     /*物料编码校验*/
     /*$("#materialOfProduct").on('input', '.materialCode', function () {
         document.activeElement.setAttribute("value", $(this).val());

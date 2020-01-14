@@ -46,6 +46,7 @@ def add_product():
                 profit = data['profit']
                 totalCost = data['totalCost']
                 taxRate = data['taxRate']
+                remark = data['remark']
                 materialCost = data['materialCost']
                 processCost = data['processCost']
                 adminstrationCost = data['adminstrationCost']
@@ -56,7 +57,7 @@ def add_product():
                 if not check_productInfoByCode(productCode) and not check_productInfoByType(productType):
                     print("数据库中不存在此成品。")
                     insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate,
-                                       materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost)
+                                       materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark)
                     for materialOfProduct in materialOfProductArr:
                         insert_materialsOfProduct(productCode, materialOfProduct[0], materialOfProduct[1],
                                                   materialOfProduct[2], materialOfProduct[3], materialOfProduct[4],
@@ -81,10 +82,10 @@ def add_product():
                     print("数据库中已存在同型号的成品。")
                     return jsonify({'ok': "type"})
             elif request.method == 'GET':
-                create_materialsOfProduct_temp()
+                # create_materialsOfProduct_temp()
                 return render_template('product_edit.html', setting=0, form=addProductForm, username=username) # setting为0表示新添，setting为1表示编辑
             else:
-                create_materialsOfProduct_temp()
+                # create_materialsOfProduct_temp()
                 return render_template('product_edit.html', form=addProductForm, username=username)
         else:
             return render_template('access_fail.html')
@@ -110,6 +111,7 @@ def edit_product(productCode):
             addProductForm.totalCost.data = productInfo[0][4]
             addProductForm.taxRate.data = productInfo[0][5]
             addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+            addProductForm.remark.data = productInfo[0][11]
             addProductForm.productCode.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.productType.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.client.render_kw={"class": "form-control","readonly": 'true'}
@@ -117,6 +119,7 @@ def edit_product(productCode):
             addProductForm.profit.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.taxRate.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.entryClerk.render_kw={"class": "form-control","readonly": 'true'}
+            addProductForm.remark.render_kw={"class": "form-control","readonly": 'true'}
             materialCost = str(productInfo[0][6])
             processCost = str(productInfo[0][7])
             adminstrationCost = str(productInfo[0][8])
@@ -145,6 +148,7 @@ def edit_product(productCode):
                 profit = data['profit']
                 totalCost = data['totalCost']
                 taxRate = data['taxRate']
+                remark = data['remark']
                 materialCost = data['materialCost']
                 processCost = data['processCost']
                 adminstrationCost = data['adminstrationCost']
@@ -153,7 +157,7 @@ def edit_product(productCode):
                 materialOfProductArr = data['materialOfProduct']
                 otherCostsArr = data['otherCostsArr']
                 update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost,
-                                   processCost, adminstrationCost, supplementaryCost, operatingCost)
+                                   processCost, adminstrationCost, supplementaryCost, operatingCost, remark)
                 delete_materialsOfProduct(productCode)
                 if len(materialOfProductArr) > 0:
                     for materialOfProduct in materialOfProductArr:
@@ -178,7 +182,7 @@ def edit_product(productCode):
 
                 return jsonify({'ok': True})
             elif request.method == 'GET':
-                create_materialsOfProduct_temp()
+                # create_materialsOfProduct_temp()
 
                 productInfo = select_productInfoByCode(productCode)
                 productChange = select_productChangeByCode(productCode)
@@ -190,6 +194,8 @@ def edit_product(productCode):
                 addProductForm.totalCost.data = productInfo[0][4]
                 addProductForm.taxRate.data = productInfo[0][5]
                 addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+                addProductForm.entryClerk.render_kw = {"class": "form-control", "readonly": 'true'}
+                addProductForm.remark.data = productInfo[0][11]
                 materialCost = str(productInfo[0][6])
                 processCost = str(productInfo[0][7])
                 adminstrationCost = str(productInfo[0][8])
@@ -206,7 +212,7 @@ def edit_product(productCode):
                                        materialOfProduct=materialOfProduct, otherCosts=otherCosts,
                                        username=username)
             else:
-                create_materialsOfProduct_temp()
+                # create_materialsOfProduct_temp()
                 return render_template('product_edit.html', form=addProductForm, username=username)
         else:
             return render_template('access_fail.html')

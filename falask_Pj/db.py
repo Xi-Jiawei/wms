@@ -346,7 +346,7 @@ def select_productChangeByCode(productCode):
 # xijiawei
 # 查询成品信息
 def select_productInfoByCode(productCode):
-    sql = "select productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost from productInfo where productCode='%s';"%(productCode)
+    sql = "select productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark from productInfo where productCode='%s';"%(productCode)
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -450,9 +450,9 @@ def select_otherCostsByCode(productCode):
 
 # xijiawei
 # 插入成品静态表
-def insert_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost):
-    sql = "insert into productInfo (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost)value('%s','%s','%s','%f','%f','%f','%f','%f','%f','%f','%f','%f');" \
-          % (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost)
+def insert_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark):
+    sql = "insert into productInfo (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark)value('%s','%s','%s','%f','%f','%f','%f','%f','%f','%f','%f','%f','%s');" \
+          % (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -515,9 +515,9 @@ def insert_productChange(productCode,entryClerk,updateOfContent,entryDate):
 
 # xijiawei
 # 更新成品物料组成表
-def update_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost):
-    sql = "update productInfo set productType='%s',client='%s',price='%f',profit='%f',totalCost='%f',taxRate='%f',materialCost='%f',processCost='%f',adminstrationCost='%f',supplementaryCost='%f',operatingCost='%f' where productCode='%s';" \
-          % (productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,productCode)
+def update_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark):
+    sql = "update productInfo set productType='%s',client='%s',price='%f',profit='%f',totalCost='%f',taxRate='%f',materialCost='%f',processCost='%f',adminstrationCost='%f',supplementaryCost='%f',operatingCost='%f',remark='%s' where productCode='%s';" \
+          % (productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,productCode)
     try:
         # 执行SQL语句
         cur.execute(sql)

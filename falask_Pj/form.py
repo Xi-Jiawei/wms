@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import StringField,SubmitField,SelectField,DateField
+from wtforms import StringField,SubmitField,SelectField,TextAreaField
 from wtforms.validators import Required
 from wtforms.validators import DataRequired # 引入Form验证父类
 
@@ -182,6 +182,22 @@ class AddProductForm(Form):
             "class": "form-control",
             "placeholder": "请输入录入员姓名",
             "required": 'required'  # 表示输入框不能为空，并有提示信息
+        }
+    )
+    # 录入员
+    remark = TextAreaField(
+        # 标签
+        label="备注",
+        # 验证器
+        validators=[
+            DataRequired('请输入备注')
+        ],
+        description="备注",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "class": "form-control",
+            "placeholder": "请输入备注",
+            #"required": 'required'  # 表示输入框不能为空，并有提示信息
         }
     )
 
