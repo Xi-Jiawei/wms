@@ -440,29 +440,29 @@
                                                         <tr>
                                                             <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
                                                             <td></td>
-                                                            <td><input type='text' style='width:80px' class='project' placeholder='项目名称'
-                                                                       value={{ i[0] }}
+                                                            <td><input type='text' style='width:80px' class='projects' placeholder='项目名称'
+                                                                       value={{ i[4] }}
                                                             /></td>
                                                             <td><input type='text' style='width:80px' class='otherCosts' placeholder='加工费'
-                                                                       value={{ i[1] }}
-                                                            /></td>
-                                                            <td><input type='text' style='width:80px' class='project' placeholder='项目名称'
                                                                        value={{ i[0] }}
+                                                            /></td>
+                                                            <td><input type='text' style='width:80px' class='projects' placeholder='项目名称'
+                                                                       value={{ i[5] }}
                                                             /></td>
                                                             <td><input type='text' style='width:80px' class='otherCosts' placeholder='管理费'
-                                                                       value={{ i[2] }}
+                                                                       value={{ i[1] }}
                                                             /></td>
-                                                            <td><input type='text' style='width:80px' class='project' placeholder='项目名称'
-                                                                       value={{ i[0] }}
+                                                            <td><input type='text' style='width:80px' class='projects' placeholder='项目名称'
+                                                                       value={{ i[6] }}
                                                             /></td>
                                                             <td><input type='text' style='width:80px' class='otherCosts' placeholder='辅料费'
-                                                                       value={{ i[3] }}
+                                                                       value={{ i[2] }}
                                                             /></td>
-                                                            <td><input type='text' style='width:80px' class='project' placeholder='项目名称'
-                                                                       value={{ i[0] }}
+                                                            <td><input type='text' style='width:80px' class='projects' placeholder='项目名称'
+                                                                       value={{ i[7] }}
                                                             /></td>
                                                             <td><input type='text' style='width:80px' class='otherCosts' placeholder='运营费'
-                                                                       value={{ i[4] }}
+                                                                       value={{ i[3] }}
                                                             /></td>
                                                         </tr>
                                                     {% endfor %}
@@ -762,16 +762,24 @@
             for (var i=0;i<trList.length;i++) {
                 otherCostsArr[i] =new Array();
                 var tdArr = trList.eq(i).find("td");
-                if(tdArr.eq(2).find("input").val()=="") {
+                if(tdArr.eq(2).find("input").val()==""||tdArr.eq(4).find("input").val()==""||tdArr.eq(6).find("input").val()==""||tdArr.eq(8).find("input").val()=="") {
                     alert("请输入项目名称！");
+                    return;
+                }
+                if(tdArr.eq(3).find("input").val()==""||tdArr.eq(5).find("input").val()==""||tdArr.eq(7).find("input").val()==""||tdArr.eq(9).find("input").val()=="") {
+                    alert("请输入费用！");
                     return;
                 }
                 otherCostsArr[i][0]=tdArr.eq(2).find("input").val();//项目名称
                 otherCostsArr[i][1]=parseInt(tdArr.eq(3).find("input").val());//加工费
-                otherCostsArr[i][2] = parseFloat(tdArr.eq(5).find("input").val());//管理费
-                otherCostsArr[i][3]=parseInt(tdArr.eq(7).find("input").val());//辅料费
-                otherCostsArr[i][4] = parseFloat(tdArr.eq(9).find("input").val());//运营费
+                otherCostsArr[i][2]=tdArr.eq(4).find("input").val();//项目名称
+                otherCostsArr[i][3] = parseFloat(tdArr.eq(5).find("input").val());//管理费
+                otherCostsArr[i][4]=tdArr.eq(6).find("input").val();//项目名称
+                otherCostsArr[i][5]=parseInt(tdArr.eq(7).find("input").val());//辅料费
+                otherCostsArr[i][6]=tdArr.eq(8).find("input").val();//项目名称
+                otherCostsArr[i][7] = parseFloat(tdArr.eq(9).find("input").val());//运营费
             }
+            console.log("otherCostsArr: ");
             console.log(otherCostsArr);
 
             rows=document.getElementById("Costs").rows;
@@ -867,55 +875,41 @@
 <script src="/static/jquery/jquery-2.1.4.min.js"></script>
 <script  type="text/javascript">
     /*表格增加行*/
-    var rowCount = 1;
-    var colCount=1;
-    var html='';
     function addRow() {
-        rowCount++;
-        console.log(rowCount);
-        console.log(colCount);
-        for(var i=0;i<colCount-2;i++){
-            html += '<td><input/></td>';
-        }
-
-        var rowTemplate = "<tr class='tr_"+rowCount+"'>\n" +
+        var rowNum=$("#materialOfProduct tbody").children("tr").length;
+        rowNum++;
+        var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
             "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
             "<td><input type='text' style='width:150px' class='materialCode'/></td>" +
             "<td><input type='text' style='width:150px' class='materialOfProduct' value='0'/></td>" +
             "<td><input type='text' style='width:150px' class='materialOfProduct' value='0.00'/></td>" +
             "<td><input type='text' style='width:150px' class='materialOfProduct' value='0'/></td>" +
-            "<td><input type='text' style='width:150px' class='materialOfProduct' value='0.00'/></td>"+html+"</tr>";
+            "<td><input type='text' style='width:150px' class='materialOfProduct' value='0.00'/></td></tr>";
         var tableHtml = $("#materialOfProduct tbody").html();
         console.log(tableHtml);
         tableHtml += rowTemplate;
         $("#materialOfProduct tbody").html(tableHtml);
-        html='';
     }
 
     /*表格增加行*/
     function addRow2() {
         var rowNum=$("#otherCosts tbody").children("tr").length;
         rowNum++;
-        console.log(rowNum);
-        console.log(colCount);
-        for(var i=0;i<colCount-2;i++){
-            html += '<td><input/></td>';
-        }
-        var rowTemplate = "<tr class='tr_"+rowCount+"'>\n" +
+        var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
             "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
             "<td>"+rowNum+"</td>\n" +
-            "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
+            "<td><input type='text' style='width:80px' class='projects' placeholder='项目名称'/></td>" +
             "<td><input type='text' style='width:80px' class='otherCosts' placeholder='加工费'/></td>" +
-            "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
+            "<td><input type='text' style='width:80px' class='projects' placeholder='项目名称'/></td>" +
             "<td><input type='text' style='width:80px' class='otherCosts' placeholder='管理费'/></td>" +
-            "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
+            "<td><input type='text' style='width:80px' class='projects' placeholder='项目名称'/></td>" +
             "<td><input type='text' style='width:80px' class='otherCosts' placeholder='辅料费'/></td>" +
-            "<td><input type='text' style='width:80px' class='project' placeholder='项目名称'/></td>" +
-            "<td><input type='text' style='width:80px' class='otherCosts' placeholder='运营费'/></td>"+html+"</tr>";
+            "<td><input type='text' style='width:80px' class='projects' placeholder='项目名称'/></td>" +
+            "<td><input type='text' style='width:80px' class='otherCosts' placeholder='运营费'/></td></tr>";
         var tableHtml = $("#otherCosts tbody").html();
+        console.log(tableHtml);
         tableHtml += rowTemplate;
         $("#otherCosts tbody").html(tableHtml);
-        html='';
     }
     /*获取form表单数据*/
     function getFormData($form) {
@@ -1118,6 +1112,11 @@
         console.log($("#price"));
         $("#price").val(price);
     });
+    /*输入框数据变成持久值*/
+    $("#otherCosts").on('blur','.projects', function() {
+        //document.activeElement.setAttribute("value", $(this).val());
+        $(this).attr("value",$(this).val());
+    });
     /*数据绑定*/
     {#$("#otherCosts").on('input', '.project', function () {
         document.activeElement.setAttribute("value", $(this).val());
@@ -1313,7 +1312,6 @@
         console.log($("#price"));
         $("#price").val(price);
     };
-
     /*为表格添加序号*/
     window.onload = function() {
         var oTable = document.getElementById("otherCosts");

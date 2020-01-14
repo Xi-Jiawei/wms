@@ -442,7 +442,7 @@ def select_productTypeByCode(productCode):
 # xijiawei
 # 查询成品其他成本组成信息
 def select_otherCostsByCode(productCode):
-    sql = "select project,procCost,adminCost,suppleCost,operaCost from otherCosts where productCode='%s';"%(productCode)
+    sql = "select procCost,adminCost,suppleCost,operaCost, process, adminstration, supplementary, operating from otherCosts where productCode='%s';"%(productCode)
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -467,7 +467,7 @@ def insert_productInfo(productCode,productType,client,price,profit,totalCost,tax
 # xijiawei
 # 插入成品物料组成表
 def insert_materialsOfProduct(productCode,materialCode,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost):
-    sql = "insert into materialsOfProduct (productCode,materialCode,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost)value('%s','%s','%d','%f','%f','%d','%f','%f');" \
+    sql = "insert into materialsOfProduct (productCode,materialCode,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost) value('%s','%s','%d','%f','%f','%d','%f','%f');" \
           % (productCode,materialCode,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost)
     try:
         # 执行SQL语句
@@ -482,9 +482,9 @@ def insert_materialsOfProduct(productCode,materialCode,materialNum,materialPrice
 
 # xijiawei
 # 插入成品费用组成表
-def insert_otherCosts(productCode,project,procCost,adminCost,suppleCost,operaCost):
-    sql = "insert into otherCosts (productCode,project,procCost,adminCost,suppleCost,operaCost)value('%s','%s','%f','%f','%f','%f');" \
-          % (productCode,project,procCost,adminCost,suppleCost,operaCost)
+def insert_otherCosts(productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating):
+    sql = "insert into otherCosts (productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating) value('%s','%f','%f','%f','%f','%s','%s','%s','%s');" \
+          % (productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -493,14 +493,15 @@ def insert_otherCosts(productCode,project,procCost,adminCost,suppleCost,operaCos
         print("语句已经提交")
         return True
         conn.close()
-    except:
+    except Exception as e:
+        print("插入异常：", e)
         conn.rollback()
 
 # xijiawei
 # 插入成品录入表
 def insert_productChange(productCode,entryClerk,updateOfContent,entryDate):
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into productChange (productCode,entryClerk,updateOfContent,entryDate)value('%s','%s','%s','%s');" \
+    sql = "insert into productChange (productCode,entryClerk,updateOfContent,entryDate) value('%s','%s','%s','%s');" \
           % (productCode,entryClerk,updateOfContent,entryDate)
     try:
         # 执行SQL语句
@@ -563,6 +564,22 @@ def update_materialsOfProduct(productCode,materialCode,materialNum,materialPrice
         conn.close()
     except:
         conn.rollback()
+
+# # xijiawei
+# # 更新其他费用组成表
+# def update_otherCosts(productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating):
+#     sql = "update otherCosts set procCost='%f',adminCost='%f',suppleCost='%f',operaCost='%f',process='%s', adminstration='%s', supplementary='%s', operating='%s' where productCode='%s';" \
+#           % (procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating, productCode)
+#     try:
+#         # 执行SQL语句
+#         cur.execute(sql)
+#         # 提交到数据库执行
+#         conn.commit()
+#         print("语句已经提交")
+#         return True
+#         conn.close()
+#     except:
+#         conn.rollback()
 
 # xijiawei
 # 更新成品物料组成表

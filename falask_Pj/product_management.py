@@ -63,8 +63,7 @@ def add_product():
                                                   materialOfProduct[2], materialOfProduct[3], materialOfProduct[4],
                                                   materialOfProduct[5], materialOfProduct[6])
                     for otherCosts in otherCostsArr:
-                        insert_otherCosts(productCode, otherCosts[0], otherCosts[1], otherCosts[2], otherCosts[3],
-                                          otherCosts[4])
+                        insert_otherCosts(productCode,otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7], otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
 
                     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
                     nowTime = datetime.now()
@@ -167,10 +166,9 @@ def edit_product(productCode):
                                                   materialOfProduct[6])
 
                 delete_otherCosts(productCode)
-                if len(otherCostsArr) > 0:
-                    for otherCosts in otherCostsArr:
-                        insert_otherCosts(productCode, otherCosts[0], otherCosts[1], otherCosts[2], otherCosts[3],
-                                          otherCosts[4])
+                for otherCosts in otherCostsArr:
+                    insert_otherCosts(productCode, otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7],
+                                      otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
 
                 # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
                 nowTime = datetime.now()
