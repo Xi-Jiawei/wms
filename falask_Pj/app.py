@@ -11,7 +11,8 @@ from form import MyForm, SelectForm, ChangeForm
 from product_management import product_management
 from procurement import procurement_app
 
-app = Flask(__name__)
+# app = Flask(__name__)
+app = Flask(__name__,static_folder='./static',template_folder='./templates')
 
 # 静态文件缓存时间设置
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
