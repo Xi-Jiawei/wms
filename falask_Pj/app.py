@@ -6,13 +6,19 @@ from model import User, NewUser
 from db import *
 import config,datetime
 import os
+import sys
 
 from form import MyForm, SelectForm, ChangeForm
 from product_management import product_management
 from procurement import procurement_app
 
 # app = Flask(__name__)
-app = Flask(__name__,static_folder='./static',template_folder='./templates')
+if getattr(sys, 'frozen', False):
+  template_folder = os.path.join(sys._MEIPASS, 'templates')
+  static_folder = os.path.join(sys._MEIPASS, 'static')
+  app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
+else:
+  app = Flask(__name__)
 
 # 静态文件缓存时间设置
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
