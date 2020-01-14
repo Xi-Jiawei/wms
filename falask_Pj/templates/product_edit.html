@@ -1086,10 +1086,10 @@
                 operatingCost+=operatCost;
             }
         }
-        $("#processCost").text(processCost.toFixed(2));
-        $("#adminstrationCost").text(adminstrationCost.toFixed(2));
-        $("#supplementaryCost").text(supplementaryCost.toFixed(2));
-        $("#operatingCost").text(operatingCost.toFixed(2));
+        $("#processCost").text(processCost);
+        $("#adminstrationCost").text(adminstrationCost);
+        $("#supplementaryCost").text(supplementaryCost);
+        $("#operatingCost").text(operatingCost);
 
         /*totalCost*/
         var totalCost = parseFloat($("#materialCost").text()) +
@@ -1099,7 +1099,7 @@
             operatingCost;
         console.log(totalCost);
         //$("#totalCost").find("input").val(totalCost);
-        $("#totalCost").val(totalCost);
+        $("#totalCost").val(totalCost.toFixed(2));
 
         /*price*/
         console.log($("#taxRate").val());

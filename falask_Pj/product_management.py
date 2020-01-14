@@ -97,10 +97,11 @@ def edit_product(productCode):
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
-        if authority[1]=='2':
+        if authority[1]=='1' or authority[1]=='2':
             print("当前权限仅限查看")
 
             productInfo = select_productInfoByCode(productCode)
+            productChange = select_productChangeByCode(productCode)
             addProductForm.productCode.data = productCode
             addProductForm.productType.data = productInfo[0][0]
             addProductForm.client.data = productInfo[0][1]
@@ -108,6 +109,7 @@ def edit_product(productCode):
             addProductForm.profit.data = productInfo[0][3]
             addProductForm.totalCost.data = productInfo[0][4]
             addProductForm.taxRate.data = productInfo[0][5]
+            addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
             addProductForm.productCode.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.productType.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.client.render_kw={"class": "form-control","readonly": 'true'}
@@ -124,8 +126,7 @@ def edit_product(productCode):
             materialOfProduct = select_materialsOfProductByCode(productCode)
             otherCosts = select_otherCostsByCode(productCode)
 
-            # setting为0表示新添，setting为1表示编辑
-            return render_template('product_view.html', setting=1, form=addProductForm, productCode=productCode,
+            return render_template('product_view.html', authority=authority[1], form=addProductForm, productCode=productCode,
                                    materialCost=materialCost,
                                    processCost=processCost, adminstrationCost=adminstrationCost,
                                    supplementaryCost=supplementaryCost, operatingCost=operatingCost,
@@ -180,6 +181,7 @@ def edit_product(productCode):
                 create_materialsOfProduct_temp()
 
                 productInfo = select_productInfoByCode(productCode)
+                productChange = select_productChangeByCode(productCode)
                 addProductForm.productCode.data = productCode
                 addProductForm.productType.data = productInfo[0][0]
                 addProductForm.client.data = productInfo[0][1]
@@ -187,6 +189,7 @@ def edit_product(productCode):
                 addProductForm.profit.data = productInfo[0][3]
                 addProductForm.totalCost.data = productInfo[0][4]
                 addProductForm.taxRate.data = productInfo[0][5]
+                addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
                 materialCost = str(productInfo[0][6])
                 processCost = str(productInfo[0][7])
                 adminstrationCost = str(productInfo[0][8])

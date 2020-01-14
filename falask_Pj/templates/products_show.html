@@ -105,7 +105,7 @@
                                 <table id="bootstrap-data-table" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                    {% if authority=='1'%}
+                                            {% if authority=='1'%}
                                             <th>成品编码</th>
                                             <th>成品型号</th>
                                             <th>交易客户</th>
@@ -115,16 +115,16 @@
                                             <th>交易客户</th>
                                             <th>成品价格</th>
                                             <th>成品利润</th>
-                                        {% endif %}
+                                            {% endif %}
                                         </tr>
                                     </thead>
                                     <tbody>
                                     {% if authority=='1'%}
                                         {% for i in products %}
                                             <tr>
-                                                <td>{{ i[0] }}</td>
-                                                <td>{{ i[1] }}</td>
-                                                <td>{{ i[2] }}</td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
+                                                <td><a href="{{ url_for("product_management.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
                                             </tr>
                                         {% endfor %}
                                     {% elif authority=='2' or authority=='3' or authority=="8"%}
