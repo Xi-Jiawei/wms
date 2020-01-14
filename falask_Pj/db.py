@@ -743,7 +743,7 @@ def update_materialOfInfo_temp(materialCode,remainderAmount):
 def select_procurement():
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
     # sql = "select id,group_concat(productCode),group_concat(productType),group_concat(productNum),group_concat(client),group_concat(entryClerk),group_concat(entryDate) from procurement group by id;"
-    sql = "select id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate from procurement order by id;"
+    sql = "select id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate from procurement order by entryDate;"
     try:
         cur.execute(sql)
         result = cur.fetchall()
@@ -768,7 +768,7 @@ def select_maxid_procurement():
 # xijiawei
 # 插入成品录入表
 def select_procurementByID(id):
-    sql = "select materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client from procurement where id='%d';"%(id)
+    sql = "select materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark from procurement where id='%d';"%(id)
     try:
         cur.execute(sql)
         result = cur.fetchall()
@@ -817,10 +817,10 @@ def delete_procurementsByIDAndDate(id,entryDate):
 
 # xijiawei
 # 插入成品录入表
-def insert_procurement(id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate):
+def insert_procurement(id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark,entryClerk,entryDate):
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into procurement (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate)value('%d','%s','%d','%d','%s','%s','%s','%s','%s','%s');" \
-          % (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate)
+    sql = "insert into procurement (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark,entryClerk,entryDate)value('%d','%s','%d','%d','%s','%s','%s','%s','%s','%s','%s');" \
+          % (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark,entryClerk,entryDate)
     try:
         # 执行SQL语句
         cur.execute(sql)

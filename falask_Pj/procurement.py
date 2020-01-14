@@ -60,7 +60,7 @@ def delete_procurements():
         for procurement in procurementArr:
             id=int(procurement['id'])
             entryDate=procurement['entryDate']
-            materials = select_procurementByID(int(id)) # materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client
+            materials = select_procurementByID(int(id)) # materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark
             for material in materials:
                 materialCode = material[0]
                 materialOfInfo = select_materialOfInfo(materialCode) # materialCode, materialName,type,price, department, remainderAmount,supplierFactory
@@ -156,7 +156,7 @@ def calculate_procurement2():
             for material in materials:
                 materialCode = material[0]
                 materialNum = int(material[1])
-                remark = material[2]
+                remark = "" # remark = material[2]
                 if url.find('edit_procurement')==-1:
                     materialInfo = select_materialOfInfo(materialCode)
                 else:
@@ -280,7 +280,7 @@ def procurement():
             # material
             for material in materialArr:
                 insert_procurement(id, material['materialCode'], int(material['materialNum']), -int(material['lackQuantity']), productCodeStr, productTypeStr,
-                                   productNumStr, client, entryClerk, entryDate)
+                                   productNumStr, client, material['remark'], entryClerk, entryDate)
                 update_materialOfInfo(material['materialCode'], int(material['remainderQuantity']))
                 materialOfInfo = select_materialOfInfo(material['materialCode'])
                 if materialOfInfo:
@@ -351,7 +351,7 @@ def edit_procurement(id):
             delete_procurementsByID(int(id)) # 清空
             for material in materialArr:
                 insert_procurement(int(id), material['materialCode'], int(material['materialNum']), -int(material['lackQuantity']), productCodeStr, productTypeStr,
-                                   productNumStr, client, entryClerk, entryDate)
+                                   productNumStr, client, material['remark'], entryClerk, entryDate)
                 update_materialOfInfo(material['materialCode'], int(material['remainderQuantity']))
                 materialOfInfo = select_materialOfInfo(material['materialCode'])
                 if materialOfInfo:
@@ -366,7 +366,7 @@ def edit_procurement(id):
 
             # return to the status of materialOfInfo before this procurement of id
             copy_materialOfInfo()
-            materials = select_procurementByID(int(id)) # materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client
+            materials = select_procurementByID(int(id)) # materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark
             procurement = [[0 for key in range(10)] for key in range(len(materials))]
             i=0
             for material in materials:
@@ -388,7 +388,7 @@ def edit_procurement(id):
                 procurement[i][6]=materialOfInfo[0][5] # remainderQuantity
                 procurement[i][7]=-material[2] # lackQuantity
                 procurement[i][8]=materialOfInfo[0][6] # supplierFactory
-                procurement[i][9]="" # remark
+                procurement[i][9]=material[7] # remark
                 i+=1
 
             # form data

@@ -205,7 +205,7 @@
                                 <td>{{ i[6] }}</td>
                                 <td>{{ i[7] }}</td>
                                 <td>{{ i[8] }}</td>
-                                <td>{{ i[9] }}</td>
+                                <td><input type="text" value="{{ i[9] }}"/></td>
                                 </tr>
                                 {% endfor %}
                                 {% endif %}
@@ -264,13 +264,16 @@
             console.log(rows);
             var materialArr=new Array();
             for(var i=1;i<rows.length;i++){
-                console.log(rows[i].cells[1]);
+                //console.log(rows[i].cells[1]);
+                console.log("rows[i].cells[10].childNodes[0]: ")
+                console.log(rows[i].cells[10].children[0].value);
                 materialArr[i-1]={
                     "materialCode":rows[i].cells[1].innerHTML,
                     "stockQuantity":rows[i].cells[5].innerHTML,
                     "materialNum":rows[i].cells[6].innerHTML,
                     "remainderQuantity":rows[i].cells[7].innerHTML,
-                    "lackQuantity":rows[i].cells[8].innerHTML
+                    "lackQuantity":rows[i].cells[8].innerHTML,
+                    "remark":rows[i].cells[10].children[0].value
                 }
             }
 
@@ -379,7 +382,7 @@
                 "<td>"+resultArr[rowNum]['remainderQuantity']+"</td>" +
                 "<td>"+resultArr[rowNum]['lackQuantity']+"</td>" +
                 "<td>"+resultArr[rowNum]['supplierFactory']+"</td>" +
-                "<td>"+resultArr[rowNum]['remark']+"</td></tr>";
+                "<td><input type='text' value='"+resultArr[rowNum]['remark']+"'/></td></tr>";
             tableHtml += rowTemplate;
         }
         //tbody[0].innerHTML=tableHtml;
