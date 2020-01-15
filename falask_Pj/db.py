@@ -1003,7 +1003,7 @@ def dao_show_material(materialCode, materialName, materialType, materialFactory)
 
     sql = 'select t1.materialCode,t1.materialName,t1.type,t1.department,t2.afterAmount,t2.afterMoney,' \
           't1.supplierFactory,t2.isInOrOut,t1.price,t2.amount,t2.totalPrice,t2.documentNumber,t2.time,t2.personName' \
-          ' from materialofinfo as t1 LEFT JOIN  materialofinout as t2  on t1.materialCode = t2.materialCode where 1=1 '
+          ' from materialOfInfo as t1 LEFT JOIN  materialOfInOut as t2  on t1.materialCode = t2.materialCode where 1=1 '
     if materialCode != '':
         sql += ' and t1.materialCode = \'' + materialCode + '\''
     if materialName != '':
@@ -1021,7 +1021,7 @@ def dao_show_material(materialCode, materialName, materialType, materialFactory)
 # lh1  查看物料物料静态表
 def dao_show_materialinfo():
     conf = []
-    result = select('materialofinfo',conf)
+    result = select('materialOfInfo',conf)
     conn.ping(reconnect=True)
     return result
     conn.close()
@@ -1029,7 +1029,7 @@ def dao_show_materialinfo():
 # lh1  查看物料出入库信息
 def dao_show_materialoutin():
     conf = []
-    result = select('materialofinout',conf)
+    result = select('materialOfInOut',conf)
     return result
     conn.close()
 
@@ -1038,23 +1038,23 @@ def dao_show_materialoutorin(materialCode):
     conf = []
     if materialCode != '':
         conf.append(' and materialCode = \'' + materialCode + '\'')
-    result = select('materialofinfo',conf)
+    result = select('materialOfInfo',conf)
     return result
     conn.close()
 
 # lh1  出库物料1
 def dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
-    # sql = "delete from materialofinfo where materialName = '%s' "%( materialName )
+    # sql = "delete from materialOfInfo where materialName = '%s' "%( materialName )
     # print("sql语句: "+sql)
     # 更新余库存
-    sql3 = " update materialofinfo set remainderAmount = remainderAmount - '%d',remainderMoney = remainderMoney + '%lf'   where materialCode = '%s'" % (int(mNum), float(m_price) * int(mNum), materialCode)
-    sql4 = "select * from materialofinfo where materialCode = '%s' " % (materialCode)
+    sql3 = " update materialOfInfo set remainderAmount = remainderAmount - '%d',remainderMoney = remainderMoney + '%lf'   where materialCode = '%s'" % (int(mNum), float(m_price) * int(mNum), materialCode)
+    sql4 = "select * from materialOfInfo where materialCode = '%s' " % (materialCode)
 
     try:
         cur.execute(sql3)
         cur.execute(sql4)
         result = cur.fetchall()
-        sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
+        sql2 = "insert into materialOfInOut(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
                " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',1,'%s','%d','%lf')" % \
                (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
                 float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
@@ -1067,11 +1067,11 @@ def dao_material_out(materialCode, materialName, materialType, m_price,materialF
 
 # lh1  入库物料0
 def dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
-    sql = "insert into materialofinfo(materialCode,materialName,type,department,price,supplierFactory) " \
+    sql = "insert into materialOfInfo(materialCode,materialName,type,department,price,supplierFactory) " \
           "values('%s','%s','%s' ,'%s', '%lf', '%s')" % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory)
     #更新静态表余库存
-    sql3 = " update materialofinfo set remainderAmount = remainderAmount + '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
-    sql4 = "select * from materialofinfo where materialCode = '%s' " % (materialCode)
+    sql3 = " update materialOfInfo set remainderAmount = remainderAmount + '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
+    sql4 = "select * from materialOfInfo where materialCode = '%s' " % (materialCode)
     res = cur.execute(sql4)
 
     try:
@@ -1081,7 +1081,7 @@ def dao_material_in(materialCode, materialName, materialType, m_price,materialFa
         cur.execute(sql4)
         result = cur.fetchall()
         if result:
-            sql2 = "insert into materialofinout(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
+            sql2 = "insert into materialOfInOut(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
                " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',0,'%s','%d','%lf')" % \
                (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
                 float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
@@ -1095,10 +1095,10 @@ def dao_material_in(materialCode, materialName, materialType, m_price,materialFa
 
 # lh1  修改物料
 def dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price,materialFactory,mCode):
-    sql = "update materialofinfo " \
+    sql = "update materialOfInfo " \
           "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialCode='%s'" \
           % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory,mCode)
-    sql2 = "update materialofinout " \
+    sql2 = "update materialOfInOut " \
           "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialCode='%s'" \
           % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory, mCode)
     # print("sql语句: "+sql)
