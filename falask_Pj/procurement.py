@@ -288,10 +288,10 @@ def edit_procurement(procurementCode):
                 addProductForm.productNum.render_kw = {"class": "form-control", "readonly": 'true'}
                 addProductForm.client.render_kw = {"class": "form-control", "readonly": 'true'}
                 addProductForm.remark.render_kw = {"class": "form-control", "readonly": 'true'}
-                return render_template('procurement_view.html', form=addProductForm, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
+                return render_template('procurement.html', form=addProductForm, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
                                        authority=authority[2], username=username)
             elif authority[2]=='3' or authority[2]=='8':
-                return render_template('procurement.html', form=addProductForm, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
+                return render_template('procurement.html', setting=1, form=addProductForm, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
                                        authority=authority[2], username=username)
     else:
         return render_template('access_fail.html')

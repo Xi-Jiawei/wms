@@ -66,27 +66,30 @@
 
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
 
-                {% if authority=="3" or authority=="2" or authority=="8"%}
-                    <li>
-                        <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购记录</a>
-                    </li>
+                <li>
+                    <a href="{{ url_for("procurement.procurement_history") }}  "><i class="menu-icon fa fa-cogs"></i>采购记录</a>
+                </li>
+
+                {% if authority=="3" or authority=="8"%}
+                    {% if setting==0 %}
+                        <li class="active">
+                            <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
+                        </li>
+                    {% elif setting==1 %}
+                        <li>
+                            <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
+                        </li>
+                        <li class="active">
+                            <a href="#"><i class="menu-icon fa fa-cogs"></i>修改采购</a>
+                        </li>
+                    {% endif %}
                 {% endif %}
 
-                {% if setting==0 %}
+                {% if authority=="2" or authority=="1"%}
                     <li class="active">
-                        <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
+                        <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>查看采购</a>
                     </li>
                 {% endif %}
-
-                {% if setting==1 %}
-                    <li>
-                        <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
-                    </li>
-                    <li class="active">
-                        <a href=""><i class="menu-icon fa fa-cogs"></i>修改采购</a>
-                    </li>
-                {% endif %}
-
             </ul>
         </div><!-- /.navbar-collapse -->
     </nav>
@@ -99,19 +102,11 @@
     <!-- Header-->
     <header id="header" class="header">
         <div class="top-left">
-            {% if setting==0%}
-            <div class="navbar-header">
-                <a class="navbar-brand" href="./"><img src="/static/images/logo.png" alt="Logo"></a>
-                <a class="navbar-brand hidden" href="./"><img src="/static/images/logo2.png" alt="Logo"></a>
-                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
-            </div>
-            {% elif setting==1 %}
             <div class="navbar-header">
                 <a class="navbar-brand" href="{{ url_for("user_login")}}"><img src="/static/images/logo.png" alt="Logo"></a>
                 <a class="navbar-brand hidden" href="{{ url_for("user_login")}}"><img src="/static/images/logo2.png" alt="Logo"></a>
                 <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
             </div>
-            {% endif %}
         </div>
         <div class="top-right">
             <div class="header-menu">
@@ -276,14 +271,16 @@
 
             <br>
 
-            <div>
-                <div class="row">
-                    <div class="col-xs-12">
-                        {{ form.ok_submit }}
-                        {{ form.csrf_token }}
+            {% if authority=="3" or authority=="8"%}
+                <div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            {{ form.ok_submit }}
+                            {{ form.csrf_token }}
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endif %}
         </form>
     </div><!-- .content -->
 </div>

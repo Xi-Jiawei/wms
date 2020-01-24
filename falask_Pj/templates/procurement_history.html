@@ -111,13 +111,10 @@
         </div>
         <div class="top-right">
             <div class="header-menu">
-
-
                 <div class="user-area dropdown float-right">
                     <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <img class="user-avatar rounded-circle" src="/static/images/admin.jpg" alt="{{ username }}">
                     </a>
-
                     <div class="user-menu dropdown-menu">
                         <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
                         <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power-off"></i>Logout</a>
@@ -181,22 +178,22 @@
                                             <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><input type='checkbox' name='checkbox' value='checkbox'/></td>
                                             <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"></td>
                                             <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[1] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][0] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][1] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][2] }}</a></td>
-                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[3] }}</a></td>
-                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[4] }}</a></td>
-                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[5] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][3] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][5] }}</a></td>
+                                            <td>{{ procurement[2][0][0] }}</td>
+                                            <td>{{ procurement[2][0][1] }}</td>
+                                            <td>{{ procurement[2][0][2] }}</td>
+                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[3] }}</td>
+                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[4] }}</td>
+                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[5] }}</td>
+                                            <td>{{ procurement[2][0][3] }}</td>
+                                            <td>{{ procurement[2][0][5] }}</td>
                                         </tr>
                                         {% for product in procurement[2][1:procurement[0]]%}
                                             <tr align="center">
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[0] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[1] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[2] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[3] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[5] }}</a></td>
+                                                <td>{{ product[0] }}</td>
+                                                <td>{{ product[1] }}</td>
+                                                <td>{{ product[2] }}</td>
+                                                <td>{{ product[3] }}</td>
+                                                <td>{{ product[5] }}</td>
                                             </tr>
                                         {% endfor %}
                                     {% endfor %}
@@ -205,22 +202,22 @@
                                         <tr align="center">
                                             <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"></td>
                                             <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[1] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][0] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][1] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][2] }}</a></td>
-                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[3] }}</a></td>
-                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[4] }}</a></td>
-                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[5] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][3] }}</a></td>
-                                            <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[2][0][5] }}</a></td>
+                                            <td>{{ procurement[2][0][0] }}</td>
+                                            <td>{{ procurement[2][0][1] }}</td>
+                                            <td>{{ procurement[2][0][2] }}</td>
+                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[3] }}</td>
+                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[4] }}</td>
+                                            <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[5] }}</td>
+                                            <td>{{ procurement[2][0][3] }}</td>
+                                            <td>{{ procurement[2][0][5] }}</td>
                                         </tr>
                                         {% for product in procurement[2][1:procurement[0]]%}
                                             <tr align="center">
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[0] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[1] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[2] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[3] }}</a></td>
-                                                <td><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ product[5] }}</a></td>
+                                                <td>{{ product[0] }}</td>
+                                                <td>{{ product[1] }}</td>
+                                                <td>{{ product[2] }}</td>
+                                                <td>{{ product[3] }}</td>
+                                                <td>{{ product[5] }}</td>
                                             </tr>
                                         {% endfor %}
                                     {% endfor %}
@@ -394,17 +391,24 @@
         numCount=0;
         for(var i=1;i<rowsLength;i++){
             numCount+=1;
-            var chkOrder = blockTable.rows[i].cells[0].firstChild;
-            console.log("chkOrder: ");
-            console.log(chkOrder);
-            if(chkOrder){
-                if (chkOrder.type == "checkbox" || chkOrder.nodeName=="#text") {
-                    console.log("i: "+i);
-                    rowCountArr[j]=numCount;
-                    numCount=0;
-                    j+=1;
-                    index=i;
-                }
+            var td = blockTable.rows[i].cells[0];
+            console.log("td: ");
+            console.log(td);
+            console.log(td.hasAttribute("rowspan"));
+            console.log(td.getAttribute("rowspan"));
+            /*if(td.hasAttribute("rowspan")){
+                console.log("i: "+i);
+                rowCountArr[j]=numCount;
+                numCount=0;
+                j+=1;
+                index=i;
+            }*/
+            if(td.getAttribute("rowspan")){
+                console.log("i: "+i);
+                rowCountArr[j]=numCount;
+                numCount=0;
+                j+=1;
+                index=i;
             }
         }
         rowCountArr[j]=rowsLength-index;
@@ -478,17 +482,19 @@
     }
 
     function printpage(){
-        var newstr = document.getElementById("procurement_history_div").innerHTML;
+        var newstr = document.getElementById("procurement-history-table").outerHTML;
         var oldstr = document.body.innerHTML;
         document.body.innerHTML = newstr;
         window.print();
         document.body.innerHTML = oldstr;
         return false;
 
-        /*var printHtml = document.getElementById("procurement_div").innerHTML;
-        var wind = window.open("",'newwindow', 'height=300, width=700, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=n o, status=no');
-        wind.document.body.innerHTML = printHtml;
-        wind.print();*/
+        /*var printHtml = document.getElementById("procurement-history-table").outerHTML;
+        var wind = window.open("");
+        //wind.document.body.innerHTML = printHtml;
+        wind.document.write(printHtml);
+        wind.print();
+        wind.close();*/
     }
 </script>
 
