@@ -1207,16 +1207,16 @@
                 success: function (callback) {
                     console.log(callback);
                     if(callback['ok']){
-                        var material=callback['material'];
+                        var material=callback['material'];//materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier
 
                         console.log(material[0]);
                         console.log(material[0][3]);
                         console.log(tdArr);
-                        tdArr.eq(3).find("input").val(material[0][3]);
+                        tdArr.eq(3).find("input").val(material[0][4]);
 
                         //console.log(tdElementsArr);
                         //tdElementsArr[3].getElementsByTagName("input")[0].setAttribute("value", material[1]);
-                        tdArr.eq(3).html('<input class="materialsOfProduct" style="width:150px" type="text" value="'+material[0][3]+'">');
+                        tdArr.eq(3).html('<input class="materialsOfProduct" style="width:150px" type="text" value="'+material[0][4]+'">');
                         console.log(tdArr.eq(3).html());
                         console.log(tdArr);
 

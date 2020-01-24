@@ -34,12 +34,25 @@
                     <a href="{{url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
                 </li>
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
-                <li>
-                    <a href="{{ url_for('material.show_material') }}"> <i class="menu-icon fa fa-th"></i>添加新物料</a>
-                </li>
-                <li>
-                    <a href="{{ url_for("material.material_inout_index")}}"> <i class="menu-icon fa fa-adn"></i>物料出入库</a>
-                </li>
+
+                {% if authority=='3' or authority=="8"%}
+                    <li>
+                        <a href="{{ url_for('material.show_material') }}"> <i class="menu-icon fa fa-th"></i>添加新物料</a>
+                    </li>
+                {% elif authority=="2" or authority=="1"%}
+                    <li>
+                        <a href="{{ url_for('material.show_material') }}"> <i class="menu-icon fa fa-th"></i>物料列表</a>
+                    </li>
+                {% endif %}
+                {% if authority=='3' or authority=="8" or authority=="2"%}
+                    <li>
+                        <a href="{{ url_for("material.material_inout_index")}}"> <i class="menu-icon fa fa-adn"></i>物料出入库</a>
+                    </li>
+                {% elif authority=="1"%}
+                    <li>
+                        <a href="{{ url_for("material.material_inout_index")}}"> <i class="menu-icon fa fa-adn"></i>物料库存</a>
+                    </li>
+                {% endif %}
                 <li class="active">
                     <a href="{{ url_for("material.material_inout_history")}}"> <i class="menu-icon fa fa-cogs"></i>出入库记录</a>
                 </li>

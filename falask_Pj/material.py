@@ -168,16 +168,16 @@ def material_inout():
             supplier = data['supplier']
             documentNumber = data['documentNumber']
             isInOrOut = int(data['isInOrOut'])
+            if not (isInOrOut == 0 or isInOrOut == 1):
+                return jsonify({'ok': False})
+            operateNum = int(data['operateNum'])
             nowTime = datetime.now()
             operateTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
-            if isInOrOut == 0:
-                operateNum = int(data['operateNum'])
-            elif isInOrOut == 1:
-                operateNum = -int(data['operateNum'])
-            else:
-                return jsonify({'ok': False})
             insert_materialInOut(documentNumber, materialCode, isInOrOut, operateNum, unit, price, supplier, operateTime, username)
-            update_materialInfo(materialCode, materialName, materialType, operateNum, price,unit,supplier)
+            if isInOrOut==0:
+                update_materialInfo(materialCode, materialName, materialType, operateNum, price,unit,supplier)
+            elif isInOrOut==1:
+                update_materialInfo(materialCode, materialName, materialType, -operateNum, price, unit, supplier)
             return jsonify({'ok': True})
     else:
         return render_template('access_fail.html')

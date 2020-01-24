@@ -642,7 +642,7 @@ def check_productInfoByType(productType):
 # xijiawei
 # 检查物料表
 def check_materialInfo(materialCode):
-    sql = "select * from materialOfInfo where materialCode= '%s';"% (materialCode)
+    sql = "select * from materialInfo where materialCode= '%s';"% (materialCode)
     cur.execute(sql)
     result = cur.fetchall()
     return result
