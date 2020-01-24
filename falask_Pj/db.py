@@ -1,6 +1,9 @@
 import threading
 import pymysql
 
+import uuid
+from datetime import datetime
+
 conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
 cur = conn.cursor()
 
@@ -363,27 +366,17 @@ def select_materialsOfProductByCode(productCode):
 
 # xijiawei
 # 查询成品物料组成
-def select_materialsOfProduct(productCodeArr):
+def select_materialsOfProductByCodeArr(productCodeArr):
     length=len(productCodeArr)
     if length==0:
         return
     else:
-        # sql = "select materialCode,sum(materialNum) from materialsOfProduct where productCode='%s'" % (productCodeArr[0])
-        # for i in range(length-1):
-        #     sql += " or productCode='%s'" % (productCodeArr[i+1])
-        # sql += " group by materialCode;"
-
-        # sql="select materialCode,sum(materialNum),group_concat(remark) from materialsOfProduct where productCode in("
-        # for i in range(length-1):
-        #     sql+="'%s',"%productCodeArr[i]
-        # sql+="'%s') group by materialCode;"%productCodeArr[length-1]
-
-        sql = "select materialCode,sum(materialNum*productNum),group_concat(remark) from materialsOfProduct where productCode in("
-        for i in range(length - 1):
-            print(productCodeArr[i])
-            sql += "'%s'," % productCodeArr[i]
-        print(productCodeArr[length - 1])
-        sql += "'%s') group by materialCode;" % productCodeArr[length - 1]
+        # sql="select m.materialCode,materialInfo.materialName,materialInfo.unit,materialInfo.inventoryNum,m.sum,materialInfo.inventoryNum-m.sum,materialInfo.supplier from (select materialInfo.materialCode,sum(materialsOfProduct.materialNum) sum from materialsOfProduct left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where materialsOfProduct.productCode='%s'"%productCodeArr[0]
+        sql = "select m.materialCode,materialInfo.materialName,materialInfo.unit,materialInfo.inventoryNum,cast(m.sum as signed integer),cast(materialInfo.inventoryNum-m.sum as signed integer),materialInfo.supplier from (select materialInfo.materialCode,sum(materialsOfProduct.materialNum*productInfo.productNum) sum from materialsOfProduct left join productInfo on materialsOfProduct.productCode=productInfo.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where materialsOfProduct.productCode='%s'" % \
+              productCodeArr[0]
+        for productCode in productCodeArr[1:productCodeArr.__len__()]:
+            sql+=" or materialsOfProduct.productCode='%s'"%productCode
+        sql+=" group by materialInfo.materialCode) m,materialInfo where materialInfo.materialCode=m.materialCode;"
         print(sql)
     conn.ping(reconnect=True)
     cur.execute(sql)
@@ -442,7 +435,7 @@ def select_productTypeByCode(productCode):
 # xijiawei
 # 查询成品其他成本组成信息
 def select_otherCostsByCode(productCode):
-    sql = "select procCost,adminCost,suppleCost,operaCost, process, adminstration, supplementary, operating from otherCosts where productCode='%s';"%(productCode)
+    sql = "select processCost,adminstrationCost,supplementaryCost,operationCost,process, adminstration, supplementary, operation from otherCosts where productCode='%s';"%(productCode)
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -453,6 +446,22 @@ def select_otherCostsByCode(productCode):
 def insert_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark):
     sql = "insert into productInfo (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark)value('%s','%s','%s','%f','%f','%f','%f','%f','%f','%f','%f','%f','%s');" \
           % (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark)
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 更新成品静态表的productNum字段
+def update_productNumOfProductInfo(productCode,productNum):
+    sql = "update productInfo set productNum='%d' where productCode='%s';" \
+          % (productNum,productCode)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -482,9 +491,9 @@ def insert_materialsOfProduct(productCode,materialCode,materialNum,materialPrice
 
 # xijiawei
 # 插入成品费用组成表
-def insert_otherCosts(productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating):
-    sql = "insert into otherCosts (productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating) value('%s','%f','%f','%f','%f','%s','%s','%s','%s');" \
-          % (productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating)
+def insert_otherCosts(productCode,processCost,adminstrationCost,supplementaryCost,operationCost,process, adminstration, supplementary, operation):
+    sql = "insert into otherCosts (productCode,processCost,adminstrationCost,supplementaryCost,operationCost,process, adminstration, supplementary, operation) value('%s','%f','%f','%f','%f','%s','%s','%s','%s');" \
+          % (productCode,processCost,adminstrationCost,supplementaryCost,operationCost,process, adminstration, supplementary, operation)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -565,22 +574,6 @@ def update_materialsOfProduct(productCode,materialCode,materialNum,materialPrice
     except:
         conn.rollback()
 
-# # xijiawei
-# # 更新其他费用组成表
-# def update_otherCosts(productCode,procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating):
-#     sql = "update otherCosts set procCost='%f',adminCost='%f',suppleCost='%f',operaCost='%f',process='%s', adminstration='%s', supplementary='%s', operating='%s' where productCode='%s';" \
-#           % (procCost,adminCost,suppleCost,operaCost,process, adminstration, supplementary, operating, productCode)
-#     try:
-#         # 执行SQL语句
-#         cur.execute(sql)
-#         # 提交到数据库执行
-#         conn.commit()
-#         print("语句已经提交")
-#         return True
-#         conn.close()
-#     except:
-#         conn.rollback()
-
 # xijiawei
 # 更新成品物料组成表
 def delete_materialsOfProduct(productCode):
@@ -648,7 +641,7 @@ def check_productInfoByType(productType):
 
 # xijiawei
 # 检查物料表
-def check_materialOfInfo(materialCode):
+def check_materialInfo(materialCode):
     sql = "select * from materialOfInfo where materialCode= '%s';"% (materialCode)
     cur.execute(sql)
     result = cur.fetchall()
@@ -657,93 +650,8 @@ def check_materialOfInfo(materialCode):
 
 # xijiawei
 # 检查物料表
-def update_materialOfInfo(materialCode,remainderAmount):
-    sql = "update materialOfInfo set remainderAmount='%d' where materialCode='%s';" % (remainderAmount,materialCode)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 插入成品录入表
-def insert_materialOfInfo(materialCode, price, remainderAmount, supplierFactory):
-    # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into materialOfInfo (materialCode, price, remainderAmount, supplierFactory)value('%s','%f','%d','%s');" \
-          % (materialCode, price, remainderAmount, supplierFactory)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 插入成品录入表
-def insert_materialOfInOut(materialCode, isInOrOut,price,amount,totalPrice,afterAmount,afterMoney,documentNumber,time):
-    # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into materialOfInOut (materialCode, isInOrOut,price,amount,totalPrice,afterAmount,afterMoney,documentNumber,time)value('%s','%d','%f','%d','%f','%d','%f','%s','%s');" \
-          % (materialCode, isInOrOut,price,amount,totalPrice,afterAmount,afterMoney,documentNumber,time)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 查询物料表
-def select_materialOfInfo(materialCode):
-    sql = "select materialCode, materialName,type,price, department, remainderAmount,supplierFactory from materialOfInfo where materialCode= '%s';"% (materialCode)
-    try:
-        cur.execute(sql)
-        result = cur.fetchall()
-        return result
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 查询物料表
-def select_materialOfInfo_temp(materialCode):
-    sql = "select materialCode, materialName,type,price, department, remainderAmount,supplierFactory from materialOfInfo_temp where materialCode= '%s';"% (materialCode)
-    try:
-        cur.execute(sql)
-        result = cur.fetchall()
-        return result
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 查询物料表
-def copy_materialOfInfo():
-    sql = "insert into materialOfInfo_temp select * from materialOfInfo;"
-    try:
-        cur.execute(sql)
-        conn.commit()
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 检查物料表
-def update_materialOfInfo_temp(materialCode,remainderAmount):
-    sql = "update materialOfInfo_temp set remainderAmount='%d' where materialCode='%s';" % (remainderAmount,materialCode)
+def update_materialInfo(materialCode,operateNum):
+    sql = "update materialInfo set inventoryNum=inventoryNum-'%d' where materialCode='%s';" % (operateNum,materialCode)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -760,7 +668,22 @@ def update_materialOfInfo_temp(materialCode,remainderAmount):
 def select_procurement():
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
     # sql = "select id,group_concat(productCode),group_concat(productType),group_concat(productNum),group_concat(client),group_concat(entryClerk),group_concat(entryDate) from procurement group by id;"
-    sql = "select id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,entryClerk,entryDate from procurement order by entryDate;"
+    sql = "select p2.count,p1.* from (select p.*,productInfo.productType,procurement.productNum,procurement.client,procurement.entryClerk,procurement.entryTime from (select t.*,group_concat(materialsOfProduct.materialCode),group_concat(materialInfo.materialName),group_concat(materialsOfProduct.materialNum) from (select procurement.procurementCode,procurement.productCode from procurement left join productInfo on procurement.productCode=productInfo.productCode order by entryTime) t left join materialsOfProduct on t.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode group by t.procurementCode,t.productCode) p,procurement,productInfo where p.procurementCode=procurement.procurementCode and p.productCode=procurement.productCode and p.productCode=productInfo.productCode) p1 left join (select count(procurementCode) count,procurementCode from procurement group by procurementCode) p2 on p1.procurementCode=p2.procurementCode;"
+    try:
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 插入成品录入表
+def select_procurementByCode(procurementCode):
+    sql = "select p.productCode,productInfo.productType,p.productNum,p.client,p.remark,materialsOfProduct.materialCode,materialInfo.materialName,materialsOfProduct.materialNum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s';"%(procurementCode)
     try:
         cur.execute(sql)
         result = cur.fetchall()
@@ -771,35 +694,175 @@ def select_procurement():
 
 # xijiawei
 # 插入成品录入表
-def select_maxid_procurement():
+def select_materialsOfProcurementByCode(procurementCode):
+    sql = "select materialInfo.materialCode,materialInfo.materialName,materialInfo.unit,materialInfo.inventoryNum+m.sum,m.sum,materialInfo.inventoryNum,materialInfo.supplier from materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m where materialInfo.materialCode=m.materialCode;"%(procurementCode)
+    try:
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 插入成品录入表
+def delete_procurementByCode(procurementCode):
+    sql = "update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum+m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney+price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode)
+    try:
+        cur.execute(sql)
+        cur.execute("delete from procurement where procurementCode='%s';"%procurementCode)
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    except:
+        conn.rollback()
+
+# xijiawei
+# 插入成品录入表
+def insert_procurement(procurementCode,productCode,productNum,client,remark,entryClerk,entryTime):
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "select max(id) from procurement;"
+    sql = "insert into procurement (procurementCode,productCode,productNum,client,remark,entryClerk,entryTime)value('%s','%s','%d','%s','%s','%s','%s');" \
+          % (procurementCode,productCode,productNum,client,remark,entryClerk,entryTime)
     try:
+        # 执行SQL语句
         cur.execute(sql)
+        # 更新materialInfo
+        cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum-m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney-price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
+        # 更新materialInOut
+        cur.execute("select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum),materialInfo.unit,materialInfo.price,materialInfo.supplier from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode;" % (procurementCode))
         result = cur.fetchall()
-        return result
+        for i in result:
+            documentNumber=uuid.uuid1() # 使用uuid生成唯一代号
+            entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 展示所有成品
+def select_all_materials():
+    sql = "select materialCode,materialName,materialType,remark,inventoryNum,price,inventoryMoney from materialInfo;"
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    conn.close()
+
+# xijiawei
+# 展示所有成品
+def select_materialInfoByCode(materialCode):
+    sql = "select materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier from materialInfo where materialCode='%s';"%materialCode
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    conn.close()
+
+# xijiawei
+# 插入成品录入表
+def insertOrUpdate_materialInfo(materialCode, materialType, materialName, remark):
+    # sql = "replace into materialInfo(materialCode, materialType, materialName, remark) value('%s','%s','%s','%s');" \
+    #       % (materialCode, materialType, materialName, remark)
+    try:
+        cur.execute("select materialCode from materialInfo where materialCode='%s';"%materialCode)
+        result = cur.fetchall()
+        if not result:
+            cur.execute("insert into materialInfo(materialCode, materialName, materialType, remark) value('%s','%s','%s','%s');"
+                        % (materialCode, materialName, materialType, remark))
+        else:
+            cur.execute("update materialInfo set materialName='%s', materialType='%s', remark='%s' where materialCode='%s';"
+                        % (materialName, materialType, remark,materialCode))
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 插入成品录入表
+def update_materialInfo(materialCode, materialName, materialType, operateNum, price,unit,supplier):
+    sql = "update materialInfo set materialName='%s',materialType='%s',inventoryNum=inventoryNum+'%d',unit='%s',price='%f',inventoryMoney=inventoryMoney+'%d'*'%f',supplier='%s' where materialCode='%s';" \
+          % (materialName, materialType, operateNum, unit, price, operateNum, price,supplier, materialCode)
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
         conn.close()
     except:
         conn.rollback()
 
 # xijiawei
 # 插入成品录入表
-def select_procurementByID(id):
-    sql = "select materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark from procurement where id='%d';"%(id)
+def delete_materialByCode(materialCode):
+    sql = "delete from materialInfo where materialCode='%s';" \
+          % (materialCode)
     try:
+        # 执行SQL语句
         cur.execute(sql)
-        result = cur.fetchall()
-        return result
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
         conn.close()
     except:
         conn.rollback()
 
 # xijiawei
-# 更新成品物料组成表
-def delete_procurementsByID(id):
-    sql = "delete from procurement where id='%d';" \
-          % (id)
+# 展示所有成品
+def select_all_materialInOut():
+    # sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInfo.price,materialInOut.operateNum*materialInfo.price,materialInOut.supplier,materialInOut.documentNumber,materialInOut.operateTime,materialInOut.operatorName from materialInOut left join materialInfo on materialInOut.materialCode=materialInfo.materialCode;"
+    sql = "select m.materialCode,materialInfo.materialName,materialInfo.materialType,m.isInOrOut,m.beforeinventoryNum,m.operateNum,m.unit,m.price,m.operateNum*m.price,m.supplier,m.documentNumber,m.operateTime,m.operatorName from (select a.* from materialInOut a where 3>(select count(*) from materialInOut b where b.materialCode=a.materialCode and b.operateTime>a.operateTime)) m left join materialInfo on m.materialCode=materialInfo.materialCode order by m.materialCode,m.operateTime desc;"
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    conn.close()
+
+# xijiawei
+# 展示所有成品
+def select_all_materialInOutFilterByDate(startDate,endDate):
+    sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInOut.price,materialInOut.operateNum*materialInOut.price,materialInOut.supplier,materialInOut.documentNumber,date_format(materialInOut.operateTime,'%%Y-%%m-%%d %%H:%%i:%%S'),materialInOut.operatorName from materialInOut left join materialInfo on materialInOut.materialCode=materialInfo.materialCode and materialInOut.operateTime>='%s' and materialInOut.operateTime<='%s' order by materialInOut.materialCode,materialInOut.operateTime desc;"%(startDate,endDate)
+    print(sql)
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    conn.close()
+
+# xijiawei
+# 展示所有成品
+def select_materialInOutByCode(materialCode):
+    sql = "select unit,supplier from materialInOut where materialCode='%s';"%(materialCode)
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    conn.close()
+
+# xijiawei
+# 插入成品录入表
+def insert_materialInOut(documentNumber,materialCode,isInOrOut,operateNum,unit,price,supplier,operateTime,operatorName):
     try:
+        cur.execute("select inventoryNum from materialInfo where materialCode='%s';"%(materialCode))
+        result = cur.fetchall()
+        if result:
+            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%d','%s','%s','%s');" \
+                  % (documentNumber, materialCode, isInOrOut, result[0][0], operateNum, unit, price, supplier, operateTime,operatorName)
+        else:
+            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%d','%s','%s','%s');" \
+                  % (documentNumber, materialCode, isInOrOut, 0, operateNum, unit, price, supplier, operateTime,operatorName)
         # 执行SQL语句
         cur.execute(sql)
         # 提交到数据库执行
@@ -810,15 +873,38 @@ def delete_procurementsByID(id):
     # except:
     #     conn.rollback()
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
         conn.rollback()
 
 # xijiawei
-# 更新成品物料组成表
-def delete_procurementsByIDAndDate(id,entryDate):
-    sql = "delete from procurement where id='%d'and entryDate='%s';" \
-          % (id,entryDate)
+# 插入成品录入表
+def update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, supplier):
     try:
+        cur.execute("select materialCode,isInOrOut,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
+        result = cur.fetchall()
+        if result:
+            materialCode=result[0][0]
+            beforeIsInOrOut=result[0][1]
+            beforeOperateNum=result[0][2]
+            operateTime=result[0][3]
+            if beforeIsInOrOut==0 and isInOrOut==0:
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum-beforeOperateNum),materialCode,operateTime))
+                # 更新materialInfo表
+                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum-beforeOperateNum), materialCode))
+            elif beforeIsInOrOut==1 and isInOrOut==0:
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum+beforeOperateNum),materialCode,operateTime))
+                # 更新materialInfo表
+                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum+beforeOperateNum), materialCode))
+            elif beforeIsInOrOut==0 and isInOrOut==1:
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum+beforeOperateNum),materialCode,operateTime))
+                # 更新materialInfo表
+                cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum+beforeOperateNum), materialCode))
+            elif beforeIsInOrOut==1 and isInOrOut==1:
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum-beforeOperateNum),materialCode,operateTime))
+                # 更新materialInfo表
+                cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum-beforeOperateNum), materialCode))
+        sql = "update materialInOut set isInOrOut='%d',operateNum='%d',unit='%s',price='%f',supplier='%s' where documentNumber='%s';" \
+                  % (isInOrOut, operateNum, unit, price, supplier, documentNumber)
         # 执行SQL语句
         cur.execute(sql)
         # 提交到数据库执行
@@ -829,164 +915,29 @@ def delete_procurementsByIDAndDate(id,entryDate):
     # except:
     #     conn.rollback()
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
         conn.rollback()
 
 # xijiawei
 # 插入成品录入表
-def insert_procurement(id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark,entryClerk,entryDate):
-    # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "insert into procurement (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark,entryClerk,entryDate)value('%d','%s','%d','%d','%s','%s','%s','%s','%s','%s','%s');" \
-          % (id,materialCode,materialNum,procurementNum,productCodeStr,productTypeStr,productNumStr,client,remark,entryClerk,entryDate)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-        return True
-        conn.close()
-    # except:
-    #     conn.rollback()
-    except Exception as e:
-        print("删除异常：",e)
-        conn.rollback()
-
-# xijiawei
-# 插入成品录入表
-def update_procurement(id,productCode,productType,productNum,client,entryClerk,entryDate):
-    # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-    sql = "update procurement set productCode='%s',productType='%s',productNum='%d',client='%s',entryClerk='%s',entryDate='%s' where id='%d';" \
-          % (productCode,productType,productNum,client,entryClerk,entryDate,id)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 创建物料组成临时表
-def create_materialsOfProduct_temp():
-    sql = "create table if not exists materialsOfProduct_temp(" \
-          "id int," \
-          "materialCode varchar(50) not null primary key);"
-    try:
-        cur.execute("drop table if exists materialsOfProduct_temp;")
-        conn.commit()
-
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# # xijiawei
-# # 检查物料组成临时表
-# def check_materialsOfProduct_temp(id):
-#     sql = "select * from materialsOfProduct_temp where id= '%s=d';"% (id)
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     return result
-#     conn.close()
-#
-# # xijiawei
-# # 检查物料组成临时表
-# def check_materialsOfProduct_temp(id,materialCode):
-#     sql = "select * from materialsOfProduct_temp where id='%d' materialCode= '%s';"% (id,materialCode)
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     return result
-#     conn.close()
-
-# # xijiawei
-# # 检查物料组成临时表
-# def check_materialsOfProduct_temp(*param):
-#     print(param)
-#     print(len(param))
-#     if len(param) == 1:
-#         print("参数个数为1：%s" % (param[0]))
-#         sql = "select * from materialsOfProduct_temp where id= '%d';" % (param[0])
-#     elif len(param) == 2:
-#         print("参数个数为1：%s; %s" % (param[0], param[1]))
-#         sql = "select * from materialsOfProduct_temp where not id='%d' and materialCode= '%s';" % (
-#             param[0], param[1])
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     return result
-#     conn.close()
-
-# xijiawei
-# 检查物料组成临时表
-def check_materialsOfProduct_temp1(id):
-    print("1")
-    #conn.ping(reconnect=True)
-    conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
-    #sql = 'select * from materialsOfProduct_temp'
-    conn.ping(reconnect=True)
-    cur = conn.cursor()
-
-    try:
-        sql = "select * from materialsOfProduct_temp where id= '%d';" % (id)
-        print(sql)
-        cur.execute(sql)
-        result = cur.fetchall()
-        return result
-        # conn.close()
-    except:
-        print("出错1")
-        conn.rollback()
-
-# xijiawei
-# 检查物料组成临时表
-def check_materialsOfProduct_temp2(id,materialCode):
-    print("2")
-
-    conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
-    #sql = 'select * from materialsOfProduct_temp'
-    conn.ping(reconnect=True)
-    cur = conn.cursor()
-    #cur.execute(sql)
-    #conn.commit()
-
-    try:
-        sql = "select * from materialsOfProduct_temp where not(id='%d') and materialCode= '%s';" % (id, materialCode)
-        print(sql)
-        cur.execute(sql)
-        result = cur.fetchall()
-        return result
-        # conn.close()
-    except:
-        print("出错2")
-        conn.rollback()
-
-# xijiawei
-# 插入物料组成临时表
-def insert_materialsOfProduct_temp(id,materialCode):
-    sql = "insert into materialsOfProduct_temp (id,materialCode) value('%d','%s');"% (id,materialCode)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# xijiawei
-# 插入物料组成临时表
-def update_materialsOfProduct_temp(id,materialCode):
-    sql = "update materialsOfProduct_temp set materialCode='%s' where id='%d';"% (materialCode,id)
+def delete_materialInOutByDocNum(documentNumber):
+    cur.execute("select materialCode,isInOrOut,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
+    result = cur.fetchall()
+    if result:
+        materialCode = result[0][0]
+        isInOrOut = result[0][1]
+        operateNum = result[0][2]
+        operateTime=result[0][3]
+    if isInOrOut == 0:
+        cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
+        # 更新materialInfo表
+        cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
+    if isInOrOut == 1:
+        cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
+        # 更新materialInfo表
+        cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
+    # 删除记录
+    sql = "delete from materialInOut where documentNumber='%s';" % (documentNumber)
     try:
         # 执行SQL语句
         cur.execute(sql)

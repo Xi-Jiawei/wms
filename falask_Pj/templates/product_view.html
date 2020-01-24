@@ -101,10 +101,10 @@
                 </li>
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
                 <li>
-                    <a href="{{ url_for("product_management.show_products") }}"> <i class="menu-icon fa fa-cogs"></i>成品列表</a>
+                    <a href="{{ url_for("product.show_products") }}"> <i class="menu-icon fa fa-cogs"></i>成品列表</a>
                 </li>
                 <li class="active">
-                    <a href="{{ url_for("product_management.edit_product",productCode=productCode) }}"> <i class="menu-icon fa fa-th"></i>成品信息</a>
+                    <a href="{{ url_for("product.edit_product",productCode=productCode) }}"> <i class="menu-icon fa fa-th"></i>成品信息</a>
                 </li>
 
             </ul>
@@ -391,7 +391,7 @@
                                         </div>
 
                                         <div class="card-body">
-                                            <table id="materialOfProduct" class="table table-striped table-bordered">
+                                            <table id="materialsOfProduct" class="table table-striped table-bordered">
                                                 <!--<caption><h3>物料组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
                                                 <br/>
                                                 <thead>
@@ -404,8 +404,8 @@
                                                 </tr>
                                                 </thead>
                                                 <tbody>
-                                                {% if materialOfProduct%}
-                                                    {% for i in materialOfProduct %}
+                                                {% if materialsOfProduct%}
+                                                    {% for i in materialsOfProduct %}
                                                         <tr class='tr_i'>
                                                             <td>{{ i[0] }}</td>
                                                             <td>{{ i[1] }}</td>

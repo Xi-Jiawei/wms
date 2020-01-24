@@ -86,13 +86,13 @@
                 {% if Authority[0] == '0' %}
                 {% else  %}
                 <li>
-                    <a href="{{ url_for("show_material") }}"> <i class="menu-icon fa fa-cogs"></i>物料管理</a>
+                    <a href="{{ url_for("material.show_material") }}"> <i class="menu-icon fa fa-cogs"></i>物料管理</a>
                 </li>
                 {% endif %}
                 {% if Authority[1] == '0' %}
                 {% else  %}
                 <li>
-                    <a href="{{ url_for("product_management.show_products") }}"> <i class="menu-icon fa fa-th"></i>成品管理</a>
+                    <a href="{{ url_for("product.show_products") }}"> <i class="menu-icon fa fa-th"></i>成品管理</a>
                 </li>
                 {% endif %}
                 {% if Authority[2] == '0' %}

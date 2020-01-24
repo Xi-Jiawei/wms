@@ -157,7 +157,6 @@
                                         {{ form.client }}
                                     </div>
                                 </div>
-
                             </div>
                         </div>
                     </div>
@@ -179,9 +178,11 @@
                                 <thead>
                                 <tr>
                                     <th width="50px">序号</th>
-                                    <th width="90px">物料编码</th>
+                                    <th width="90px">成品编码</th>
+                                    <th width="90px">成品型号</th>
+                                    <th width="90px">成品数量</th>
+                                    <th width="60px">物料编码</th>
                                     <th width="90px">物料名称</th>
-                                    <th width="90px">规格型号</th>
                                     <th width="60px">单位</th>
                                     <th width="90px">库存数量</th>
                                     <th width="100px">需出库数量</th>
@@ -192,22 +193,75 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% if procurement %}
-                                {% for i in procurement %}
+                                {% for product in products %}
                                 <tr>
-                                <td></td>
-                                <td>{{ i[0] }}</td>
-                                <td>{{ i[1] }}</td>
-                                <td>{{ i[2] }}</td>
-                                <td>{{ i[3] }}</td>
-                                <td>{{ i[4] }}</td>
-                                <td>{{ i[5] }}</td>
-                                <td>{{ i[6] }}</td>
-                                <td>{{ i[7] }}</td>
-                                <td>{{ i[8] }}</td>
-                                <td><input type="text" value="{{ i[9] }}"/></td>
+                                <td rowspan="{{ product[3].__len__() }}"></td>
+                                <td rowspan="{{ product[3].__len__() }}">{{ product[0] }}</td>
+                                <td rowspan="{{ product[3].__len__() }}">{{ product[1] }}</td>
+                                <td rowspan="{{ product[3].__len__() }}">{{ product[2] }}</td>
+                                <td>{{ product[3][0][0] }}</td>
+                                <td>{{ product[3][0][1] }}</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>{{ product[3][0][2] }}</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td rowspan="{{ product[3].__len__() }}">{{ product[4] }}</td>
                                 </tr>
+                                    {% for material in product[3][1:product[3].__len__()] %}
+                                        <tr>
+                                            <td>{{ material[0] }}</td>
+                                            <td>{{ material[1] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>{{ material[2] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        </tr>
+                                    {% endfor %}
                                 {% endfor %}
+                                {% if materials %}
+                                    <tr>
+                                        <td rowspan="{{ materials.__len__() }}">汇总</td>
+                                        <td rowspan="{{ materials.__len__() }}">{{ productCodeInput }}</td>
+                                        <td rowspan="{{ materials.__len__() }}">{{ productTypeInput }}</td>
+                                        <td rowspan="{{ materials.__len__() }}">{{ productNumInput }}</td>
+                                        <td>{{ materials[0][0] }}</td>
+                                        <td>{{ materials[0][1] }}</td>
+                                        <td>{{ materials[0][2] }}</td>
+                                        <td>{{ materials[0][3] }}</td>
+                                        <td>{{ materials[0][4] }}</td>
+                                        <td>{{ materials[0][5] }}</td>
+                                        <td>
+                                            {% if materials[0][5]<0 %}
+                                                {{ -materials[0][5] }}
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ materials[0][6] }}</td>
+                                        <td rowspan="{{ materials.__len__() }}">-</td>
+                                    </tr>
+                                    {% for material in materials[1:materials.__len__()] %}
+                                        <tr>
+                                            <td>{{ material[0] }}</td>
+                                            <td>{{ material[1] }}</td>
+                                            <td>{{ material[2] }}</td>
+                                            <td>{{ material[3] }}</td>
+                                            <td>{{ material[4] }}</td>
+                                            <td>{{ material[5] }}</td>
+                                            <td>
+                                                {% if material[5]<0 %}
+                                                    {{ -material[5] }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ material[6] }}</td>
+                                        </tr>
+                                    {% endfor %}
                                 {% endif %}
                                 </tbody>
                             </table>
@@ -220,7 +274,9 @@
 
             </div>
 
-            <div class="footer">
+            <br>
+
+            <div>
                 <div class="row">
                     <div class="col-xs-12">
                         {{ form.ok_submit }}
@@ -263,19 +319,6 @@
             var rows=document.getElementById("procurement_table").rows;
             console.log(rows);
             var materialArr=new Array();
-            for(var i=1;i<rows.length;i++){
-                //console.log(rows[i].cells[1]);
-                console.log("rows[i].cells[10].childNodes[0]: ")
-                console.log(rows[i].cells[10].children[0].value);
-                materialArr[i-1]={
-                    "materialCode":rows[i].cells[1].innerHTML,
-                    "stockQuantity":rows[i].cells[5].innerHTML,
-                    "materialNum":rows[i].cells[6].innerHTML,
-                    "remainderQuantity":rows[i].cells[7].innerHTML,
-                    "lackQuantity":rows[i].cells[8].innerHTML,
-                    "remark":rows[i].cells[10].children[0].value
-                }
-            }
 
             var productNumArr,productCodeOrTypeInputArr,productCodeOrType;
             productCodeOrType=$("#productCodeOrType").val();
@@ -293,8 +336,7 @@
             var data={'productCodeOrTypeInputArr':productCodeOrTypeInputArr,
                 'productCodeOrType':productCodeOrType,
                 'productNumArr':productNumArr,
-                'client':$("#client").val(),
-                'materialArr':materialArr
+                'client':$("#client").val()
             };
 
             console.log(data);
@@ -360,30 +402,70 @@
 
 <script src="/static/jquery/jquery-2.1.4.min.js"></script>
 <script>
-    function ShowData(resultArr) {
-        console.log(resultArr);
+    function ShowData(result) {
+        console.log(result);
         //var table=document.getElementById("bootstrap-data-table");
         var table=document.getElementById("procurement_table");
         var tbody=table.getElementsByTagName("tbody");
-        console.log(table);
-        console.log(table.children);
-        console.log(table.getElementsByTagName("tbody"));
-        console.log(table.getElementsByTagName("tbody")[0]);
         var tableHtml = "";
-        for(var rowNum=0;rowNum<resultArr.length;rowNum++){
-            var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
-                "<td>"+(rowNum+1)+"</td>\n" +
-                "<td>"+resultArr[rowNum]['materialCode']+"</td>" +
-                "<td>"+resultArr[rowNum]['materialName']+"</td>" +
-                "<td>"+resultArr[rowNum]['materialType']+"</td>" +
-                "<td>"+resultArr[rowNum]['department']+"</td>" +
-                "<td>"+resultArr[rowNum]['stockQuantity']+"</td>" +
-                "<td>"+resultArr[rowNum]['materialNum']+"</td>" +
-                "<td>"+resultArr[rowNum]['remainderQuantity']+"</td>" +
-                "<td>"+resultArr[rowNum]['lackQuantity']+"</td>" +
-                "<td>"+resultArr[rowNum]['supplierFactory']+"</td>" +
-                "<td><input type='text' value='"+resultArr[rowNum]['remark']+"'/></td></tr>";
+        var productNumStr="",productCodeStr="",productTypeStr="";
+        for(var i=0;i<result['products'].length;i++){
+            var rowTemplate = "<tr><td rowspan="+result['products'][i][3].length+">"+(i+1)+"</td>\n"+
+                "<td rowspan="+result['products'][i][3].length+">"+result['products'][i][0]+"</td>\n"+
+                "<td rowspan="+result['products'][i][3].length+">"+result['products'][i][1]+"</td>\n"+
+                "<td rowspan="+result['products'][i][3].length+">"+result['products'][i][2]+"</td>\n"+
+                "<td>"+result['products'][i][3][0][0]+"</td>\n"+
+                "<td>"+result['products'][i][3][0][1]+"</td>\n"+
+                "<td>-</td>"+
+                "<td>-</td>"+
+                "<td>"+result['products'][i][3][0][2]+"</td>\n"+
+                "<td>-</td>"+
+                "<td>-</td>"+
+                "<td>-</td>"+
+                "<td rowspan="+result['products'][i][3].length+"></td></tr>";
             tableHtml += rowTemplate;
+            productCodeStr+=result['products'][i][0]+"/";
+            productTypeStr+=result['products'][i][1]+"/";
+            productNumStr+=result['products'][i][2]+"/";
+            for(var j=1;j<result['products'][i][3].length;j++) {
+                rowTemplate = "<tr><td>" + result['products'][i][3][j][0] + "</td>\n" +
+                    "<td>" + result['products'][i][3][j][1] + "</td>\n" +
+                    "<td>-</td>" +
+                    "<td>-</td>" +
+                    "<td>" + result['products'][i][3][j][2] + "</td>\n" +
+                    "<td>-</td>" +
+                    "<td>-</td>" +
+                    "<td>-</td></tr>";
+                tableHtml += rowTemplate;
+            }
+        }
+
+        if(result['materials']) {
+            rowTemplate = "<tr><td rowspan=" + result['materials'].length + ">汇总</td>\n" +
+                "<td rowspan=" + result['materials'].length + ">" + productCodeStr + "</td>\n" +
+                "<td rowspan=" + result['materials'].length + ">" + productTypeStr + "</td>\n" +
+                "<td rowspan=" + result['materials'].length + ">" + productNumStr + "</td>\n" +
+                "<td>" + result['materials'][0][0] + "</td>\n" +
+                "<td>" + result['materials'][0][1] + "</td>\n" +
+                "<td>" + result['materials'][0][2] + "</td>\n" +
+                "<td>" + result['materials'][0][3] + "</td>\n" +
+                "<td>" + result['materials'][0][4] + "</td>\n" +
+                "<td>" + result['materials'][0][5] + "</td>\n" +
+                "<td>" + result['materials'][0][5] + "</td>\n" +
+                "<td>" + result['materials'][0][6] + "</td>\n" +
+                "<td rowspan=" + result['materials'].length + "></td></tr>";
+            tableHtml += rowTemplate;
+            for (var i = 1; i < result['materials'].length; i++) {
+                rowTemplate = "<tr><td>" + result['materials'][i][0] + "</td>\n" +
+                    "<td>" + result['materials'][i][1] + "</td>\n" +
+                    "<td>" + result['materials'][i][2] + "</td>\n" +
+                    "<td>" + result['materials'][i][3] + "</td>\n" +
+                    "<td>" + result['materials'][i][4] + "</td>\n" +
+                    "<td>" + result['materials'][i][5] + "</td>\n" +
+                    "<td>" + result['materials'][i][5] + "</td>\n" +
+                    "<td>" + result['materials'][i][6] + "</td></tr>";
+                tableHtml += rowTemplate;
+            }
         }
         //tbody[0].innerHTML=tableHtml;
         $("#procurement_table tbody").html(tableHtml);
@@ -402,6 +484,20 @@
         else productCodeOrTypeInputArr=$("#productCodeOrTypeInput").val().split("/");
         if($("#productNum").val()=="")productNumArr=new Array();
         else productNumArr=$("#productNum").val().split("/");
+        /*判断productNumArr数组元素是否是数字*/
+        if(productNumArr.length>0) {
+            for (var i = 0; i < productNumArr.length-1; i++) {
+                if (!$.isNumeric(productNumArr[i])) {
+                    alert("成品数量输入错误!");
+                    return;
+                }else
+                    productNumArr[i]=parseInt(productNumArr[i]);
+            }
+            // 如果数组最后一个元素不是数字，则移除最后元素
+            if(!$.isNumeric(productNumArr[productNumArr.length-1]))
+                productNumArr.splice(productNumArr.length-1,1);
+            else productNumArr[productNumArr.length-1]=parseInt(productNumArr[productNumArr.length-1]);
+        }
         var data={'productCodeOrTypeInputArr':productCodeOrTypeInputArr,
             'productCodeOrType':productCodeOrType,
             'productNumArr':productNumArr,
@@ -411,7 +507,7 @@
         console.log(data);
 
         $.ajax({
-            url: "/calculate_procurement2",
+            url: "/calculate_procurement",
             type: "POST",
             dataType: "json",
             //data:$(this).serialize(),
@@ -422,10 +518,14 @@
                 //alert(callback['ok']);//不要用callback.valueOf('ok')
                 if (callback['ok']) {
                     //alert('获取');
-                    var result = callback['result'];
+                    if(callback['result']) {
+                        var result = callback['result'];
+                        ShowData(result);
+                    }
+                    /*var result = callback['result'];
                     ShowData(result);
                     for (var i = 0; i < result.length; i++)
-                        if (result[i]['exception']) alert(result[i]['exception']);
+                        if (result[i]['exception']) alert(result[i]['exception']);*/
                 } else if (!callback['ok']) {
                     alert("编码输入错误！");
                 }
@@ -450,6 +550,20 @@
         else productCodeOrTypeInputArr=$("#productCodeOrTypeInput").val().split("/");
         if($("#productNum").val()=="")productNumArr=new Array();
         else productNumArr=$("#productNum").val().split("/");
+        /*判断productNumArr数组元素是否是数字*/
+        if(productNumArr.length>0) {
+            for (var i = 0; i < productNumArr.length-1; i++) {
+                if (!$.isNumeric(productNumArr[i])) {
+                    alert("成品数量输入错误!");
+                    return;
+                }else
+                    productNumArr[i]=parseInt(productNumArr[i]);
+            }
+            // 如果数组最后一个元素不是数字，则移除最后元素
+            if(!$.isNumeric(productNumArr[productNumArr.length-1]))
+                productNumArr.splice(productNumArr.length-1,1);
+            else productNumArr[productNumArr.length-1]=parseInt(productNumArr[productNumArr.length-1]);
+        }
         var data={'productCodeOrTypeInputArr':productCodeOrTypeInputArr,
             'productCodeOrType':productCodeOrType,
             'productNumArr':productNumArr,
@@ -459,7 +573,7 @@
         console.log(data);
 
         $.ajax({
-            url: "/calculate_procurement2",
+            url: "/calculate_procurement",
             type: "POST",
             dataType: "json",
             //data:$(this).serialize(),
@@ -470,10 +584,11 @@
                 //alert(callback['ok']);//不要用callback.valueOf('ok')
                 if (callback['ok']) {
                     //alert('获取');
-                    var result = callback['result'];
-                    ShowData(result);
-                    for (var i = 0; i < result.length; i++)
-                        if (result[i]['exception']) alert(result[i]['exception']);
+                    //console.log(callback['result']);
+                    if(callback['result']) {
+                        var result = callback['result'];
+                        ShowData(result);
+                    }
                 } else if (!callback['ok']) {
                     alert("编码输入错误！");
                 }
@@ -489,25 +604,17 @@
 
     /*为表格添加序号*/
     window.onload = function() {
-        //var oTable = document.getElementsByTagName("table");
-        var oTable=document.getElementById('procurement_table');
-        console.log("mark");
-        console.log(oTable);
-        console.log(oTable.rows.length);
-        for ( var i = 1; i < oTable.rows.length; i++) {
-            console.log(i);
-            console.log(oTable.rows[i].cells[0]);
-            if(oTable.rows[i].cells[0].firstChild==null)
-                oTable.rows[i].cells[0].innerHTML = i;
-            else {
-                var tdInner=oTable.rows[i].cells[0].firstChild;
-                console.log(tdInner);
-                console.log(tdInner.type);
-                if (tdInner.type != "CHECKBOX")
-                    oTable.rows[i].cells[1].innerHTML = i;
+        var table=document.getElementById('procurement_table');
+        var j=1;
+        console.log(table.rows);
+        console.log(table.rows.length);
+
+        //第一列填入序号
+        for ( var i = 1; i < table.rows.length;i++) {
+            if(table.rows[i].cells[0].hasAttribute("rowspan")&&table.rows[i].cells[0].innerHTML =="" ) {
+                table.rows[i].cells[0].innerHTML = j;
+                j += 1;
             }
-            if (i % 2 == 0)
-                oTable.rows[i].className = "ot";
         }
     };
 

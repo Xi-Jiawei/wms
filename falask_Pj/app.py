@@ -9,8 +9,9 @@ import os
 import sys
 
 from form import MyForm, SelectForm, ChangeForm
-from product_management import product_management
+from product import product_app
 from procurement import procurement_app
+from material import material_app
 
 # app = Flask(__name__)
 if getattr(sys, 'frozen', False):
@@ -246,114 +247,14 @@ def cc_change_pass():
     else:
         return render_template('changepassword.html')
 
-# lh 查看物料信息
-@app.route('/show_material', methods=['GET', 'POST'])
-def show_material():
-    materialCode = ''
-    materialName = ''
-    materialType = ''
-    materialFactory = ''
-    personName = session['username']
-    Authority = session['authority']
-    Authority = Authority[0]
-    if request.method == "POST":
-        materialCode = request.form["materialCode"]
-        materialName = request.form["materialName"]
-        materialType = request.form["materialType"]
-        materialFactory = request.form["materialFactory"]
-    materialAll = dao_show_material(materialCode, materialName, materialType, materialFactory)
-    materialinfoAll = dao_show_materialinfo()
-    materialoutinAll = dao_show_materialoutin()
-    # print(materialAll)
-    return render_template('material_index.html', materialAll=materialAll, materialCode=materialCode,
-                           materialName=materialName, materialType=materialType,
-                           materialFactory=materialFactory,Authority=Authority,personName=personName)
-
-# lh 物料出入库
-@app.route('/material_outorin/<mCode>', methods=['GET', 'POST'])
-def material_outorin(mCode):
-    material_init = dao_show_materialoutorin(mCode)
-    materialinfoAll = dao_show_materialinfo()
-    materialCode = ''
-    materialName = ''
-    materialType = ''
-    materialFactory = ''
-    materialTime = datetime.datetime.today()
-
-    personName = session['username']
-    mNum = ''
-    mDepartment = ''
-    m_price = 0
-    mDcNum = ''
-    isinorout = -1
-    if request.method == "POST":
-        materialCode = request.form["materialCode"]
-        materialName = request.form["materialName"]
-        materialType = request.form["materialType"]
-        materialFactory = request.form["materialFactory"]
-
-        mNum = request.form['mNum']
-        mDepartment = request.form['mDepartment']
-        m_price = request.form['m_price']
-        mDcNum = request.form['mDcNum']
-        isinorout = request.form['isinorout']
-        print("物料出入库", session['username'],isinorout)
-        if isinorout == '1':
-           if dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
-                print("出库成功")
-                message = "出库成功"
-                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
-           else:
-                message = "出库失败,请重新填写"
-                print("出库失败,请重新填写")
-                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
-                #   session.pop(user.name)
-        elif isinorout == '0':
-            # print("入库！")
-
-            if dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
-                print("入库成功")
-                message = "入库成功"
-                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
-            else:
-                message = "入库失败,请重新填写"
-                print("入库失败,请重新填写")
-                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
-                #   session.pop(user.name)
-        else :
-            materialCode = request.form["materialCode"]
-            materialName = request.form["materialName"]
-            materialType = request.form["materialType"]
-            materialFactory = request.form["materialFactory"]
-
-            mDepartment = request.form['mDepartment']
-            m_price = request.form['m_price']
-            if dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price, materialFactory,mCode):
-                print("修改成功")
-                message = "修改成功"
-                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
-            else:
-                message = "修改成功,请重新填写"
-                return render_template('material_outorin.html', message=message, materialinfoAll=materialinfoAll)
-
-    else:
-        # print(material_init)
-        for i in material_init:
-            materialCode = i[0]
-            materialName = i[1]
-            materialType = i[2]
-            mDepartment = i[3]
-            m_price = i[4]
-            materialFactory = i[7]
-
-        return render_template('material_outorin.html',materialCode=materialCode,materialName=materialName,
-                               materialType=materialType,mDepartment=mDepartment,m_price=m_price,
-                               materialFactory=materialFactory,personName=personName,materialinfoAll=materialinfoAll)
-
 # xijiawei
-# 添加“product_management.py”蓝本
-app.register_blueprint(product_management)
-
+# 添加“material.py”蓝本
+app.register_blueprint(material_app)
+# xijiawei
+# 添加“product.py”蓝本
+app.register_blueprint(product_app)
+# xijiawei
+# 添加“procurement.py”蓝本
 app.register_blueprint(procurement_app)
 
 if __name__ == '__main__':

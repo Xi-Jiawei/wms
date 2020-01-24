@@ -10,11 +10,11 @@ from datetime import datetime
 from form import *
 
 #product_managent = Flask(__name__)
-product_management=Blueprint('product_management',__name__)
+product_app=Blueprint('product',__name__)
 
 # xijiawei
 # 成品管理
-@product_management.route('/product_management', methods=['GET', 'POST'])
+@product_app.route('/products', methods=['GET', 'POST'])
 def show_products():
     print(session)
     print(session.keys())
@@ -27,7 +27,7 @@ def show_products():
     else:
         return render_template('access_fail.html')
 
-@product_management.route('/add_product', methods=['GET', 'POST'])
+@product_app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
     addProductForm=AddProductForm()
     if session.get('username'):
@@ -52,16 +52,16 @@ def add_product():
                 adminstrationCost = data['adminstrationCost']
                 supplementaryCost = data['supplementaryCost']
                 operatingCost = data['operatingCost']
-                materialOfProductArr = data['materialOfProduct']
+                materialsOfProductArr = data['materialsOfProduct']
                 otherCostsArr = data['otherCostsArr']
                 if not check_productInfoByCode(productCode) and not check_productInfoByType(productType):
                     print("数据库中不存在此成品。")
                     insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate,
                                        materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark)
-                    for materialOfProduct in materialOfProductArr:
-                        insert_materialsOfProduct(productCode, materialOfProduct[0], materialOfProduct[1],
-                                                  materialOfProduct[2], materialOfProduct[3], materialOfProduct[4],
-                                                  materialOfProduct[5], materialOfProduct[6])
+                    for materialsOfProduct in materialsOfProductArr:
+                        insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
+                                                  materialsOfProduct[2], materialsOfProduct[3], materialsOfProduct[4],
+                                                  materialsOfProduct[5], materialsOfProduct[6])
                     for otherCosts in otherCostsArr:
                         insert_otherCosts(productCode,otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7], otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
 
@@ -91,7 +91,7 @@ def add_product():
     else:
         return render_template('access_fail.html')
 
-@product_management.route('/edit_product/<productCode>', methods=['GET', 'POST'])
+@product_app.route('/edit_product/<productCode>', methods=['GET', 'POST'])
 def edit_product(productCode):
     addProductForm = AddProductForm()
     if session.get('username'):
@@ -125,14 +125,14 @@ def edit_product(productCode):
             supplementaryCost = str(productInfo[0][9])
             operatingCost = str(productInfo[0][10])
 
-            materialOfProduct = select_materialsOfProductByCode(productCode)
+            materialsOfProduct = select_materialsOfProductByCode(productCode)
             otherCosts = select_otherCostsByCode(productCode)
 
             return render_template('product_view.html', authority=authority[1], form=addProductForm, productCode=productCode,
                                    materialCost=materialCost,
                                    processCost=processCost, adminstrationCost=adminstrationCost,
                                    supplementaryCost=supplementaryCost, operatingCost=operatingCost,
-                                   materialOfProduct=materialOfProduct, otherCosts=otherCosts,
+                                   materialsOfProduct=materialsOfProduct, otherCosts=otherCosts,
                                    username=username)
         elif authority[1]=='3' or authority[1]=='8':
             print("当前权限可编辑")
@@ -153,17 +153,17 @@ def edit_product(productCode):
                 adminstrationCost = data['adminstrationCost']
                 supplementaryCost = data['supplementaryCost']
                 operatingCost = data['operatingCost']
-                materialOfProductArr = data['materialOfProduct']
+                materialsOfProductArr = data['materialsOfProduct']
                 otherCostsArr = data['otherCostsArr']
                 update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost,
                                    processCost, adminstrationCost, supplementaryCost, operatingCost, remark)
                 delete_materialsOfProduct(productCode)
-                if len(materialOfProductArr) > 0:
-                    for materialOfProduct in materialOfProductArr:
-                        insert_materialsOfProduct(productCode, materialOfProduct[0], materialOfProduct[1],
-                                                  materialOfProduct[2],
-                                                  materialOfProduct[3], materialOfProduct[4], materialOfProduct[5],
-                                                  materialOfProduct[6])
+                if len(materialsOfProductArr) > 0:
+                    for materialsOfProduct in materialsOfProductArr:
+                        insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
+                                                  materialsOfProduct[2],
+                                                  materialsOfProduct[3], materialsOfProduct[4], materialsOfProduct[5],
+                                                  materialsOfProduct[6])
 
                 delete_otherCosts(productCode)
                 for otherCosts in otherCostsArr:
@@ -191,7 +191,8 @@ def edit_product(productCode):
                 addProductForm.profit.data = productInfo[0][3]
                 addProductForm.totalCost.data = productInfo[0][4]
                 addProductForm.taxRate.data = productInfo[0][5]
-                addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+                if productChange.__len__()>0:
+                    addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
                 addProductForm.entryClerk.render_kw = {"class": "form-control", "readonly": 'true'}
                 addProductForm.remark.data = productInfo[0][11]
                 materialCost = str(productInfo[0][6])
@@ -200,14 +201,14 @@ def edit_product(productCode):
                 supplementaryCost = str(productInfo[0][9])
                 operatingCost = str(productInfo[0][10])
 
-                materialOfProduct = select_materialsOfProductByCode(productCode)
+                materialsOfProduct = select_materialsOfProductByCode(productCode)
                 otherCosts = select_otherCostsByCode(productCode)
 
                 # setting为0表示新添，setting为1表示编辑
                 return render_template('product_edit.html', setting=1, form=addProductForm, productCode=productCode, materialCost=materialCost,
                                        processCost=processCost, adminstrationCost=adminstrationCost,
                                        supplementaryCost=supplementaryCost, operatingCost=operatingCost,
-                                       materialOfProduct=materialOfProduct, otherCosts=otherCosts,
+                                       materialsOfProduct=materialsOfProduct, otherCosts=otherCosts,
                                        username=username)
             else:
                 # create_materialsOfProduct_temp()
@@ -219,7 +220,7 @@ def edit_product(productCode):
 
 # xijiawei
 # jQuery测试
-@product_management.route('/delete_products', methods=['GET', 'POST'])
+@product_app.route('/delete_products', methods=['GET', 'POST'])
 def delete_products():
     if session.get('username'):
         username = session['username']
@@ -243,7 +244,7 @@ def delete_products():
 
 # xijiawei
 # 创建物料组成临时表
-@product_management.route('/check_uniqueness', methods=['GET', 'POST'])
+@product_app.route('/check_uniqueness', methods=['GET', 'POST'])
 def check_uniqueness():
     if request.method == "POST":
         data = request.get_json()
@@ -261,8 +262,8 @@ def check_uniqueness():
         #     insert_materialsOfProduct_temp(id,materialCode)
         #     return jsonify({'ok': False})
 
-        if check_materialOfInfo(materialCode):
-            material=select_materialOfInfo(materialCode)
+        if check_materialInfo(materialCode):
+            material=select_materialInfoByCode(materialCode)
             return jsonify({'ok': True,'material':material})
         else:
             return jsonify({'ok': False})
