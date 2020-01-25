@@ -54,10 +54,15 @@ def add_product():
                 operatingCost = data['operatingCost']
                 materialsOfProductArr = data['materialsOfProduct']
                 otherCostsArr = data['otherCostsArr']
+                # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+                nowTime = datetime.now()
+                entryTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
+                # entryClerk = data['entryClerk']
+                entryClerk=username
                 if not check_productInfoByCode(productCode) and not check_productInfoByType(productType):
                     print("数据库中不存在此成品。")
                     insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate,
-                                       materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark)
+                                       materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
                     for materialsOfProduct in materialsOfProductArr:
                         insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
                                                   materialsOfProduct[2], materialsOfProduct[3], materialsOfProduct[4],
@@ -65,13 +70,8 @@ def add_product():
                     for otherCosts in otherCostsArr:
                         insert_otherCosts(productCode,otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7], otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
 
-                    # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-                    nowTime = datetime.now()
-                    entryDate = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
-                    # entryClerk = data['entryClerk']
-                    entryClerk=username
                     updateOfContent = "新加"
-                    insert_productChange(productCode, entryClerk, updateOfContent, entryDate)
+                    insert_productChange(productCode, entryClerk, updateOfContent, entryTime)
 
                     return jsonify({'ok': "ok"})
                 elif check_productInfoByCode(productCode):
@@ -97,11 +97,10 @@ def edit_product(productCode):
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
-        if authority[1]=='1' or authority[1]=='2':
+        if authority[1]=='2':
             print("当前权限仅限查看")
 
-            productInfo = select_productInfoByCode(productCode)
-            productChange = select_productChangeByCode(productCode)
+            productInfo = select_productInfoByCode(productCode) # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
             addProductForm.productCode.data = productCode
             addProductForm.productType.data = productInfo[0][0]
             addProductForm.client.data = productInfo[0][1]
@@ -109,9 +108,7 @@ def edit_product(productCode):
             addProductForm.profit.data = productInfo[0][3]
             addProductForm.totalCost.data = productInfo[0][4]
             addProductForm.taxRate.data = productInfo[0][5]
-            # addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
-            if productChange.__len__()>0:
-                    addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+            addProductForm.entryClerk.data = productInfo[0][13]
             addProductForm.remark.data = productInfo[0][11]
             addProductForm.productCode.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.productType.render_kw={"class": "form-control","readonly": 'true'}
@@ -157,8 +154,13 @@ def edit_product(productCode):
                 operatingCost = data['operatingCost']
                 materialsOfProductArr = data['materialsOfProduct']
                 otherCostsArr = data['otherCostsArr']
+                # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+                nowTime = datetime.now()
+                entryTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
+                # entryClerk = data['entryClerk']
+                entryClerk=username
                 update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost,
-                                   processCost, adminstrationCost, supplementaryCost, operatingCost, remark)
+                                   processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
                 delete_materialsOfProduct(productCode)
                 if len(materialsOfProductArr) > 0:
                     for materialsOfProduct in materialsOfProductArr:
@@ -172,20 +174,14 @@ def edit_product(productCode):
                     insert_otherCosts(productCode, otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7],
                                       otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
 
-                # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
-                nowTime = datetime.now()
-                entryDate = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
-                # entryClerk = data['entryClerk']
-                entryClerk=username
                 updateOfContent = "修改"
-                insert_productChange(productCode, entryClerk, updateOfContent, entryDate)
+                insert_productChange(productCode, entryClerk, updateOfContent, entryTime)
 
                 return jsonify({'ok': True})
             elif request.method == 'GET':
                 # create_materialsOfProduct_temp()
 
                 productInfo = select_productInfoByCode(productCode)
-                productChange = select_productChangeByCode(productCode)
                 addProductForm.productCode.data = productCode
                 addProductForm.productType.data = productInfo[0][0]
                 addProductForm.client.data = productInfo[0][1]
@@ -193,9 +189,7 @@ def edit_product(productCode):
                 addProductForm.profit.data = productInfo[0][3]
                 addProductForm.totalCost.data = productInfo[0][4]
                 addProductForm.taxRate.data = productInfo[0][5]
-                # addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
-                if productChange.__len__()>0:
-                    addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+                addProductForm.entryClerk.data = productInfo[0][13]
                 addProductForm.productCode.render_kw = {"class": "form-control", "readonly": 'true'}
                 addProductForm.productType.render_kw = {"class": "form-control", "readonly": 'true'}
                 addProductForm.entryClerk.render_kw = {"class": "form-control", "readonly": 'true'}

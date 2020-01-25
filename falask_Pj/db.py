@@ -331,7 +331,7 @@ def show_allregister():
 # xijiawei
 # 展示所有成品
 def select_all_products():
-    sql = "select productCode,productType,client,price,profit from productInfo;"
+    sql = "select productCode,productType,client,price,profit,totalCost,remark,entryTime,entryClerk from productInfo;"
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -340,7 +340,7 @@ def select_all_products():
 # xijiawei
 # 查询成品录入信息
 def select_productChangeByCode(productCode):
-    sql = "select entryClerk,updateOfContent,isUpdateOrAdd,entryDate from productChange where productCode='%s';" % (productCode)
+    sql = "select entryClerk,updateOfContent,isUpdateOrAdd,entryTime from productChange where productCode='%s';" % (productCode)
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -349,7 +349,7 @@ def select_productChangeByCode(productCode):
 # xijiawei
 # 查询成品信息
 def select_productInfoByCode(productCode):
-    sql = "select productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark from productInfo where productCode='%s';"%(productCode)
+    sql = "select productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk from productInfo where productCode='%s';"%(productCode)
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -443,9 +443,9 @@ def select_otherCostsByCode(productCode):
 
 # xijiawei
 # 插入成品静态表
-def insert_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark):
-    sql = "insert into productInfo (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark)value('%s','%s','%s','%f','%f','%f','%f','%f','%f','%f','%f','%f','%s');" \
-          % (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark)
+def insert_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk):
+    sql = "insert into productInfo (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk)value('%s','%s','%s','%f','%f','%f','%f','%f','%f','%f','%f','%f','%s','%s','%s');" \
+          % (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -525,9 +525,9 @@ def insert_productChange(productCode,entryClerk,updateOfContent,entryDate):
 
 # xijiawei
 # 更新成品物料组成表
-def update_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark):
-    sql = "update productInfo set productType='%s',client='%s',price='%f',profit='%f',totalCost='%f',taxRate='%f',materialCost='%f',processCost='%f',adminstrationCost='%f',supplementaryCost='%f',operatingCost='%f',remark='%s' where productCode='%s';" \
-          % (productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,productCode)
+def update_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk):
+    sql = "update productInfo set productType='%s',client='%s',price='%f',profit='%f',totalCost='%f',taxRate='%f',materialCost='%f',processCost='%f',adminstrationCost='%f',supplementaryCost='%f',operatingCost='%f',remark='%s',entryTime='%s',entryClerk='%s' where productCode='%s';" \
+          % (productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk,productCode)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -668,7 +668,7 @@ def update_materialInfo(materialCode,operateNum):
 def select_procurement():
     # entryDate = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
     # sql = "select id,group_concat(productCode),group_concat(productType),group_concat(productNum),group_concat(client),group_concat(entryClerk),group_concat(entryDate) from procurement group by id;"
-    sql = "select p2.count,p1.* from (select p.*,productInfo.productType,procurement.productNum,procurement.client,procurement.entryClerk,procurement.entryTime from (select t.*,group_concat(materialsOfProduct.materialCode),group_concat(materialInfo.materialName),group_concat(materialsOfProduct.materialNum) from (select procurement.procurementCode,procurement.productCode from procurement left join productInfo on procurement.productCode=productInfo.productCode order by entryTime) t left join materialsOfProduct on t.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode group by t.procurementCode,t.productCode) p,procurement,productInfo where p.procurementCode=procurement.procurementCode and p.productCode=procurement.productCode and p.productCode=productInfo.productCode) p1 left join (select count(procurementCode) count,procurementCode from procurement group by procurementCode) p2 on p1.procurementCode=p2.procurementCode;"
+    sql = "select p2.count,p1.* from (select p.*,productInfo.productType,procurement.productNum,procurement.client,procurement.entryClerk,procurement.entryTime from (select t.*,group_concat(materialsOfProduct.materialCode),group_concat(materialInfo.materialName),group_concat(materialsOfProduct.materialNum) from (select procurement.procurementCode,procurement.productCode from procurement left join productInfo on procurement.productCode=productInfo.productCode) t left join materialsOfProduct on t.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode group by t.procurementCode,t.productCode) p,procurement,productInfo where p.procurementCode=procurement.procurementCode and p.productCode=procurement.productCode and p.productCode=productInfo.productCode order by procurement.entryTime) p1 left join (select count(procurementCode) count,procurementCode from procurement group by procurementCode) p2 on p1.procurementCode=p2.procurementCode;"
     try:
         cur.execute(sql)
         result = cur.fetchall()

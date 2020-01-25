@@ -109,12 +109,19 @@
                                             <th>成品编码</th>
                                             <th>成品型号</th>
                                             <th>交易客户</th>
+                                            <th>备注</th>
+                                            <th>录入时间</th>
+                                            <th>录入员</th>
                                             {% elif authority=='2' or authority=='3' or authority=="8"%}
                                             <th>成品编码</th>
                                             <th>成品型号</th>
                                             <th>交易客户</th>
                                             <th>成品价格</th>
                                             <th>成品利润</th>
+                                            <th>总成本</th>
+                                            <th>备注</th>
+                                            <th>录入时间</th>
+                                            <th>录入员</th>
                                             {% endif %}
                                         </tr>
                                     </thead>
@@ -122,9 +129,12 @@
                                     {% if authority=='1'%}
                                         {% for i in products %}
                                             <tr>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
+                                                <td>{{ i[0] }}</td>
+                                                <td>{{ i[1] }}</td>
+                                                <td>{{ i[2] }}</td>
+                                                <td>{{ i[6] }}</td>
+                                                <td>{{ i[7] }}</td>
+                                                <td>{{ i[8] }}</td>
                                             </tr>
                                         {% endfor %}
                                     {% elif authority=='2' or authority=='3' or authority=="8"%}
@@ -135,6 +145,10 @@
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[3] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[4] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[5] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[6] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[7] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[8] }}</a></td>
                                             </tr>
                                         {% endfor %}
                                         {% endif %}

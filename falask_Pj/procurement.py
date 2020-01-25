@@ -103,7 +103,7 @@ def calculate_procurement():
         products = []
         for i in range(productCodeArr.__len__()):
             materialsOfProduct = select_materialsOfProductByCode(productCodeArr[i])  # materialCode,,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost
-            productInfo = select_productInfoByCode(productCodeArr[i])  # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark
+            productInfo = select_productInfoByCode(productCodeArr[i])  # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
             product = []
             material = []
             product.append(productCodeArr[i])
@@ -262,9 +262,15 @@ def edit_procurement(procurementCode):
                     product = []
                     material = []
                     product.append(i[0])  # productCode
-                    product.append(i[1])  # productType
+                    if i[1]:
+                        product.append(i[1])  # productType
+                    else:
+                        product.append("")
                     product.append(i[2])  # productNum
-                    material.append([i[5], i[6], i[7]])  # materialCode,materialName,materialNum
+                    if i[5] and i[6] and i[7]:
+                        material.append([i[5], i[6], i[7]])  # materialCode,materialName,materialNum
+                    else:
+                        material.append(["","",""])
                     product.append(material)
                     product.append(i[4])  # remark
                     # productCode,productType,productNum,[materialCode,materialName,materialNum],remark
@@ -272,7 +278,8 @@ def edit_procurement(procurementCode):
 
                     # form data
                     productCodeInput+=i[0]+'/'
-                    productTypeInput+=i[1]+'/'
+                    if i[1]:
+                        productTypeInput+=i[1]+'/'
                     productNumInput+=str(i[2])+'/'
                 else:
                     material.append([i[5], i[6], i[7]])  # materialCode,materialName,materialNum
