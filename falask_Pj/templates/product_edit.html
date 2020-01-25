@@ -1110,7 +1110,7 @@
         console.log($("#profit").val());
         var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
-        $("#price").val(price);
+        $("#price").val(price.toFixed(2));
     });
     /*输入框数据变成持久值*/
     $("#otherCosts").on('blur','.projects', function() {
@@ -1310,7 +1310,7 @@
         if($.isNumeric(parseFloat($("#taxRate").val())) && $.isNumeric(parseFloat($("#profit").val())))
             price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
-        $("#price").val(price);
+        $("#price").val(price.toFixed(2));
     };
     /*为表格添加序号*/
     window.onload = function() {

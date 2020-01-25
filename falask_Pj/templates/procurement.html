@@ -324,8 +324,10 @@
                 return;
             }
             else productCodeOrTypeInputArr=$("#productCodeOrTypeInput").val().split("/");
+            if(productCodeOrTypeInputArr[productCodeOrTypeInputArr.length-1]=="")productCodeOrTypeInputArr.splice(productCodeOrTypeInputArr.length-1,1);
             if($("#productNum").val()=="")productNumArr=new Array();
             else productNumArr=$("#productNum").val().split("/");
+            if(productNumArr[productNumArr.length-1]=="")productNumArr.splice(productNumArr.length-1,1);
             if(productNumArr.length!=productCodeOrTypeInputArr.length){
                 alert("数量个数与编码个数不匹配！");
                 return;

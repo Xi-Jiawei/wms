@@ -109,7 +109,9 @@ def edit_product(productCode):
             addProductForm.profit.data = productInfo[0][3]
             addProductForm.totalCost.data = productInfo[0][4]
             addProductForm.taxRate.data = productInfo[0][5]
-            addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+            # addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+            if productChange.__len__()>0:
+                    addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
             addProductForm.remark.data = productInfo[0][11]
             addProductForm.productCode.render_kw={"class": "form-control","readonly": 'true'}
             addProductForm.productType.render_kw={"class": "form-control","readonly": 'true'}
@@ -191,8 +193,11 @@ def edit_product(productCode):
                 addProductForm.profit.data = productInfo[0][3]
                 addProductForm.totalCost.data = productInfo[0][4]
                 addProductForm.taxRate.data = productInfo[0][5]
+                # addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
                 if productChange.__len__()>0:
                     addProductForm.entryClerk.data = productChange[productChange.__len__()-1][0]
+                addProductForm.productCode.render_kw = {"class": "form-control", "readonly": 'true'}
+                addProductForm.productType.render_kw = {"class": "form-control", "readonly": 'true'}
                 addProductForm.entryClerk.render_kw = {"class": "form-control", "readonly": 'true'}
                 addProductForm.remark.data = productInfo[0][11]
                 materialCost = str(productInfo[0][6])

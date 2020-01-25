@@ -72,7 +72,7 @@ def calculate_procurement():
         productTypeArr = []
         if productCodeOrType == "0":
             productCodeArr = productCodeOrTypeInputArr
-            for productCode in productCodeArr[0:len(productCodeArr) - 2]:
+            for productCode in productCodeArr[0:len(productCodeArr) - 1]:
                 if select_productTypeByCode(productCode):
                     productTypeArr.append(select_productTypeByCode(productCode)[0][0])
                 else:
@@ -83,7 +83,8 @@ def calculate_procurement():
                 productCodeArr.pop(len(productCodeArr) - 1)
         elif productCodeOrType == "1":
             productTypeArr = productCodeOrTypeInputArr
-            for productType in productTypeArr[0:len(productTypeArr) - 2]:
+            # productTypeArrTemp=productTypeArr[0:len(productTypeArr) - 1]
+            for productType in productTypeArr[0:len(productTypeArr) - 1]:
                 if select_productCodeByType(productType):
                     productCodeArr.append(select_productCodeByType(productType)[0][0])
                 else:
@@ -169,26 +170,26 @@ def procurement():
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
 
             # productCode and productType
-            productCodeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
-            productTypeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
+            productCodeArr=[]
+            productTypeArr=[]
             if productCodeOrType == "0":
                 productCodeArr = productCodeOrTypeInputArr
                 if not select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
                     return jsonify({'ok': False})
                 else:
-                    for i in range(len(productCodeArr)):
-                        productType = select_productTypeByCode(productCodeArr[i])
-                        productTypeArr[i]=productType[0][0]
+                    for productCode in productCodeArr:
+                        productTypeArr.append(select_productTypeByCode(productCode)[0][0])
             elif productCodeOrType == "1":
                 productTypeArr = productCodeOrTypeInputArr
                 if not select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
                     return jsonify({'ok': False})
                 else:
-                    for i in range(len(productTypeArr)):
-                        productCode = select_productCodeByType(productTypeArr[i])
-                        productCodeArr[i] = productCode[0][0]
+                    for productType in productTypeArr:
+                        productCodeArr.append(select_productCodeByType(productType)[0][0])
 
-            procurementCode=uuid.uuid1() # 使用uuid生成唯一代号
+            # procurementCode=uuid.uuid1() # 使用uuid生成唯一代号
+            procurementCode=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
+            procurementCode=procurementCode[0:16] # 使用时间戳生成唯一代号
             for i in range(productCodeArr.__len__()):
                 insert_procurement(procurementCode, productCodeArr[i], int(productNumArr[i]), client, "null", entryClerk, entryTime)
             return jsonify({'ok': True})
