@@ -10,7 +10,7 @@ procurement_app=Blueprint('procurement',__name__)
 # 采购记录
 @procurement_app.route('/procurement_history', methods=['GET'])
 def procurement_history():
-    addProductForm = AddProductForm()
+    addProductForm = ProductForm()
     print(session)
     print(session.keys())
     print(session.get('username'))
@@ -128,10 +128,12 @@ def productTypeByCode():
     if request.method == "POST":
         data = request.get_json()
         productCodeArr = data['productCodeArr']  # 不要写成productCode=request.data["productcode"]
-        productTypeArr = [0 for key in range(len(productCodeArr))]
-        for i in range(len(productCodeArr)):
-            productTypeArr[i]=select_productTypeByCode(productCodeArr[i])
-        return jsonify({'ok': True, 'productTypeArr': productTypeArr})
+        productTypeArrStr=""
+        for productCode in productCodeArr:
+            result=select_productTypeByCode(productCode)
+            if result:
+                productTypeArrStr+=result[0][0]+"/"
+        return jsonify({'ok': True, 'productTypeArrStr': productTypeArrStr})
     else: return jsonify({'ok': -1})
 
 # xijiawei
@@ -141,10 +143,12 @@ def productCodeByType():
     if request.method == "POST":
         data = request.get_json()
         productTypeArr = data['productTypeArr']  # 不要写成productCode=request.data["productcode"]
-        productCodeArr = [0 for key in range(len(productTypeArr))]
-        for i in range(len(productTypeArr)):
-            productCodeArr[i]=select_productCodeByType(productTypeArr[i])
-        return jsonify({'ok': True, 'productCodeArr': productCodeArr})
+        productCodeArrStr = ""
+        for productType in productTypeArr:
+            result = select_productCodeByType(productType)
+            if result:
+                productCodeArrStr += result[0][0] + "/"
+        return jsonify({'ok': True, 'productCodeArrStr': productCodeArrStr})
     else: return jsonify({'ok': -1})
 
 # xijiawei
@@ -163,6 +167,7 @@ def procurement():
             productCodeOrType = data['productCodeOrType']
             productNumArr = data['productNumArr']
             client = data['client']
+            remarkArr = data['remarkArr']
             if session.get('username'):
                 entryClerk = session['username']
             else:
@@ -191,10 +196,10 @@ def procurement():
             procurementCode=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
             procurementCode=procurementCode[0:16] # 使用时间戳生成唯一代号
             for i in range(productCodeArr.__len__()):
-                insert_procurement(procurementCode, productCodeArr[i], int(productNumArr[i]), client, "null", entryClerk, entryTime)
+                insert_procurement(procurementCode, productCodeArr[i], int(productNumArr[i]), client, remarkArr[i], entryClerk, entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
-            addProductForm = AddProductForm()
+            addProductForm = ProductForm()
             return render_template('procurement.html', setting=0, form=addProductForm, authority=authority[2],username=username)
     else:
         return render_template('access_fail.html')
@@ -206,7 +211,7 @@ def edit_procurement(procurementCode):
     print(session)
     print(session.keys())
     print(session.get('username'))
-    addProductForm = AddProductForm()
+    addProductForm = ProductForm()
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
@@ -218,6 +223,7 @@ def edit_procurement(procurementCode):
             productCodeOrType = data['productCodeOrType']
             productNumArr = data['productNumArr']
             client = data['client']
+            remarkArr = data['remarkArr']
             if session.get('username'):
                 entryClerk = session['username']
             else:
@@ -247,7 +253,7 @@ def edit_procurement(procurementCode):
             # update procurement and update materialInfo
             delete_procurementByCode(procurementCode) # 撤回上次采购
             for i in range(productCodeArr.__len__()):
-                insert_procurement(procurementCode, productCodeArr[i], int(productNumArr[i]), client, "null", entryClerk, entryTime)
+                insert_procurement(procurementCode, productCodeArr[i], int(productNumArr[i]), client, remarkArr[i], entryClerk, entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
             all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialNum

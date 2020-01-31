@@ -29,7 +29,7 @@ def show_products():
 
 @product_app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
-    addProductForm=AddProductForm()
+    addProductForm=ProductForm()
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
@@ -93,7 +93,7 @@ def add_product():
 
 @product_app.route('/edit_product/<productCode>', methods=['GET', 'POST'])
 def edit_product(productCode):
-    addProductForm = AddProductForm()
+    addProductForm = ProductForm()
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
@@ -224,7 +224,7 @@ def delete_products():
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
-        addProductForm = AddProductForm()
+        addProductForm = ProductForm()
         products = select_all_products()
         if request.method == "POST":
             data = request.get_json()

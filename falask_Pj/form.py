@@ -31,7 +31,7 @@ class ChangeForm(Form):
 
 # xijiawei
 # 添加成品表单
-class AddProductForm(Form):
+class ProductForm(Form):
     # 成品编号
     productCode = StringField(
         # 标签

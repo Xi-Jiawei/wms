@@ -190,19 +190,19 @@
                                 <tbody>
                                 {% for product in products %}
                                 <tr>
-                                <td rowspan="{{ product[3].__len__() }}"></td>
-                                <td rowspan="{{ product[3].__len__() }}">{{ product[0] }}</td>
-                                <td rowspan="{{ product[3].__len__() }}">{{ product[1] }}</td>
-                                <td rowspan="{{ product[3].__len__() }}">{{ product[2] }}</td>
-                                <td>{{ product[3][0][0] }}</td>
-                                <td>{{ product[3][0][1] }}</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>{{ product[3][0][2] }}</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td>-</td>
-                                <td rowspan="{{ product[3].__len__() }}">{{ product[4] }}</td>
+                                    <td rowspan="{{ product[3].__len__() }}"></td>
+                                    <td rowspan="{{ product[3].__len__() }}">{{ product[0] }}</td>
+                                    <td rowspan="{{ product[3].__len__() }}">{{ product[1] }}</td>
+                                    <td rowspan="{{ product[3].__len__() }}">{{ product[2] }}</td>
+                                    <td>{{ product[3][0][0] }}</td>
+                                    <td>{{ product[3][0][1] }}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>{{ product[3][0][2] }}</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td>-</td>
+                                    <td rowspan="{{ product[3].__len__() }}"><textarea rows="{{ product[3].__len__() }}" class='remark'>{{ product[4] }}</textarea></td>
                                 </tr>
                                     {% for material in product[3][1:product[3].__len__()] %}
                                         <tr>
@@ -332,10 +332,25 @@
                 alert("数量个数与编码个数不匹配！");
                 return;
             }
+            var remarkArr=new Array();
+            var table=document.getElementById('procurement_table');
+            var j=0;
+            for ( var i = 1; i < table.rows.length;i++) {
+                if(table.rows[i].cells[12]){
+                    if(j<productCodeOrTypeInputArr.length){
+                        console.log(table.rows[i].cells[12].firstElementChild);
+                        console.log(table.rows[i].cells[12].firstElementChild.value);
+                        remarkArr[j]=table.rows[i].cells[12].firstElementChild.value; //不要用“remarkArr[j]=table.rows[i].cells[12].firstElementChild.innerHTML;”
+                        j += 1;
+                    }
+                    else break;
+                }
+            }
             var data={'productCodeOrTypeInputArr':productCodeOrTypeInputArr,
                 'productCodeOrType':productCodeOrType,
                 'productNumArr':productNumArr,
-                'client':$("#client").val()
+                'client':$("#client").val(),
+                'remarkArr':remarkArr
             };
 
             console.log(data);
@@ -421,7 +436,7 @@
                 "<td>-</td>"+
                 "<td>-</td>"+
                 "<td>-</td>"+
-                "<td rowspan="+result['products'][i][3].length+"></td></tr>";
+                "<td rowspan="+result['products'][i][3].length+"><textarea rows="+result['products'][i][3].length+" class='remark' placeholder='备注'></textarea></td></tr>";
             tableHtml += rowTemplate;
             productCodeStr+=result['products'][i][0]+"/";
             productTypeStr+=result['products'][i][1]+"/";
@@ -600,6 +615,60 @@
             }
         });
     });
+
+    /*成品编码和成品型号切换*/
+    $("#productCodeOrType").on('change',function(e){
+        var productCodeOrTypeInputArr=$("#productCodeOrTypeInput").val().split("/");
+        if($("#productCodeOrType").val()==0){
+            $.ajax({
+                    url:"/productCodeByType",
+                    type: "POST",
+                    dataType: "json",
+                    //data:$(this).serialize(),
+                    data:JSON.stringify({'productTypeArr':productCodeOrTypeInputArr}),
+                    contentType: 'application/json; charset=UTF-8',
+                    success: function (callback) {
+                        console.log(callback);
+                        //alert(callback['ok']);//不要用callback.valueOf('ok')
+                        if(callback['ok']){
+                            $("#productCodeOrTypeInput").val(callback['productCodeArrStr']);
+                        }else if(!callback['ok']){
+                            alert("成品编码或成品型号输入错误！");
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.log(xhr.status);// 状态码
+                        console.log(xhr.readyState);// 状态
+                        console.log(textStatus);// 错误信息
+                        alert('返回值错误');
+                    }
+                });
+        }else if($("#productCodeOrType").val()==1){
+            $.ajax({
+                    url:"/productTypeByCode",
+                    type: "POST",
+                    dataType: "json",
+                    //data:$(this).serialize(),
+                    data:JSON.stringify({'productCodeArr':productCodeOrTypeInputArr}),
+                    contentType: 'application/json; charset=UTF-8',
+                    success: function (callback) {
+                        console.log(callback);
+                        //alert(callback['ok']);//不要用callback.valueOf('ok')
+                        if(callback['ok']){
+                            $("#productCodeOrTypeInput").val(callback['productTypeArrStr']);
+                        }else if(!callback['ok']){
+                            alert("成品编码或成品型号输入错误！");
+                        }
+                    },
+                    error: function(xhr, textStatus, errorThrown) {
+                        console.log(xhr.status);// 状态码
+                        console.log(xhr.readyState);// 状态
+                        console.log(textStatus);// 错误信息
+                        alert('返回值错误');
+                    }
+                });
+        }
+    })
 
     /*为表格添加序号*/
     window.onload = function() {
