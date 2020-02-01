@@ -803,12 +803,16 @@ def delete_materialByCode(materialCode):
 # xijiawei
 # 查询每个物料的最近3条出入库记录
 def select_all_materialInOut():
-    # sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInfo.price,materialInOut.operateNum*materialInfo.price,materialInOut.supplier,materialInOut.documentNumber,materialInOut.operateTime,materialInOut.operatorName from materialInOut left join materialInfo on materialInOut.materialCode=materialInfo.materialCode;"
-    sql = "select m.materialCode,materialInfo.materialName,materialInfo.materialType,m.isInOrOut,m.beforeinventoryNum,m.operateNum,m.unit,m.price,m.operateNum*m.price,m.supplier,m.documentNumber,date_format(m.operateTime,'%Y-%m-%d %H:%i:%s'),m.operatorName from (select a.* from materialInOut a where 3>(select count(*) from materialInOut b where b.materialCode=a.materialCode and b.operateTime>a.operateTime)) m left join materialInfo on m.materialCode=materialInfo.materialCode order by m.materialCode,m.operateTime desc;"
-    cur.execute(sql)
-    result=cur.fetchall()
-    return result
-    conn.close()
+    try:
+        # sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInfo.price,materialInOut.operateNum*materialInfo.price,materialInOut.supplier,materialInOut.documentNumber,materialInOut.operateTime,materialInOut.operatorName from materialInOut left join materialInfo on materialInOut.materialCode=materialInfo.materialCode;"
+        sql = "select m.materialCode,materialInfo.materialName,materialInfo.materialType,m.isInOrOut,m.beforeinventoryNum,m.operateNum,m.unit,m.price,m.operateNum*m.price,m.supplier,m.documentNumber,date_format(m.operateTime,'%Y-%m-%d %H:%i:%s'),m.operatorName from (select a.* from materialInOut a where 3>(select count(*) from materialInOut b where b.materialCode=a.materialCode and b.operateTime>a.operateTime)) m left join materialInfo on m.materialCode=materialInfo.materialCode order by m.materialCode,m.operateTime desc;"
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
 
 # xijiawei
 # 根据时间段查询物料出入库记录
