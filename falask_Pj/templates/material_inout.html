@@ -54,11 +54,11 @@
                 {% endif %}
                 {% if authority=='3' or authority=="8" or authority=="2"%}
                     <li class="active">
-                        <a href="{{ url_for("material.material_inout_index")}}"> <i class="menu-icon fa fa-adn"></i>物料出入库</a>
+                        <a href="{{ url_for("material.material_inout")}}"> <i class="menu-icon fa fa-adn"></i>物料出入库</a>
                     </li>
                 {% elif authority=="1"%}
                     <li class="active">
-                        <a href="{{ url_for("material.material_inout_index")}}"> <i class="menu-icon fa fa-adn"></i>物料库存</a>
+                        <a href="{{ url_for("material.material_inout")}}"> <i class="menu-icon fa fa-adn"></i>物料库存</a>
                     </li>
                 {% endif %}
                 <li>

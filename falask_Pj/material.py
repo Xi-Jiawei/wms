@@ -1,10 +1,11 @@
-from flask import Flask, url_for, render_template, request, redirect, session, Blueprint, jsonify
-from datetime import datetime
+from flask import render_template, request, session, Blueprint, jsonify
 
 from db import *
 from form import *
 
-#product_managent = Flask(__name__)
+from datetime import datetime
+
+#material_app = Flask(__name__)
 material_app=Blueprint('material',__name__)
 
 # xijiawei
@@ -23,15 +24,13 @@ def show_material():
         return render_template('access_fail.html')
 
 # xijiawei
-# 更新物料信息
+# 添加或更新物料信息
 @material_app.route('/update_material', methods=['POST'])
 def update_material():
     print(session)
     print(session.keys())
     print(session.get('username'))
     if session.get('username'):
-        username = session['username']
-        authority = login_Authority(username)
         if request.method == "POST":
             data = request.get_json()
             materialCode = data['materialCode']
@@ -42,18 +41,16 @@ def update_material():
             materials = select_all_materials()
             return jsonify({'materials': materials})
     else:
-        return render_template('access_fail.html')
+        return jsonify({'ok': False})
 
 # xijiawei
-# 物料管理
+# 删除物料
 @material_app.route('/delete_materials', methods=['POST'])
 def delete_materials():
     print(session)
     print(session.keys())
     print(session.get('username'))
     if session.get('username'):
-        username = session['username']
-        authority = login_Authority(username)
         if request.method == "POST":
             data = request.get_json()
             materialCodeArr = data['materialCodeArr']
@@ -62,10 +59,47 @@ def delete_materials():
             materials = select_all_materials()
             return jsonify({'materials': materials})
     else:
+        return jsonify({'ok': False})
+
+# xijiawei
+# 物料出入库
+@material_app.route('/material_inout', methods=['GET', 'POST'])
+def material_inout():
+    print(session)
+    print(session.keys())
+    print(session.get('username'))
+    if session.get('username'):
+        username = session['username']
+        authority = login_Authority(username)
+        if request.method == "GET":
+            materials = select_all_materials() # materialCode,materialName,materialType,inventoryNum,unit,price,inventoryMoney,supplier,remark
+            return render_template('material_inout.html', authority=authority[1], materials=materials, username=username)
+        if request.method == "POST":
+            data = request.get_json()
+            materialCode = data['materialCode']
+            materialName = data['materialName']
+            materialType = data['materialType']
+            unit = data['unit']
+            price = float(data['price'])
+            supplier = data['supplier']
+            documentNumber = data['documentNumber']
+            isInOrOut = int(data['isInOrOut'])
+            if not (isInOrOut == 0 or isInOrOut == 1):
+                return jsonify({'ok': False})
+            operateNum = int(data['operateNum'])
+            nowTime = datetime.now()
+            operateTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
+            insert_materialInOut(documentNumber, materialCode, isInOrOut, operateNum, unit, price, supplier, operateTime, username)
+            if isInOrOut==0:
+                update_materialInfo(materialCode, materialName, materialType, operateNum, price,unit,supplier)
+            elif isInOrOut==1:
+                update_materialInfo(materialCode, materialName, materialType, -operateNum, price, unit, supplier)
+            return jsonify({'ok': True})
+    else:
         return render_template('access_fail.html')
 
 # xijiawei
-# 查看物料出入库记录（显示每个物料的最近3条出入库记录）
+# 物料出入库记录（显示每个物料的最近3条出入库记录）
 @material_app.route('/material_inout_history', methods=['GET', 'POST'])
 def material_inout_history():
     print(session)
@@ -94,7 +128,7 @@ def material_inout_history():
         return render_template('access_fail.html')
 
 # xijiawei
-# 查询物料出入库记录
+# 查询物料出入库记录（根据时间段）
 @material_app.route('/material_inout_history_search', methods=['POST'])
 def material_inout_history_search():
     print(session)
@@ -108,77 +142,20 @@ def material_inout_history_search():
             materials=select_all_materialInOutFilterByDate(startDate, endDate)
             return jsonify({'materials': materials})
     else:
-        return render_template('access_fail.html')
+        return jsonify({'ok': False})
 
 # xijiawei
-# 物料管理
+# 删除物料出入库记录
 @material_app.route('/delete_material_inout', methods=['POST'])
 def delete_material_inout():
     print(session)
     print(session.keys())
     print(session.get('username'))
     if session.get('username'):
-        username = session['username']
-        authority = login_Authority(username)
         if request.method == "POST":
             data = request.get_json()
             documentNumber = data['documentNumber']
             delete_materialInOutByDocNum(documentNumber)
             return jsonify({'ok': True})
     else:
-        return render_template('access_fail.html')
-
-# xijiawei
-# 物料出入库首页
-@material_app.route('/material_inout_index', methods=['GET'])
-def material_inout_index():
-    print(session)
-    print(session.keys())
-    print(session.get('username'))
-    if session.get('username'):
-        username = session['username']
-        authority = login_Authority(username)
-        if request.method == "GET":
-            materials=[]
-            materialsInfo = select_all_materials()
-            for material in materialsInfo:
-                materialInOut = select_materialInOutByCode(material[0])
-                if materialInOut:
-                    materials.append([material[0], material[1], material[2], material[4], materialInOut[materialInOut.__len__()-1][0], material[5], material[6],materialInOut[materialInOut.__len__()-1][1]])
-                else:
-                    materials.append([material[0], material[1], material[2], material[4], "", material[5], material[6],""])
-            return render_template('material_inout.html', authority=authority[1], materials=materials, username=username)
-    else:
-        return render_template('access_fail.html')
-
-# xijiawei
-# 物料出入库提交
-@material_app.route('/material_inout', methods=['POST'])
-def material_inout():
-    if session.get('username'):
-        username = session['username']
-        authority = login_Authority(username)
-        if request.method == "POST":
-            data = request.get_json()
-            materialCode = data['materialCode']
-            materialName = data['materialName']
-            materialType = data['materialType']
-            unit = data['unit']
-            price = float(data['price'])
-            supplier = data['supplier']
-            documentNumber = data['documentNumber']
-            isInOrOut = int(data['isInOrOut'])
-            if not (isInOrOut == 0 or isInOrOut == 1):
-                return jsonify({'ok': False})
-            operateNum = int(data['operateNum'])
-            nowTime = datetime.now()
-            operateTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
-            insert_materialInOut(documentNumber, materialCode, isInOrOut, operateNum, unit, price, supplier, operateTime, username)
-            if isInOrOut==0:
-                update_materialInfo(materialCode, materialName, materialType, operateNum, price,unit,supplier)
-            elif isInOrOut==1:
-                update_materialInfo(materialCode, materialName, materialType, -operateNum, price, unit, supplier)
-            return jsonify({'ok': True})
-    else:
-        return render_template('access_fail.html')
-
+        return jsonify({'ok': False})

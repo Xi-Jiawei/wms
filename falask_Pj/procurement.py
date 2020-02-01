@@ -1,5 +1,4 @@
 from flask import render_template, request, session, Blueprint, jsonify
-from datetime import datetime
 
 from db import *
 from form import *
@@ -10,7 +9,7 @@ procurement_app=Blueprint('procurement',__name__)
 # 采购记录
 @procurement_app.route('/procurement_history', methods=['GET'])
 def procurement_history():
-    addProductForm = ProductForm()
+    form = ProductForm()
     print(session)
     print(session.keys())
     print(session.get('username'))
@@ -36,7 +35,7 @@ def procurement_history():
                     procurement.append(i[10]) # entryDate
                 else:
                     product.append([i[2], i[6], i[7],i[3],i[4],i[5]])
-            return render_template('procurement_history.html', form=addProductForm,
+            return render_template('procurement_history.html', form=form,
                                    procurements=procurements,
                                    authority=authority[2],
                                    username=username)
@@ -122,7 +121,7 @@ def calculate_procurement():
     else: return jsonify({'ok': -1})
 
 # xijiawei
-#
+# 根据产品编码查询产品型号
 @procurement_app.route('/productTypeByCode', methods=['GET', 'POST'])
 def productTypeByCode():
     if request.method == "POST":
@@ -137,7 +136,7 @@ def productTypeByCode():
     else: return jsonify({'ok': -1})
 
 # xijiawei
-#
+# 根据产品型号查询产品编码
 @procurement_app.route('/productCodeByType', methods=['GET', 'POST'])
 def productCodeByType():
     if request.method == "POST":
@@ -194,13 +193,12 @@ def procurement():
 
             # procurementCode=uuid.uuid1() # 使用uuid生成唯一代号
             procurementCode=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
-            procurementCode=procurementCode[0:16] # 使用时间戳生成唯一代号
-            for i in range(productCodeArr.__len__()):
-                insert_procurement(procurementCode, productCodeArr[i], int(productNumArr[i]), client, remarkArr[i], entryClerk, entryTime)
+            procurementCode="PM"+procurementCode[0:16] # 使用时间戳生成唯一代号
+            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
-            addProductForm = ProductForm()
-            return render_template('procurement.html', setting=0, form=addProductForm, authority=authority[2],username=username)
+            form = ProductForm()
+            return render_template('procurement.html', setting=0, form=form, authority=authority[2],username=username)
     else:
         return render_template('access_fail.html')
 
@@ -211,7 +209,7 @@ def edit_procurement(procurementCode):
     print(session)
     print(session.keys())
     print(session.get('username'))
-    addProductForm = ProductForm()
+    form = ProductForm()
     if session.get('username'):
         username = session['username']
         authority = login_Authority(username)
@@ -252,8 +250,7 @@ def edit_procurement(procurementCode):
 
             # update procurement and update materialInfo
             delete_procurementByCode(procurementCode) # 撤回上次采购
-            for i in range(productCodeArr.__len__()):
-                insert_procurement(procurementCode, productCodeArr[i], int(productNumArr[i]), client, remarkArr[i], entryClerk, entryTime)
+            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
             all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialNum
@@ -292,20 +289,20 @@ def edit_procurement(procurementCode):
             # sum(materialNum) group by materialCode
             materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
             # form data
-            addProductForm.productCodeOrType.data = 0
-            addProductForm.productCodeOrTypeInput.data=productCodeInput
-            addProductForm.productNum.data=productNumInput
-            addProductForm.client.data = all_products[0][3]
+            form.productCodeOrType.data = 0
+            form.productCodeOrTypeInput.data=productCodeInput
+            form.productNum.data=productNumInput
+            form.client.data = all_products[0][3]
             if authority[2]=='1' or authority[2]=='2':
-                addProductForm.productCodeOrType.render_kw = {"class": "form-control", "readonly": 'true'}
-                addProductForm.productCodeOrTypeInput.render_kw = {"class": "form-control", "readonly": 'true'}
-                addProductForm.productNum.render_kw = {"class": "form-control", "readonly": 'true'}
-                addProductForm.client.render_kw = {"class": "form-control", "readonly": 'true'}
-                addProductForm.remark.render_kw = {"class": "form-control", "readonly": 'true'}
-                return render_template('procurement.html', form=addProductForm, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
+                form.productCodeOrType.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.productCodeOrTypeInput.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.productNum.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.client.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.remark.render_kw = {"class": "form-control", "readonly": 'true'}
+                return render_template('procurement.html', form=form, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
                                        authority=authority[2], username=username)
             elif authority[2]=='3' or authority[2]=='8':
-                return render_template('procurement.html', setting=1, form=addProductForm, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
+                return render_template('procurement.html', setting=1, form=form, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
                                        authority=authority[2], username=username)
     else:
         return render_template('access_fail.html')

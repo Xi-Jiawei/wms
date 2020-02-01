@@ -47,11 +47,11 @@
                 {% endif %}
                 {% if authority=='3' or authority=="8" or authority=="2"%}
                     <li>
-                        <a href="{{ url_for("material.material_inout_index")}}"> <i class="menu-icon fa fa-adn"></i>物料出入库</a>
+                        <a href="{{ url_for("material.material_inout")}}"> <i class="menu-icon fa fa-adn"></i>物料出入库</a>
                     </li>
                 {% elif authority=="1"%}
                     <li>
-                        <a href="{{ url_for("material.material_inout_index")}}"> <i class="menu-icon fa fa-adn"></i>物料库存</a>
+                        <a href="{{ url_for("material.material_inout")}}"> <i class="menu-icon fa fa-adn"></i>物料库存</a>
                     </li>
                 {% endif %}
                 <li>
@@ -179,9 +179,9 @@
                                         <td>{{ i[0] }}</td>
                                         <td>{{ i[1] }}</td>
                                         <td>{{ i[2] }}</td>
-                                        <td>{{ i[3] }}</td>
+                                        <td>{{ i[8] }}</td>
                                         {% if authority=='3' or authority=="8"%}
-                                            <td><a data-toggle="modal" data-target="#materialModal" onclick="materialEdit('{{ i[0] }}','{{ i[1] }}','{{ i[2] }}','{{ i[3] }}')"> 修改 </a><a onclick="materialDelete('{{ i[0] }}')"> 删除 </a></td>
+                                            <td><a data-toggle="modal" data-target="#materialModal" onclick="materialEdit('{{ i[0] }}','{{ i[1] }}','{{ i[2] }}','{{ i[8] }}')"> 修改 </a><a onclick="materialDelete('{{ i[0] }}')"> 删除 </a></td>
                                         {% endif %}
                                     </tr>
                                 {% endfor %}
@@ -254,9 +254,9 @@
                             tableData[i][0]=materials[i][0];
                             tableData[i][1]=materials[i][1];
                             tableData[i][2]=materials[i][2];
-                            tableData[i][3]=materials[i][3];
+                            tableData[i][3]=materials[i][8];
                             //tableData[i][4]="修改";
-                            tableData[i][4]="<a class='edit' data-toggle='modal' data-target='#materialModal' onclick='materialEdit(\""+materials[i][0]+"\",\""+materials[i][1]+"\",\""+materials[i][2]+"\",\""+materials[i][3]+"\")'> 修改 </a><a onclick='materialDelete(\""+materials[i][0]+"\")'> 删除 </a>";
+                            tableData[i][4]="<a class='edit' data-toggle='modal' data-target='#materialModal' onclick='materialEdit(\""+materials[i][0]+"\",\""+materials[i][1]+"\",\""+materials[i][2]+"\",\""+materials[i][8]+"\")'> 修改 </a><a onclick='materialDelete(\""+materials[i][0]+"\")'> 删除 </a>";
                         }
                         var currentPage = realTable.page();
                         realTable.clear();
@@ -317,9 +317,9 @@
                         tableData[i][0]=materials[i][0];
                         tableData[i][1]=materials[i][1];
                         tableData[i][2]=materials[i][2];
-                        tableData[i][3]=materials[i][3];
+                        tableData[i][3]=materials[i][8];
                         //tableData[i][4]="修改";
-                        tableData[i][4]="<a class='edit' data-toggle='modal' data-target='#materialModal' onclick='materialEdit(\""+materials[i][0]+"\",\""+materials[i][1]+"\",\""+materials[i][2]+"\",\""+materials[i][3]+"\")'> 修改 </a><a onclick='materialDelete(\""+materials[i][0]+"\")'> 删除 </a>";
+                        tableData[i][4]="<a class='edit' data-toggle='modal' data-target='#materialModal' onclick='materialEdit(\""+materials[i][0]+"\",\""+materials[i][1]+"\",\""+materials[i][2]+"\",\""+materials[i][8]+"\")'> 修改 </a><a onclick='materialDelete(\""+materials[i][0]+"\")'> 删除 </a>";
                     }
                     var currentPage = realTable.page();
                     realTable.clear();
