@@ -250,7 +250,8 @@ def edit_procurement(procurementCode):
 
             # update procurement and update materialInfo
             delete_procurementByCode(procurementCode) # 撤回上次采购
-            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            # insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, "系统账号", entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
             all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialNum
