@@ -110,8 +110,21 @@ def material_inout_history():
         authority = login_Authority(username)
         if request.method == "GET":
             materialInOut = select_all_materialInOut()
+            materialInOutSums = select_sum_materialInOut()
+            mSumTitle=""
+            mSumNum=""
+            mSumAmount=""
+            for i in materialInOutSums:
+                if i[0]==0:
+                    mSumTitle+="入库/"
+                    mSumNum = mSumNum + str(i[1]) + "/"
+                    mSumAmount = mSumAmount + str(i[2]) + "/"
+                if i[0]==1:
+                    mSumTitle+="出库"
+                    mSumNum = mSumNum + str(i[1])
+                    mSumAmount = mSumAmount + str(i[2])
             nowTime = datetime.now().strftime('%Y-%m-%dT%H:%M')
-            return render_template('material_inout_history.html', authority=authority[1], materialInOut=materialInOut,
+            return render_template('material_inout_history.html', authority=authority[1], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount],
                                    username=username,nowTime=nowTime)
         if request.method == "POST":
             data = request.get_json()

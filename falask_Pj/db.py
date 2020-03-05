@@ -805,7 +805,21 @@ def delete_materialByCode(materialCode):
 def select_all_materialInOut():
     try:
         # sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInfo.price,materialInOut.operateNum*materialInfo.price,materialInOut.supplier,materialInOut.documentNumber,materialInOut.operateTime,materialInOut.operatorName from materialInOut left join materialInfo on materialInOut.materialCode=materialInfo.materialCode;"
-        sql = "select m.materialCode,materialInfo.materialName,materialInfo.materialType,m.isInOrOut,m.beforeinventoryNum,m.operateNum,m.unit,m.price,m.operateNum*m.price,m.supplier,m.documentNumber,date_format(m.operateTime,'%Y-%m-%d %H:%i:%s'),m.operatorName from (select a.* from materialInOut a where 3>(select count(*) from materialInOut b where b.materialCode=a.materialCode and b.operateTime>a.operateTime)) m left join materialInfo on m.materialCode=materialInfo.materialCode order by m.materialCode,m.operateTime desc;"
+        sql = "select m.materialCode,materialInfo.materialName,materialInfo.materialType,m.isInOrOut,m.beforeinventoryNum,m.operateNum,m.unit,m.price,round(m.operateNum*m.price,2),m.supplier,m.documentNumber,date_format(m.operateTime,'%Y-%m-%d %H:%i:%s'),m.operatorName from (select a.* from materialInOut a where 3>(select count(*) from materialInOut b where b.materialCode=a.materialCode and b.operateTime>a.operateTime)) m left join materialInfo on m.materialCode=materialInfo.materialCode order by m.materialCode,m.operateTime desc;"
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询每个物料的最近3条出入库记录
+def select_sum_materialInOut():
+    try:
+        # sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInfo.price,materialInOut.operateNum*materialInfo.price,materialInOut.supplier,materialInOut.documentNumber,materialInOut.operateTime,materialInOut.operatorName from materialInOut left join materialInfo on materialInOut.materialCode=materialInfo.materialCode;"
+        sql = "select isInOrOut,sum(operateNum),round(sum(operateNum*price),2) from materialInOut group by isInOrOut;"
         cur.execute(sql)
         result = cur.fetchall()
         return result
@@ -817,7 +831,7 @@ def select_all_materialInOut():
 # xijiawei
 # 根据时间段查询物料出入库记录
 def select_all_materialInOutFilterByDate(startDate,endDate):
-    sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInOut.price,materialInOut.operateNum*materialInOut.price,materialInOut.supplier,materialInOut.documentNumber,date_format(materialInOut.operateTime,'%%Y-%%m-%%d %%H:%%i:%%S'),materialInOut.operatorName from materialInOut, materialInfo where materialInOut.materialCode=materialInfo.materialCode and materialInOut.operateTime>='%s' and materialInOut.operateTime<='%s' order by materialInOut.materialCode,materialInOut.operateTime desc;"%(startDate,endDate)
+    sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInOut.price,round(materialInOut.operateNum*materialInOut.price,2),materialInOut.supplier,materialInOut.documentNumber,date_format(materialInOut.operateTime,'%%Y-%%m-%%d %%H:%%i:%%S'),materialInOut.operatorName from materialInOut, materialInfo where materialInOut.materialCode=materialInfo.materialCode and materialInOut.operateTime>='%s' and materialInOut.operateTime<='%s' order by materialInOut.materialCode,materialInOut.operateTime desc;"%(startDate,endDate)
     print(sql)
     cur.execute(sql)
     result=cur.fetchall()
