@@ -158,6 +158,21 @@
                                     {% endfor %}
                                 {% endif %}
                                 </tbody>
+                                <tfoot>
+                                <tr>
+                                    {% if authority=='3' or authority=="8" or authority=="2"%}
+                                        <td>余库存总金额</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>{{ inventoryMoneySum }}</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                    {% endif %}
+                                </tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>

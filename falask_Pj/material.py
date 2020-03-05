@@ -73,7 +73,8 @@ def material_inout():
         authority = login_Authority(username)
         if request.method == "GET":
             materials = select_all_materials() # materialCode,materialName,materialType,inventoryNum,unit,price,inventoryMoney,supplier,remark
-            return render_template('material_inout.html', authority=authority[1], materials=materials, username=username)
+            inventoryMoneySum = select_sum_materials()
+            return render_template('material_inout.html', authority=authority[1], materials=materials, inventoryMoneySum=inventoryMoneySum[0][0], username=username)
         if request.method == "POST":
             data = request.get_json()
             materialCode = data['materialCode']

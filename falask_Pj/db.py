@@ -735,6 +735,15 @@ def select_all_materials():
     conn.close()
 
 # xijiawei
+# 查询所有物料
+def select_sum_materials():
+    sql = "select round(sum(inventoryMoney),2) from materialInfo;"
+    cur.execute(sql)
+    result=cur.fetchall()
+    return result
+    conn.close()
+
+# xijiawei
 # 根据物料编码查询物料信息
 def select_materialInfoByCode(materialCode):
     sql = "select materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier from materialInfo where materialCode='%s';"%materialCode
@@ -854,10 +863,10 @@ def insert_materialInOut(documentNumber,materialCode,isInOrOut,operateNum,unit,p
         cur.execute("select inventoryNum from materialInfo where materialCode='%s';"%(materialCode))
         result = cur.fetchall()
         if result:
-            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%d','%s','%s','%s');" \
+            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" \
                   % (documentNumber, materialCode, isInOrOut, result[0][0], operateNum, unit, price, supplier, operateTime,operatorName)
         else:
-            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%d','%s','%s','%s');" \
+            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" \
                   % (documentNumber, materialCode, isInOrOut, 0, operateNum, unit, price, supplier, operateTime,operatorName)
         # 执行SQL语句
         cur.execute(sql)
