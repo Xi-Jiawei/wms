@@ -130,8 +130,6 @@
                                             <th>客户</th>
                                             <th>录入员</th>
                                             <th>日期</th>
-                                            <th>物料编码</th>
-                                            <th>物料数量</th>
                                         {% elif authority=='1' or authority=="2"%}
                                             <th>序号</th>
                                             <th>采购代号</th>
@@ -141,8 +139,6 @@
                                             <th>客户</th>
                                             <th>录入员</th>
                                             <th>日期</th>
-                                            <th>物料编码</th>
-                                            <th>物料数量</th>
                                         {% endif %}
                                     </tr>
                                     </thead>
@@ -159,16 +155,12 @@
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[3] }}</td>
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[4] }}</td>
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[5] }}</td>
-                                                <td>{{ procurement[2][0][3] }}</td>
-                                                <td>{{ procurement[2][0][5] }}</td>
                                             </tr>
                                             {% for product in procurement[2][1:procurement[0]]%}
                                                 <tr align="center">
                                                     <td>{{ product[0] }}</td>
                                                     <td>{{ product[1] }}</td>
                                                     <td>{{ product[2] }}</td>
-                                                    <td>{{ product[3] }}</td>
-                                                    <td>{{ product[5] }}</td>
                                                 </tr>
                                             {% endfor %}
                                         {% endfor %}
@@ -183,16 +175,12 @@
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[3] }}</td>
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[4] }}</td>
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle">{{ procurement[5] }}</td>
-                                                <td>{{ procurement[2][0][3] }}</td>
-                                                <td>{{ procurement[2][0][5] }}</td>
                                             </tr>
                                             {% for product in procurement[2][1:procurement[0]]%}
                                                 <tr align="center">
                                                     <td>{{ product[0] }}</td>
                                                     <td>{{ product[1] }}</td>
                                                     <td>{{ product[2] }}</td>
-                                                    <td>{{ product[3] }}</td>
-                                                    <td>{{ product[5] }}</td>
                                                 </tr>
                                             {% endfor %}
                                         {% endfor %}
