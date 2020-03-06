@@ -1064,7 +1064,8 @@
         /*price*/
         console.log($("#taxRate").val());
         console.log($("#profit").val());
-        var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);//不要写成var price=($("#taxRate").val()+1)*($("#profit").val()+totalCost);
+        //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);//不要写成var price=($("#taxRate").val()+1)*($("#profit").val()+totalCost);
+        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
         $("#price").val(price.toFixed(2));
     });
@@ -1117,7 +1118,8 @@
         /*price*/
         console.log($("#taxRate").val());
         console.log($("#profit").val());
-        var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
+        //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
+        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
         $("#price").val(price.toFixed(2));
     });
@@ -1317,7 +1319,8 @@
         console.log($("#profit").val());
         var price=0;
         if($.isNumeric(parseFloat($("#taxRate").val())) && $.isNumeric(parseFloat($("#profit").val())))
-            price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
+            //price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
+            price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
         $("#price").val(price.toFixed(2));
     };
