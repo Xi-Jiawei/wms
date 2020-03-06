@@ -32,7 +32,7 @@ def procurement_history():
                     procurement.append(product)
                     procurement.append(i[8]) # client
                     procurement.append(i[9]) # entryClerk
-                    procurement.append(i[10]) # entryDate
+                    procurement.append(i[10].strftime('%Y-%m-%d %H:%M:%S.%f')[0:21]) # entryDate
                 else:
                     product.append([i[2], i[6], i[7],i[3],i[4],i[5]])
             return render_template('procurement_history.html', form=form,
@@ -264,8 +264,7 @@ def edit_procurement(procurementCode):
             # update procurement and update materialInfo
             # 简单方式：无论是否修改了产品编码，都是先撤回上次采，再插入新采购
             delete_procurementByCode(procurementCode)  # 撤回上次采购
-            #  insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
-            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, "系统账号",entryTime)
+            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
             all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialNum

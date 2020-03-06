@@ -263,11 +263,11 @@ def check_uniqueness():
             return jsonify({'ok': False})
     else: return jsonify({'ok': -1})
 
-# xijiawei
-# 物料编码校验
-@product_app.route('/test', methods=['GET', 'POST'])
-def test():
-    if request.method == "GET":
-        return render_template('test.html')
-    else:
-        return render_template('access_fail.html')
+# # xijiawei
+# # 物料编码校验
+# @product_app.route('/test', methods=['GET', 'POST'])
+# def test():
+#     if request.method == "GET":
+#         return render_template('test.html')
+#     else:
+#         return render_template('access_fail.html')
