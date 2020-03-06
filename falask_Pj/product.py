@@ -79,7 +79,11 @@ def add_product():
                     return jsonify({'ok': "type"})
             elif request.method == 'GET':
                 # create_materialsOfProduct_temp()
-                return render_template('product_edit.html', setting=0, form=form, username=username) # setting为0表示新添，setting为1表示编辑
+                result=select_all_materials()
+                materialCodes=[]
+                for i in result:
+                    materialCodes.append(i[0])
+                return render_template('product_edit.html', setting=0, form=form, username=username, materialCodes=materialCodes) # setting为0表示新添，setting为1表示编辑
             else:
                 # create_materialsOfProduct_temp()
                 return render_template('product_edit.html', form=form, username=username)
@@ -202,11 +206,16 @@ def edit_product(productCode):
                 materialsOfProduct = select_materialsOfProductByCode(productCode)
                 otherCosts = select_otherCostsByCode(productCode)
 
+                result=select_all_materials()
+                materialCodes=[]
+                for i in result:
+                    materialCodes.append(i[0])
+
                 # setting为0表示新添，setting为1表示编辑
                 return render_template('product_edit.html', setting=1, form=form, productCode=productCode, materialCost=materialCost,
                                        processCost=processCost, adminstrationCost=adminstrationCost,
                                        supplementaryCost=supplementaryCost, operatingCost=operatingCost,
-                                       materialsOfProduct=materialsOfProduct, otherCosts=otherCosts,
+                                       materialsOfProduct=materialsOfProduct, otherCosts=otherCosts, materialCodes=materialCodes,
                                        username=username)
             else:
                 # create_materialsOfProduct_temp()
@@ -253,3 +262,12 @@ def check_uniqueness():
         else:
             return jsonify({'ok': False})
     else: return jsonify({'ok': -1})
+
+# xijiawei
+# 物料编码校验
+@product_app.route('/test', methods=['GET', 'POST'])
+def test():
+    if request.method == "GET":
+        return render_template('test.html')
+    else:
+        return render_template('access_fail.html')

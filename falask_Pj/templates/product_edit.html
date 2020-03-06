@@ -367,7 +367,7 @@
                                                     {% for i in materialsOfProduct %}
                                                         <tr class='tr_i'>
                                                             <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
-                                                            <td><input type='text' style='width:150px' class='materialCode'
+                                                            <td><input type='text' style='width:150px' class='materialCode' list="materialCodeList"
                                                                        value={{ i[0] }}
                                                             /></td>
                                                             <td><input type='text' style='width:150px' class='materialsOfProduct'
@@ -387,6 +387,15 @@
                                                 {% endif %}
                                                 </tbody>
                                             </table>
+
+                                            <datalist id="materialCodeList">
+                                                {% if materialCodes %}
+                                                    {% for i in materialCodes %}
+                                                        <option value={{ i }}></option>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </datalist>
+
                                         </div>
                                     </div>
                                 </div>
@@ -880,7 +889,7 @@
         rowNum++;
         var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
             "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
-            "<td><input type='text' style='width:150px' class='materialCode'/></td>" +
+            "<td><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/></td>" +
             "<td><input type='text' style='width:150px' class='materialsOfProduct' value='0'/></td>" +
             "<td><input type='text' style='width:150px' class='materialsOfProduct' value='0.00'/></td>" +
             "<td><input type='text' style='width:150px' class='materialsOfProduct' value='0'/></td>" +

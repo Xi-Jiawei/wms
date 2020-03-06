@@ -680,7 +680,8 @@ def delete_procurementByCode(procurementCode):
         for i in result:
             # documentNumber = uuid.uuid1()  # 使用uuid生成唯一代号
             documentNumber=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
-            documentNumber=documentNumber[0:16] # 使用时间戳生成唯一代号
+            # documentNumber=documentNumber[0:16] # 使用时间戳生成唯一代号
+            documentNumber = procurementCode + documentNumber[10:16]  # 使用时间戳生成唯一代号
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             insert_materialInOut(documentNumber, i[0], 0, i[1], i[2], i[3], i[4], entryTime, "系统账号")
         # 更新materialInfo
@@ -709,9 +710,45 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
         for i in result:
             # documentNumber=uuid.uuid1() # 使用uuid生成唯一代号
             documentNumber=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
-            documentNumber=documentNumber[0:16] # 使用时间戳生成唯一代号
+            documentNumber=procurementCode+documentNumber[10:16] # 使用时间戳生成唯一代号
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-            insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk)
+            insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,"系统账号")
+        # 更新materialInfo
+        cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum-m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney-price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 未启用
+# 更新采购：只修改产品数量，只在内部更新出入库
+def update_procurement(procurementCode,productCodeArr,productNumArr,client,remarkArr,entryClerk,entryTime):
+    try:
+        # 查询旧materialInOut
+        cur.execute("select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode;" % (procurementCode))
+        resultOld = cur.fetchall()
+        # 查询materialInOut近似的操作时间
+        cur.execute("select entryTime from procurement where procurementCode='%s';" % (procurementCode))
+        entryDate = cur.fetchall()
+        for i in range(productCodeArr.__len__()):
+            sql = "update procurement set productNum='%d',client='%s',remark='%s',entryClerk='%s' where procurementCode='%s' and productCode='%s';" \
+                  % (int(productNumArr[i]),client,remarkArr[i],entryClerk,procurementCode, productCodeArr[i])
+            cur.execute(sql)
+            sql = "update productInfo set productNum='%d' where productCode='%s';" \
+                  % (int(productNumArr[i]), productCodeArr[i])
+            cur.execute(sql)
+        # 更新materialInOut
+        cur.execute("select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode;" % (procurementCode))
+        result = cur.fetchall()
+        for i in range(result.__len__()):
+            update_materialInOutByCode(result[i][0], resultOld[i][1]-result[i][1], entryDate[0][0])
         # 更新materialInfo
         cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum-m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney-price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
         # 提交到数据库执行
@@ -912,6 +949,27 @@ def update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, sup
                   % (isInOrOut, operateNum, unit, price, supplier, documentNumber)
         # 执行SQL语句
         cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 更新物料出入库记录，更新相关物料出入库记录物料数量，并更新materialInfo表
+def update_materialInOutByCode(materialCode, differenceOperateNum, operateTime):
+    try:
+        # 更新materialInOut表
+        cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" %
+                    (differenceOperateNum, materialCode, operateTime))
+        # 更新materialInfo表
+        cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" %
+                    (differenceOperateNum, differenceOperateNum, materialCode))
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")

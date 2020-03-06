@@ -248,10 +248,24 @@ def edit_procurement(procurementCode):
                         productCode = select_productCodeByType(productTypeArr[i])
                         productCodeArr[i] = productCode[0][0]
 
+            # 复杂方式：判断更新的采购是否修改了产品编码，如果只是修改数量，则只在内部更新出入库
+            # productCodeArrOld=[]
+            # result=select_procurementByCode(procurementCode)
+            # for i in result:
+            #     productCodeArrOld.append(i[0])
+            # # 判断更新的采购是否修改了产品编码
+            # if list(set(productCodeArr).difference(set(productCodeArrOld)))==[]:
+            #     update_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            # else:
+            #     # update procurement and update materialInfo
+            #     delete_procurementByCode(procurementCode)  # 撤回上次采购
+            #     # insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            #     insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, "系统账号", entryTime)
             # update procurement and update materialInfo
-            delete_procurementByCode(procurementCode) # 撤回上次采购
-            # insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
-            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, "系统账号", entryTime)
+            # 简单方式：无论是否修改了产品编码，都是先撤回上次采，再插入新采购
+            delete_procurementByCode(procurementCode)  # 撤回上次采购
+            #  insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, "系统账号",entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
             all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialNum
