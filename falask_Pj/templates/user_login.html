@@ -12,7 +12,7 @@
     <meta name="description" content="Ela Admin - HTML5 Admin Template">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/dist/css/normalize.css">
     <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
     <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
@@ -39,11 +39,11 @@
                 <form role="form" method="post">
                     <div class="form-group">
                         <label for="user_id">用户名</label>
-                        <input type="text" id="user_id" name="user_id"  class="form-control" placeholder="用户名">
+                        <input type="text" id="username" name="username"  class="form-control" placeholder="用户名">
                     </div>
                     <div class="form-group">
                         <label>密码</label>
-                        <input type="password" id="user_pwd" name="user_pwd" class="form-control" placeholder="密码">
+                        <input type="password" id="password" name="password" class="form-control" placeholder="密码">
                     </div>
                     <div class="checkbox">
                         <label>
@@ -55,9 +55,6 @@
 
                     </div>
                     <button type="submit" class="btn btn-success btn-flat m-b-30 m-t-30">登陆</button>
-{#                    <div class="register-link m-t-15 text-center">#}
-{#                        <p>Don't have account ? <a href="#"> Sign Up Here</a></p>#}
-{#                    </div>#}
                 </form>
             </div>
              {% if message %} {{ message }} {% endif %}

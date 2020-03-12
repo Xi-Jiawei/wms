@@ -1,14 +1,13 @@
 from datetime import timedelta
 
-from flask import Flask, url_for, render_template, request, redirect, session
+from flask import Flask, url_for, render_template, request, redirect, session, jsonify
 
-from model import User, NewUser
+from form import *
 from db import *
-import config,datetime
+import config
 import os
 import sys
 
-from form import MyForm, SelectForm, ChangeForm
 from product import product_app
 from procurement import procurement_app
 from material import material_app
@@ -43,15 +42,12 @@ def index_operator():
 # cc 登陆
 @app.route('/', methods=['GET', 'POST'])
 def user_login():
-    print(session)
     # if session:
     if session.get('username'):
         username = session['username']
-        # session.pop('username')
-        print('session 不为空 ', username)
-        print("开始调用函数获取用户类型")
-        Authority = login_Authority(username)
-        if Authority == '888':
+        # session.pop('username
+        authority = select_user_authority(username)
+        if authority == '888':
             print("admin login!")
             return redirect(url_for('index_adm'))
         else:
@@ -61,17 +57,14 @@ def user_login():
     # print(session[0])
     if request.method == "POST":
         session.clear()
-        print(request.form)
-        user = User()
-        stu_id = user.id = request.form["user_id"]
-        user.pwd = request.form["user_pwd"]
-        Authority = login_Authority(user.id)
-        print("测试Authorith 输出数字", Authority)
-        # print("admin login", Authority)
-        session['authority'] = Authority
-        if loginCheck(user.id, user.pwd):
-            session['username'] = user.id
-            if Authority == '888':
+        username = request.form["username"]
+        password = request.form["password"]
+        print("name:  pwd:", username, password)
+        if login_check(username,password):
+            session['username'] = username
+            authority = select_user_authority(username)
+            session['authority'] = authority
+            if authority == '888':
                 print("admin login!")
                 return redirect(url_for('index_adm'))
             else:
@@ -80,11 +73,9 @@ def user_login():
         else:
             message = "用户名或者密码错误"
             session.clear()
-            return render_template('user_login.html', message=message)
-        print("name:  pwd:", user.name, user.pwd)
-        return redirect(url_for("user_login"))  # 跳到主页
-    return render_template('user_login.html')
-
+            return render_template('user_login.html', message=message) # 跳到主页
+    elif request.method == "GET":
+        return render_template('user_login.html')
 
 # cc退出系统
 @app.route('/out', methods=['GET', 'POST'])
@@ -97,28 +88,6 @@ def out():
 def person_management():
     return render_template('person_management.html')
 
-# cc 人员管理_查看人员
-@app.route('/show_person',methods=['GET', 'POST'])
-def show_person():
-    personName = session['username']
-    temp = list(show_allperson())
-    person = []
-    for i in temp:
-        i = list(i)
-        if i[3] == '888':
-            i[3] = "管理员"
-        else:
-            a = i[3][0]
-            b = i[3][1]
-            c = i[3][2]
-            sa = "物料" + person_authority(a)
-            sb = "成品" + person_authority(b)
-            sc = "采购" + person_authority(c)
-            i[3] = sa + "、" + sb + "、" + sc
-        person.append(i)
-    # print(person)
-    return render_template('person_management_show.html', person=person, personName=personName)
-
 # cc 查看人员管理的数字映射权限
 def person_authority(auth):
     return {
@@ -128,122 +97,109 @@ def person_authority(auth):
         '3': "修改权限",
     }.get(auth,'error')
 
+# xijiawei
+def show_all_users():
+    result = select_all_users()
+    users = []
+    for i in result:
+        user = [i[0], i[1], i[2]]
+        users.append(user)
+        if i[3] == '888':
+            user.append("管理员")
+        else:
+            user.append("物料" + person_authority(i[3][0]) + "、" + "成品" + person_authority(
+                i[3][1]) + "、" + "采购" + person_authority(i[3][2]))
+    return users
+
+# cc 人员管理_查看人员
+@app.route('/show_users',methods=['GET', 'POST'])
+def show_users():
+    username = session['username']
+    users = show_all_users()
+    return render_template('person_management_show.html', users=users, username=username)
+
 # cc 人员管理_增加人员
-@app.route('/add_person',methods=['GET', 'POST'])
-def add_person():
-    form = MyForm()
+@app.route('/add_user',methods=['GET', 'POST'])
+def add_user():
+    form = UserForm()
     if request.method == "POST":
-        # print(form.data['status'])
-        # print(form.data['statusPro'])
-        # print(form.data['statusPur'])
-        print("增加人员: ")
-        user = NewUser()
-        user.name = request.form["name"]
-        authority = form.data['status'] + "" + form.data['statusPro'] + "" + form.data['statusPur']
-        user.authority = authority
-        # print(user.name, user.pwd, user.authority)
-        cc_add_account(user.name, user.pwd, int(user.authority))
-        add_message = "添加成功"
-        return render_template('add_person.html', add_message=add_message, form=form)
-    return render_template('add_person.html',form=form)
+        # username=request.form["username"]
+        # authority = form.data['materialAuth'] + form.data['productAuth'] + form.data['procurementAuth']
+        data = request.get_json()
+        username = data["username"]
+        authority = data['materialAuth'] + data['productAuth'] + data['procurementAuth']
+        if select_user(username):
+            return jsonify({'ok': False})
+        else:
+            insert_user(username, '88888888', authority)
+            return jsonify({'ok': True})
+    elif request.method == "GET":
+        return render_template('add_person.html',form=form)
 
 # cc 人员管理_删除人员
-@app.route('/delete_person',methods=['GET', 'POST'])
-def delete_person():
-    result = cc_findname()
-    temp = list(show_allperson())
-    person = []
-    for i in temp:
-        i = list(i)
-        if i[3] == '888':
-            i[3] = "管理员"
-        else:
-            a = i[3][0]
-            b = i[3][1]
-            c = i[3][2]
-            sa = "物料" + person_authority(a)
-            sb = "成品" + person_authority(b)
-            sc = "采购" + person_authority(c)
-            i[3] = sa + "、" + sb + "、" + sc
-        person.append(i)
-    form = SelectForm()
+@app.route('/delete_user',methods=['GET', 'POST'])
+def delete_user():
+    form = UserForm()
     if request.method == "POST":
-        print("删除人员: ")
-        id = form.data['personName']
-        cc_deletename(id)
+        userid = form.data['userid']
+        delete_userByID(userid)
         delete_message = "删除成功"
-        return render_template('delete_person.html', delete_message=delete_message, form=form, person=person)
-    return render_template('delete_person.html', form=form, person=person)
+        users = show_all_users()
+        choices = select_all_users_for_selector()
+        form.userid.choices = choices
+        return render_template('delete_person.html', delete_message=delete_message, form=form, users=users)
+    elif request.method == "GET":
+        users = show_all_users()
+        choices = select_all_users_for_selector()
+        form.userid.choices = choices
+        return render_template('delete_person.html', form=form, users=users)
 
 # cc 人员管理_权限管理
-@app.route('/change_person',methods=['GET', 'POST'])
-def change_person():
-    temp = list(show_allperson())
-    person = []
-    for i in temp:
-        i = list(i)
-        if i[3] == '888':
-            i[3] = "管理员"
-        else:
-            a = i[3][0]
-            b = i[3][1]
-            c = i[3][2]
-            sa = "物料" + person_authority(a)
-            sb = "成品" + person_authority(b)
-            sc = "采购" + person_authority(c)
-            i[3] = sa + "、" + sb + "、" + sc
-        person.append(i)
-    form = ChangeForm()
+@app.route('/change_authority',methods=['GET', 'POST'])
+def change_authority():
+    form = UserForm()
     if request.method == "POST":
-        print("修改人员权限")
-        id = form.data['personName']
-        authority = form.data['status'] + "" + form.data['statusPro'] + "" + form.data['statusPur']
-        cc_changeAuthority(id,authority)
+        userid = form.data['userid']
+        authority = form.data['materialAuth'] + form.data['productAuth'] + form.data['procurementAuth']
+        update_user_authority(userid, authority)
         change_message = "修改成功"
-        return render_template('change_person.html', change_message=change_message, form=form, person=person)
-    return render_template('change_person.html', form=form, person=person)
+        users = show_all_users()
+        choices = select_all_users_for_selector()
+        form.userid.choices = choices
+        return render_template('change_person.html', change_message=change_message, form=form, users=users)
+    elif request.method == "GET":
+        users = show_all_users()
+        choices = select_all_users_for_selector()
+        form.userid.choices = choices
+        return render_template('change_person.html', form=form, users=users)
 
 # cc 修改密码
-@app.route('/cc_change_pass', methods=['GET', 'POST'])
-def cc_change_pass():
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
     print("修改界面", session['username'])
     # sql 修改数据库中的密码
     # fun_changepassword(user)
     if request.method == "POST":
-        user = NewUser()
-        user.name = session['username']
-        print("需要修改的用户是", user.name)
-        user.pwd = select_pass(user.name)
-        print("数据库查询到的密码是：", user.pwd)
+        username = session['username']
+        password = select_user_password(username)
         oldpassword = request.form["oldpassword"]
-        print("需要修改的用户是", oldpassword)
         newpassword = request.form["newpassword"]
         renewpassword = request.form["renewpassword"]
-        if newpassword == renewpassword:
-            print("两次输入密码一致")
-            print("----------------------------------------------")
-        else:
-            message = "两次密码不一致，请重新输入"
-            print("两次密码不一致，请重新输入")
-            return render_template('changepassword.html', message=message)
-        # print("新密码： 旧密码：", oldpassword, user.pwd[0])
-        if str(oldpassword) == str(user.pwd[0]):
-            print("新旧密码一致")
-            user.pwd = newpassword
-            update_pass(user.name, user.pwd)
-            print("密码修改成功")
-            print("密码修改成功，请推出当前界面重新登陆")
-            # return 'ok'
-            message = "密码修改成功，请重新登陆"
-            # session.pop(user.name)
-            session.clear()
-            return redirect(url_for("user_login"))  # 跳到主页
-            # return render_template('user_login.html', message=message)
-        else:
+        if oldpassword!=password:
             message = "旧密码有误，请重新输入"
             print("旧密码有误，请重新输入")
             return render_template('changepassword.html', message=message)
-            #   session.pop(user.name)
+        else:
+            if newpassword != renewpassword:
+                message = "两次密码不一致，请重新输入"
+                print("两次密码不一致，请重新输入")
+                return render_template('changepassword.html', message=message)
+            else:
+                update_user_password(username, newpassword)
+                message = "密码修改成功，请重新登陆"
+                # session.pop(user.name)
+                session.clear()
+                return redirect(url_for("user_login"))  # 跳到主页
     else:
         return render_template('changepassword.html')
 

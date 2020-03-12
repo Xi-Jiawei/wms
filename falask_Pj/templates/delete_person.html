@@ -30,33 +30,34 @@
 
 </head>
 <body>
-    <!-- Left Panel -->
+<!-- Left Panel -->
 
-        <aside id="left-panel" class="left-panel">
-        <nav class="navbar navbar-expand-sm navbar-default">
-            <div id="main-menu" class="main-menu collapse navbar-collapse">
-                <ul class="nav navbar-nav">
-                    <li >
-                        <a href="{{ url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
-                    </li>
-                    <li class="menu-title">菜单</li><!-- /.menu-title -->
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li >
+                    <a href="{{ url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
+                </li>
+                <li class="menu-title">菜单</li><!-- /.menu-title -->
+
                 <li>
-                    <a href="{{ url_for("show_person") }}"> <i class="menu-icon fa fa-cogs"></i>查看人员</a>
+                    <a href="{{ url_for("show_users") }}"> <i class="menu-icon fa fa-cogs"></i>查看人员</a>
                 </li>
                 <li>
-                    <a href="{{ url_for("add_person") }}"> <i class="menu-icon fa fa-th"></i>添加人员</a>
+                    <a href="{{ url_for("add_user") }}"> <i class="menu-icon fa fa-th"></i>添加人员</a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for("delete_user") }}"> <i class="menu-icon fa fa-table"></i>删除人员</a>
                 </li>
                 <li>
-                    <a href="{{ url_for("delete_person") }}"> <i class="menu-icon fa fa-table"></i>删除人员</a>
-                </li>
-                <li>
-                    <a href="{{ url_for("change_person") }}"> <i class="menu-icon fa fa-table"></i>修改人员权限</a>
+                    <a href="{{ url_for("change_authority") }}"> <i class="menu-icon fa fa-table"></i>修改人员权限</a>
                 </li>
 
-                </ul>
-            </div><!-- /.navbar-collapse -->
-        </nav>
-    </aside>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
 
     <!-- Left Panel -->
 
@@ -112,7 +113,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {% for i in person %}
+                                    {% for i in users %}
                                             <tr>
                                             <td>{{ i[0] }}</td>
                                             <td>{{ i[1] }}</td>
@@ -135,7 +136,7 @@
 
                                         <div class="form-group has-success">
                                             <label for="cc-name" class="control-label mb-1">用户姓名</label>
-                                            {{ form.personName(class="form-control")}}
+                                            {{ form.userid(class="form-control")}}
                                         </div>
                                         <div>
                                             <button id="payment-button" type="submit" class="btn btn-lg btn-info btn-block">

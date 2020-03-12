@@ -11,190 +11,253 @@ cur = conn.cursor()
 # 同步锁
 lock=threading.Lock()
 
-def select(table, conf):
-    sql = 'select * from ' + table + ' where 1 = 1'
-    for item in conf:
-        sql += item
-    print(sql)
-    cur.execute(sql)
-    result = cur.fetchall()
-    return result
+# def select(table, conf):
+#     sql = 'select * from ' + table + ' where 1 = 1'
+#     for item in conf:
+#         sql += item
+#     print(sql)
+#     cur.execute(sql)
+#     result = cur.fetchall()
+#     return result
+#
+# # 登录
+# def loginCheck(name, pwd):
+#     sql = "select * from authority where username='%s' and password='%s'" % (name, pwd)
+#     conn.ping(reconnect=True)
+#     cur.execute(sql)
+#     result = cur.fetchall()
+#     if (len(result)) == 0:
+#         return False
+#     else:
+#         return True
+#     conn.close()
+#
+# # 登录查询返回用户类型
+# def login_Authority(username):
+#     conn.ping(reconnect=True)
+#     sql = "select authority from authority where username='%s'" % (username)
+#     # sql = "select authority from  authority where username='"+id+"';"
+#     cur.execute(sql)
+#     result = cur.fetchone()
+#     if result != None:
+#         for record in result:
+#             return record
+#     conn.close()
+#
+# # 登录查询返回用户密码
+# def select_pwd(name):
+#     sql = "select password from  passwd where accountingid='%s'" % (name)
+#     cur.execute(sql)
+#     result = cur.fetchall()
+#     for record in result:
+#         return record
+#     conn.close()
+#
+#
+# # 修改用户密码
+# def update_pwd(name, pwd):
+#     sql = "update passwd set password= '%s'  where accountingid='%s'" % (pwd, name)
+#     try:
+#         # 执行SQL语句
+#         cur.execute(sql)
+#         # 提交到数据库执行
+#         conn.commit()
+#         print("语句已经提交")
+#     except:
+#         conn.rollback()
+#
+#     conn.close()
+#
+#
+# # lh 管理员 增加用户
+# def db_add_account(id, name, pwd, gender, email, tel, introduce, ruletype):
+#
+#     sql_account = "insert into account value ('%s','%s','%s','%s','%s','%s' ) " % (id, name, gender, email,tel,introduce)
+#     sql_pwd = "insert into passwd value ('%s','%s',%s)" % (id, pwd, ruletype)
+#     print(sql_account + " " + sql_pwd)
+#         # 执行SQL语句
+#     try:
+#         cur.execute(sql_account)
+#         cur.execute(sql_pwd)
+#         # 提交到数据库执行
+#         conn.commit()
+#         conn.close()
+#     except:
+#         conn.rollback()
+#
+# # lh 管理员 查看全部人员返回所有结果
+# def show_allacount():
+#     sql = "select * from  account "
+#     cur.execute(sql)
+#     result = cur.fetchall()
+#     # for record in result:
+#     return result
+#     conn.close()
+#
+# # cc 管理员_人员管理_查看人员
+# def show_allperson():
+#     sql = "select * from authority;"
+#     # print(sql)
+#     cur.execute(sql)
+#     result = cur.fetchall()
+#     return result
+#     conn.close()
+#
+# # cc 管理员增加人员
+# def cc_add_account(name, pwd, power):
+#     sql_account = "insert into authority (username,password,authority) values ('%s','%s','%s');" % (name, pwd, power)
+#     print(sql_account)
+#     # 执行SQL语句
+#     try:
+#         cur.execute(sql_account)
+#         # 提交到数据库执行
+#         conn.commit()
+#         result = cur.fetchall()
+#         return result
+#         conn.close()
+#     except Exception as e:
+#         print(e)
+#         conn.rollback()
+#
+# # cc 管理员增加人员
+# def cc_findname():
+#     sql_find = 'select userid,username from authority;'
+#     # 执行SQL语句
+#     try:
+#         cur.execute(sql_find)
+#         # 提交到数据库执行
+#         conn.commit()
+#         result = cur.fetchall()
+#         return result
+#         conn.close()
+#     except Exception as e:
+#         print(e)
+#         conn.rollback()
+#
+# # cc 管理员删除人员
+# def cc_deletename(id):
+#     sql_delete = 'DELETE FROM authority WHERE userid = ' + id
+#     print(sql_delete)
+#     # 执行SQL语句
+#     try:
+#         cur.execute(sql_delete)
+#         # 提交到数据库执行
+#         conn.commit()
+#         result = cur.fetchall()
+#         return result
+#         conn.close()
+#     except Exception as e:
+#         print(e)
+#         conn.rollback()
+#
+# # cc 修改人员权限
+# def cc_changeAuthority(id,authority):
+#     sql_change = 'UPDATE authority SET authority = \'' + authority + '\' WHERE userid ='+ id
+#     # print(sql_change)
+#     # 执行SQL语句
+#     try:
+#         cur.execute(sql_change)
+#         # 提交到数据库执行
+#         conn.commit()
+#         result = cur.fetchall()
+#         return result
+#         conn.close()
+#     except Exception as e:
+#         print(e)
+#         conn.rollback()
+#
+# # cc 查询密码
+# def select_pass(name):
+#     sql = "select password from authority where username='%s'" % (name)
+#     conn.ping(reconnect=True)
+#     cur.execute(sql)
+#     result = cur.fetchall()
+#     for record in result:
+#         return record
+#     conn.close()
+#
+# # cc 修改用户密码
+# def update_pass(name, pwd):
+#     sql = "update authority set password= '%s'  where username='%s'" % (pwd, name)
+#     print(sql)
+#     try:
+#         # 执行SQL语句
+#         cur.execute(sql)
+#         # 提交到数据库执行
+#         conn.commit()
+#         # print("语句已经提交")
+#     except:
+#         conn.rollback()
+#     conn.close()
 
-# 登录
-def loginCheck(name, pwd):
-    sql = "select * from authority where personName='%s' and password='%s'" % (name, pwd)
-    conn.ping(reconnect=True)
-    cur.execute(sql)
-    result = cur.fetchall()
-    if (len(result)) == 0:
-        return False
-    else:
-        return True
-    conn.close()
-
-# 登录查询返回用户类型
-def login_Authority(id):
-    conn.ping(reconnect=True)
-    sql = "select authority from  authority where personName='%s'" % (id)
-    # sql = "select authority from  authority where personName='"+id+"';"
-    cur.execute(sql)
-    result = cur.fetchone()
-    if result != None:
-        for record in result:
-            return record
-    conn.close()
-
-# 登录查询返回用户密码
-def select_pwd(name):
-    sql = "select password from  passwd where accountingid='%s'" % (name)
-    cur.execute(sql)
-    result = cur.fetchall()
-    for record in result:
-        return record
-    conn.close()
-
-
-# 修改用户密码
-def update_pwd(name, pwd):
-    sql = "update passwd set password= '%s'  where accountingid='%s'" % (pwd, name)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        print("语句已经提交")
-    except:
-        conn.rollback()
-
-    conn.close()
-
-
-# lh 管理员 增加用户
-def db_add_account(id, name, pwd, gender, email, tel, introduce, ruletype):
-
-    sql_account = "insert into account value ('%s','%s','%s','%s','%s','%s' ) " % (id, name, gender, email,tel,introduce)
-    sql_pwd = "insert into passwd value ('%s','%s',%s)" % (id, pwd, ruletype)
-    print(sql_account + " " + sql_pwd)
-        # 执行SQL语句
-    try:
-        cur.execute(sql_account)
-        cur.execute(sql_pwd)
-        # 提交到数据库执行
-        conn.commit()
-        conn.close()
-    except:
-        conn.rollback()
-
-# lh 管理员 查看全部人员返回所有结果
-def show_allacount():
-    sql = "select * from  account "
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-
-# cc 管理员_人员管理_查看人员
-def show_allperson():
-    sql = "select * from  authority "
+# xijiawei
+# 管理员_人员管理_查看人员
+def select_all_users():
+    sql = "select * from users;"
     # print(sql)
     cur.execute(sql)
     result = cur.fetchall()
     return result
     conn.close()
 
-
-# cc 管理员增加人员
-def cc_add_account(name, pwd, power):
-    sql_account = "INSERT INTO authority (personName,password,authority) VALUES ('%s','%s','%s' ) " % (name, pwd, power)
-    print(sql_account)
-    # 执行SQL语句
-    try:
-        cur.execute(sql_account)
-        # 提交到数据库执行
-        conn.commit()
-        result = cur.fetchall()
-        return result
-        conn.close()
-    except Exception as e:
-        print(e)
-        conn.rollback()
-
-# cc 管理员增加人员
-def cc_findname():
-    sql_find = 'SELECT personId,personName FROM authority'
-    # 执行SQL语句
-    try:
-        cur.execute(sql_find)
-        # 提交到数据库执行
-        conn.commit()
-        result = cur.fetchall()
-        return result
-        conn.close()
-    except Exception as e:
-        print(e)
-        conn.rollback()
-
-# cc 管理员删除人员
-def cc_deletename(id):
-    sql_delete = 'DELETE FROM authority WHERE personId = ' + id
-    print(sql_delete)
-    # 执行SQL语句
-    try:
-        cur.execute(sql_delete)
-        # 提交到数据库执行
-        conn.commit()
-        result = cur.fetchall()
-        return result
-        conn.close()
-    except Exception as e:
-        print(e)
-        conn.rollback()
-
-# cc 修改人员权限
-def cc_changeAuthority(id,authority):
-    sql_change = 'UPDATE authority SET authority = \'' + authority + '\' WHERE personId ='+ id
-    # print(sql_change)
-    # 执行SQL语句
-    try:
-        cur.execute(sql_change)
-        # 提交到数据库执行
-        conn.commit()
-        result = cur.fetchall()
-        return result
-        conn.close()
-    except Exception as e:
-        print(e)
-        conn.rollback()
-
-# cc 查询密码
-def select_pass(name):
-    sql = "select password from authority where personName='%s'" % (name)
-    conn.ping(reconnect=True)
+# xijiawei
+# 管理员_人员管理_查看人员
+def select_all_users_for_selector():
+    sql = "select userid,username from users;"
+    # print(sql)
     cur.execute(sql)
     result = cur.fetchall()
-    for record in result:
-        return record
+    return result
     conn.close()
 
-# cc 修改用户密码
-def update_pass(name, pwd):
-    sql = "update authority set password= '%s'  where personName='%s'" % (pwd, name)
-    print(sql)
-    try:
-        # 执行SQL语句
-        cur.execute(sql)
-        # 提交到数据库执行
-        conn.commit()
-        # print("语句已经提交")
-    except:
-        conn.rollback()
+# xijiawei
+def select_user(username):
+    sql = "select * from users where username='%s';"%username
+    # print(sql)
+    cur.execute(sql)
+    result = cur.fetchall()
+    return result
     conn.close()
 
-# Bill学生打卡记录
-def add_register(name):
-    sql = "insert into register (accountingid,type,time) values(%s,%s,now())" % (name, 1)
+# xijiawei
+def login_check(username,password):
+    sql = "select * from users where username='%s' and password='%s';"%(username,password)
+    # print(sql)
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result:
+        return result[0][0]
+    else:
+        return None
+    conn.close()
+
+# xijiawei
+def select_user_password(username):
+    sql = "select password from users where username='%s';"%username
+    # print(sql)
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result:
+        return result[0][0]
+    else:
+        return None
+    conn.close()
+
+# xijiawei
+def select_user_authority(username):
+    sql = "select authority from users where username='%s';"%username
+    # print(sql)
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result:
+        return result[0][0]
+    else:
+        return None
+    conn.close()
+
+# xijiawei
+def insert_user(username, password, authority):
+    sql = "insert into users (username, password, authority) value('%s','%s','%s');" % (username, password, authority)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -203,52 +266,13 @@ def add_register(name):
         print("语句已经提交")
         return True
         conn.close()
-    except:
+    except Exception as e:
+        print("插入异常：", e)
         conn.rollback()
 
-
-# Bill 学生查看全部打卡记录返回所有结果
-def show_register(name):
-    sql = "select * from  register where accountingid='%s'" % (name)
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-# lh 学生查看全部课程
-def show_allcourse():
-    sql = "select * from  course "
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-# lh 学生查看全部已选课程
-def show_allcoursesed(id):
-    sql = "select course.courseid,course.coursename from courseselected ,course " \
-          "where studentid='%s' and courseselected.courseid = course.courseid "  % (id)
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-# lh 学生选课
-def dbstu_xuanke(courseid,stuid):
-    print(courseid + " " + stuid)
-    sql = "insert into courseselected  value('%s', '%s') " % (courseid,stuid)
-    try:
-        cur.execute(sql)
-        conn.commit()
-    except:
-        conn.rollback()
-    conn.close()
-
-# Bill 财务增加收支记录
-def add_shouzhi(name,type,amount):
-    sql = "insert into finance (accountingid,type,amount,time) values(%s,%s,%s,now())" % (name, type,amount)
+# xijiawei
+def update_user_authority(userid, authority):
+    sql = "update users set authority='%s' where userid='%s';"% (authority, userid)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -257,33 +281,13 @@ def add_shouzhi(name,type,amount):
         print("语句已经提交")
         return True
         conn.close()
-    except:
+    except Exception as e:
+        print("插入异常：", e)
         conn.rollback()
 
-# lh 财务 查看报表
-def show_baobiao():
-    sql = "select sum(f2.amount)/2 as shouru,sum(f1.amount)/2 as zhichu, (sum(f2.amount) - sum(f1.amount))/2  as shouzhi  " \
-          "from  finance as f1,finance as f2 where f1.type = 1 and f2.type = 0"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-# lh 财务 查看报表详细
-def show_baobiaoxize():
-    sql = "select  (CASE when type='0' then '收入' when type='1' then '支出' END)as type ,f.amount  from  finance f"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-
-# Bill 老师增加课程
-def add_course(course_id, course_name, teacher_name):
-    sql = "insert into course (courseid,teacherid,coursename) values('%s','%s','%s' )" % (course_id, teacher_name, course_name)
-    # print("sql语句: "+sql)
+# xijiawei
+def update_user_password(username, password):
+    sql = "update users set password='%s' where username='%s';"% (password, username)
     try:
         # 执行SQL语句
         cur.execute(sql)
@@ -292,41 +296,24 @@ def add_course(course_id, course_name, teacher_name):
         print("语句已经提交")
         return True
         conn.close()
-    except:
+    except Exception as e:
+        print("插入异常：", e)
         conn.rollback()
 
-# lh 老师 查看课程
-def show_allclass():
-    sql = "select c.classid,stu.name from  class as c, account as stu where c.studentid = stu.accountingid"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-# lh 老师 查看选课情况
-def show_allcourseselected():
-    sql = "SELECT rs.coursename, t.name, rs.stuname  " \
-          "FROM (SELECT c.coursename , stu.name as stuname, c.teacherid FROM course as c, account as stu, " \
-          "courseselected as cs   WHERE cs.courseid = c.courseid and cs.studentid = accountingid) as rs, account as t " \
-          "where t.accountingid = rs.teacherid "
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
-# lh 老师 查看考勤
-def show_allregister():
-    sql = "select a.name , r.time " \
-          "from  register as r, account as a " \
-          " where r.accountingid = a.accountingid"
-    cur.execute(sql)
-    result = cur.fetchall()
-    # for record in result:
-    return result
-    conn.close()
-
+# xijiawei
+def delete_userByID(userid):
+    sql = "delete from users where userid='%s';"%userid
+    try:
+        # 执行SQL语句
+        cur.execute(sql)
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    except Exception as e:
+        print("插入异常：", e)
+        conn.rollback()
 
 # xijiawei
 # 展示所有成品
@@ -920,35 +907,70 @@ def insert_materialInOut(documentNumber,materialCode,isInOrOut,operateNum,unit,p
 
 # xijiawei
 # 更新物料出入库记录，更新相关物料出入库记录物料数量，并更新materialInfo表
-def update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, supplier):
+def update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, supplier, operateTime, operatorName, beforeInventoryNum):
     try:
-        cur.execute("select materialCode,isInOrOut,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
+        # cur.execute("select materialCode,isInOrOut,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
+        # result = cur.fetchall()
+        # if result:
+        #     materialCode=result[0][0]
+        #     beforeIsInOrOut=result[0][1]
+        #     beforeOperateNum=result[0][2]
+        #     operateTime=result[0][3]
+        #     if beforeIsInOrOut==0 and isInOrOut==0:
+        #         cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum-beforeOperateNum),materialCode,operateTime))
+        #         # 更新materialInfo表
+        #         cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum-beforeOperateNum), materialCode))
+        #     elif beforeIsInOrOut==1 and isInOrOut==0:
+        #         cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum+beforeOperateNum),materialCode,operateTime))
+        #         # 更新materialInfo表
+        #         cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum+beforeOperateNum), materialCode))
+        #     elif beforeIsInOrOut==0 and isInOrOut==1:
+        #         cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum+beforeOperateNum),materialCode,operateTime))
+        #         # 更新materialInfo表
+        #         cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum+beforeOperateNum), materialCode))
+        #     elif beforeIsInOrOut==1 and isInOrOut==1:
+        #         cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum-beforeOperateNum),materialCode,operateTime))
+        #         # 更新materialInfo表
+        #         cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum-beforeOperateNum), materialCode))
+        # sql = "update materialInOut set isInOrOut='%d',operateNum='%d',unit='%s',price='%f',supplier='%s' where documentNumber='%s';" \
+        #           % (isInOrOut, operateNum, unit, price, supplier, documentNumber)
+        # # 执行SQL语句
+        # cur.execute(sql)
+
+        cur.execute("select materialCode,isInOrOut,price,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
         result = cur.fetchall()
+        cur.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
         if result:
             materialCode=result[0][0]
             beforeIsInOrOut=result[0][1]
-            beforeOperateNum=result[0][2]
-            operateTime=result[0][3]
+            beforePrice=result[0][2]
+            beforeOperateNum=result[0][3]
+            beforeOperateTime=result[0][4]
             if beforeIsInOrOut==0 and isInOrOut==0:
-                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum-beforeOperateNum),materialCode,operateTime))
+                # 更新materialInOut表（相当于撤销此条出入库记录，调整为最新）
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (-beforeOperateNum,materialCode,beforeOperateTime))
                 # 更新materialInfo表
-                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum-beforeOperateNum), materialCode))
+                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum*price-beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
+                # 插入materialInOut表
+                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum-beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
             elif beforeIsInOrOut==1 and isInOrOut==0:
-                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum+beforeOperateNum),materialCode,operateTime))
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (beforeOperateNum,materialCode,beforeOperateTime))
                 # 更新materialInfo表
-                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum+beforeOperateNum), materialCode))
+                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum*price+beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
+                # 插入materialInOut表
+                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum+beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
             elif beforeIsInOrOut==0 and isInOrOut==1:
-                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum+beforeOperateNum),materialCode,operateTime))
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (-beforeOperateNum,materialCode,beforeOperateTime))
                 # 更新materialInfo表
-                cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum+beforeOperateNum), materialCode))
+                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((-operateNum-beforeOperateNum), (-operateNum*price-beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
+                # 插入materialInOut表
+                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum-beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
             elif beforeIsInOrOut==1 and isInOrOut==1:
-                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % ((operateNum-beforeOperateNum),materialCode,operateTime))
+                cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (beforeOperateNum,materialCode,beforeOperateTime))
                 # 更新materialInfo表
-                cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum-beforeOperateNum), materialCode))
-        sql = "update materialInOut set isInOrOut='%d',operateNum='%d',unit='%s',price='%f',supplier='%s' where documentNumber='%s';" \
-                  % (isInOrOut, operateNum, unit, price, supplier, documentNumber)
-        # 执行SQL语句
-        cur.execute(sql)
+                cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((-operateNum+beforeOperateNum), (-operateNum*price+beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
+                # 插入materialInOut表
+                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum+beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
@@ -1017,7 +1039,7 @@ def delete_materialInOutByDocNum(documentNumber):
 def dao_show_material(materialCode, materialName, materialType, materialFactory):
 
     sql = 'select t1.materialCode,t1.materialName,t1.type,t1.department,t2.afterAmount,t2.afterMoney,' \
-          't1.supplierFactory,t2.isInOrOut,t1.price,t2.amount,t2.totalPrice,t2.documentNumber,t2.time,t2.personName' \
+          't1.supplierFactory,t2.isInOrOut,t1.price,t2.amount,t2.totalPrice,t2.documentNumber,t2.time,t2.username' \
           ' from materialOfInfo as t1 LEFT JOIN  materialOfInOut as t2  on t1.materialCode = t2.materialCode where 1=1 '
     if materialCode != '':
         sql += ' and t1.materialCode = \'' + materialCode + '\''
@@ -1058,7 +1080,7 @@ def dao_show_materialoutorin(materialCode):
     conn.close()
 
 # lh1  出库物料1
-def dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
+def dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,username):
     # sql = "delete from materialOfInfo where materialName = '%s' "%( materialName )
     # print("sql语句: "+sql)
     # 更新余库存
@@ -1069,9 +1091,9 @@ def dao_material_out(materialCode, materialName, materialType, m_price,materialF
         cur.execute(sql3)
         cur.execute(sql4)
         result = cur.fetchall()
-        sql2 = "insert into materialOfInOut(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
+        sql2 = "insert into materialOfInOut(username,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
                " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',1,'%s','%d','%lf')" % \
-               (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
+               (username, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
                 float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
         cur.execute(sql2)
         conn.commit()
@@ -1081,7 +1103,7 @@ def dao_material_out(materialCode, materialName, materialType, m_price,materialF
         conn.rollback()
 
 # lh1  入库物料0
-def dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,personName):
+def dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,username):
     sql = "insert into materialOfInfo(materialCode,materialName,type,department,price,supplierFactory) " \
           "values('%s','%s','%s' ,'%s', '%lf', '%s')" % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory)
     #更新静态表余库存
@@ -1096,9 +1118,9 @@ def dao_material_in(materialCode, materialName, materialType, m_price,materialFa
         cur.execute(sql4)
         result = cur.fetchall()
         if result:
-            sql2 = "insert into materialOfInOut(personName,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
+            sql2 = "insert into materialOfInOut(username,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
                " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',0,'%s','%d','%lf')" % \
-               (personName, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
+               (username, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
                 float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
             cur.execute(sql2)
         conn.commit()

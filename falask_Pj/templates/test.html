@@ -4,61 +4,179 @@
     <meta charset="UTF-8">
     <title>Title</title>
 
-    {#<link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
-    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
-    <script src="/static/jquery/bootstrap.min.js"></script>#}
-    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+
+    <link rel="stylesheet" type="text/css" href="/static/jquery/jquery.dataTables.css">
 </head>
 <body>
-<input type="text" list="query"/>
+
+<!--输入框下拉提示-->
+<!--<input type="text" list="query"/>
 <datalist id="query">
     <option value="xijiawei"/>
     <option value="xiajiang"/>
     <option value="liuyan"/>
     <option value="sichuan"/>
-</datalist>
-<label><a data-toggle="modal" data-target="#myModal" onclick="myFunction(1214)"> 测试 </a></label>
-<!--模态框-->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                    &times;
-                </button>
-                <h4 class="modal-title" id="myModalLabel">
-                    模态框（Modal）标题
-                </h4>
-            </div>
-            <div class="modal-body">
-                <label id="modalText">在这里添加一些文本</label>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">关闭
-                </button>
-                <button type="button" class="btn btn-primary">
-                    提交更改
-                </button>
-            </div>
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal -->
+</datalist>-->
+
+<!--DataTable-->
+<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+    <div class="card-body">
+        <!--<input id="search" type="text"/>-->
+        <table id="user_table" class="table table-striped table-bordered">
+            <thead>
+            <tr>
+                <th>用户ID</th>
+                <th>用户姓名</th>
+                <th>用户密码</th>
+                <th>用户权限</th>
+                <th>编辑</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for i in users %}
+                <tr>
+                    <td>{{ i[0] }}</td>
+                    <td>{{ i[1] }}</td>
+                    <td>{{ i[2] }}</td>
+                    <td>{{ i[3] }}</td>
+                    <td><a class='edit' onclick='deleteRow()'>删除</a></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>{{ sum }}</td>
+                <td>-</td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
 </div>
 
+<!--表单-->
+<!--<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+    <div class="card-body">
+        <form action="#" method="post" novalidate="novalidate">
+            <div class="row">
+                <label class="control-label mb-1">选择用户</label>
+                <div class="col-xs-12">
+                    {{ form.userid }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-xs-12">
+                    {{ form.submit }}
+                    {{ form.csrf_token }}
+                </div>
+            </div>
+        </form>
+    </div>
+</div>-->
+
+<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+    <div class="card-body">
+        <label><a data-toggle="modal" data-target="#myModal" onclick="myFunction(1214)"> 模态框测试 </a></label>
+        <!--模态框-->
+        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            &times;
+                        </button>
+                        <h4 class="modal-title" id="myModalLabel">
+                            模态框（Modal）标题
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <label id="modalText">在这里添加一些文本</label>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">关闭
+                        </button>
+                        <button type="button" class="btn btn-primary">
+                            提交更改
+                        </button>
+                    </div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal -->
+        </div>
+    </div>
+</div>
 
 <script src="/static/jquery/jquery-2.1.4.min.js"></script>
 <script src="/static/jquery/bootstrap.min.js"></script>
-<script src="/static/jquery/jquery.matchHeight.min.js"></script>
-<script src="/static/jquery/main.js"></script>
-<script src="/static/jquery/datatables.min.js"></script>
-<script src="/static/jquery/dataTables.bootstrap.min.js"></script>
-<script src="/static/jquery/dataTables.buttons.min.js"></script>
-<script src="/static/jquery/buttons.bootstrap.min.js"></script>
 
+<script src="/static/lib/datatables.min.js"></script>
+<script src="/static/lib/dataTables.bootstrap.min.js"></script>
+<script src="/static/lib/dataTables.buttons.min.js"></script>
+<script src="/static/lib/buttons.bootstrap.min.js"></script>
+<script src="/static/lib/jszip.min.js"></script>
+<script src="/static/lib/vfs_fonts.js"></script>
+<script src="/static/lib/buttons.html5.min.js"></script>
+<script src="/static/lib/buttons.print.min.js"></script>
+<script src="/static/lib/buttons.colVis.min.js"></script>
+<script src="/static/lib/datatables-init.js"></script>
+
+<!--<script type="text/javascript" charset="utf8" src="/static/jquery/jquery.dataTables.js"></script>-->
 <script type="text/javascript">
     function myFunction(materialCode){
         console.log("ok");
         //$('#modalText').val(materialCode);
         $('#modalText').html(materialCode);
+    }
+
+    $(document).ready( function () {
+        var table=$('#user_table').DataTable();
+
+        table.on('search.dt', function() {
+            console.log("mark");
+            console.log(table.rows({ filter: 'applied'}).nodes());
+            console.log(table.rows({ filter: 'applied'}).nodes().length);
+            console.log(table.rows({ filter: 'applied'}).data());
+            console.log(table.rows({ filter: 'applied'}).data().length);
+
+            var data=table.rows({ filter: 'applied'}).data();
+            var length=table.rows({ filter: 'applied'}).nodes().length;
+            var sum=0;
+            for(var i=0;i<length;i++){
+                sum+=parseInt(data[i][3]);
+            }
+            console.log(sum);
+
+            /*var trArr = $("#user_table tfoot").children("tr");
+            var tdArr = trArr.eq(0).find("td");
+            //tdArr.eq(3).val(sum);
+            //console.log(tdArr.eq(3).val());
+            tdArr.eq(3).text(sum);
+            console.log(tdArr.eq(3).text());*/
+            console.log($("#user_table tfoot tr td"));
+            $("#user_table tfoot tr td").eq(3).text(sum);
+        });
+    });
+
+    function deleteRow(){
+        /*console.log(event);
+        console.log(event.parentElement);*/
+        /*以下无效代码*/
+        /*var activeElement=document.activeElement;
+        console.log(activeElement);*/
+        var element=event.currentTarget;
+        console.log(element);
+        console.log(element.parentElement.parentElement);
+        //var table=document.getElementById("user_table");
+        var table=$('#user_table').DataTable();
+        var index = table.row(element.parentElement.parentElement).index();
+        console.log(index);
+
+        //table.rows(element.parentElement.parentElement).remove().draw();
+        table.rows(element.parentElement.parentElement).remove();
+        var currentPage = table.page();
+        table.page(currentPage).draw(false);
     }
 </script>
 </body>

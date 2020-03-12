@@ -4,30 +4,114 @@ from wtforms.validators import Required
 from wtforms.validators import DataRequired # 引入Form验证父类
 
 # 添加人员表单
-from db import cc_findname
+# from db import cc_findname
 
+# class MyForm(Form):
+#     status = SelectField('物料权限', validators=[Required()], choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
+#     statusPro = SelectField('成品权限', validators=[Required()], choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
+#     statusPur = SelectField('采购权限', validators=[Required()], choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
+#
+# # 删除人员表单
+# class SelectForm(Form):
+#     result = cc_findname()
+#     personName = SelectField('用户姓名', validators=[Required()], choices=result)
+#
+# # 修改人员权限表单
+# class ChangeForm(Form):
+#     result = cc_findname()
+#     # print(result)
+#     personName = SelectField('用户姓名', validators=[Required()], choices=result)
+#     status = SelectField('物料权限', validators=[Required()],
+#                          choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
+#     statusPro = SelectField('成品权限', validators=[Required()],
+#                             choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
+#     statusPur = SelectField('采购权限', validators=[Required()],
+#                             choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
 
-class MyForm(Form):
-    status = SelectField('物料权限', validators=[Required()], choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
-    statusPro = SelectField('成品权限', validators=[Required()], choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
-    statusPur = SelectField('采购权限', validators=[Required()], choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
-
-# 删除人员表单
-class SelectForm(Form):
-    result = cc_findname()
-    personName = SelectField('用户姓名', validators=[Required()], choices=result)
-
-# 修改人员权限表单
-class ChangeForm(Form):
-    result = cc_findname()
-    # print(result)
-    personName = SelectField('用户姓名', validators=[Required()], choices=result)
-    status = SelectField('物料权限', validators=[Required()],
-                         choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
-    statusPro = SelectField('成品权限', validators=[Required()],
-                            choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
-    statusPur = SelectField('采购权限', validators=[Required()],
-                            choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')])
+# xijiawei
+# 添加用户表单
+class UserForm(Form):
+    # username = StringField(
+    #     # 标签
+    #     label="用户名称",
+    #     # 验证器
+    #     validators=[
+    #         DataRequired('请输入用户名称')
+    #     ],
+    #     description="用户名称",
+    #     # 附加选项,会自动在前端判别
+    #     render_kw={
+    #         "id": "username",
+    #         "class": "form-control",
+    #         "placeholder": "请输入用户名称",
+    #         "required": 'required'  # 表示输入框不能为空，并有提示信息
+    #     }
+    # )
+    materialAuth = SelectField(
+        # 标签
+        label="物料权限",
+        # 验证器
+        validators=[
+            DataRequired('请选择物料权限')
+        ],
+        description="物料权限",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "materialAuth",
+            "class": "form-control"
+        },
+        choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')]
+    )
+    productAuth = SelectField(
+        # 标签
+        label="成品权限",
+        # 验证器
+        validators=[
+            DataRequired('请选择成品权限')
+        ],
+        description="成品权限",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "productAuth",
+            "class": "form-control"
+        },
+        choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')]
+    )
+    procurementAuth = SelectField(
+        # 标签
+        label="采购权限",
+        # 验证器
+        validators=[
+            DataRequired('请选择采购权限')
+        ],
+        description="采购权限",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "procurementAuth",
+            "class": "form-control"
+        },
+        choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')]
+    )
+    userid = SelectField(
+        # 标签
+        label="用户",
+        # 验证器
+        validators=[
+            DataRequired('请选择用户')
+        ],
+        description="用户",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "userid",
+            "class": "form-control"
+        }
+    )
+    submit = SubmitField(
+        label="提交",
+        render_kw={
+            "class": "btn btn-primary btn-block btn-flat"
+        }
+    )
 
 # xijiawei
 # 添加成品表单

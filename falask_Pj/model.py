@@ -11,7 +11,6 @@ class User:
         self.tel = tel
         self.introduce = introduce
 
-
 class Student:
     def __init__(self, studentid = None,name=None, pwd=None, gender=None,
                  email=None, tel=None, introduce=None):
@@ -22,7 +21,6 @@ class Student:
         self.email = email
         self.tel = tel
         self.introduce = introduce
-
 
 class NewUser:
     def __init__(self, name=None, pwd=None, authority=None):

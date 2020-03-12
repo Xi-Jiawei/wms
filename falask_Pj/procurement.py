@@ -16,7 +16,7 @@ def procurement_history():
     if request.method == 'GET':
         if session.get('username'):
             username = session['username']
-            authority = login_Authority(username)
+            authority = select_user_authority(username)
             all_procurements = select_procurement() # count(p.procurementCode),procurementCode,productCode,materialCodeConcatStr,materialNameConcatStr,materialNumConcatStr,productType,productNum,client,entryClerk,entryDate
             procurements=[]
             procurementCode=''
@@ -159,7 +159,7 @@ def procurement():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         if request.method == "POST":
             data = request.get_json()
             productCodeOrTypeInputArr = data['productCodeOrTypeInputArr']
@@ -212,7 +212,7 @@ def edit_procurement(procurementCode):
     form = ProductForm()
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
 
         # POST
         if request.method == "POST":

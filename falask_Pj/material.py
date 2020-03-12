@@ -17,7 +17,7 @@ def show_material():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         materials = select_all_materials()
         return render_template('material.html', authority=authority[1], materials=materials, username=username)
     else:
@@ -70,7 +70,7 @@ def material_inout():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         if request.method == "GET":
             materials = select_all_materials() # materialCode,materialName,materialType,inventoryNum,unit,price,inventoryMoney,supplier,remark
             inventoryMoneySum = select_sum_materials()
@@ -108,7 +108,7 @@ def material_inout_history():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         if request.method == "GET":
             materialInOut = select_all_materialInOut()
             materialInOutSums = select_sum_materialInOut()
@@ -125,8 +125,7 @@ def material_inout_history():
                     mSumNum = mSumNum + str(i[1])
                     mSumAmount = mSumAmount + str(i[2])
             nowTime = datetime.now().strftime('%Y-%m-%dT%H:%M')
-            return render_template('material_inout_history.html', authority=authority[1], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount],
-                                   username=username,nowTime=nowTime)
+            return render_template('material_inout_history.html', authority=authority[1], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount], username=username,nowTime=nowTime)
         if request.method == "POST":
             data = request.get_json()
             materialCode = data['materialCode']
@@ -136,8 +135,13 @@ def material_inout_history():
             price = data['price']
             supplier = data['supplier']
             documentNumber = data['documentNumber']
-            update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, supplier)
-            return jsonify({'ok': True})
+            operateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            materialInfo=select_materialInfoByCode(materialCode)
+            beforeInventoryNum=0
+            if materialInfo:
+                beforeInventoryNum=materialInfo[0][3]
+            update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, supplier, operateTime, username, beforeInventoryNum)
+            return jsonify({'ok': True,'beforeInventoryNum':beforeInventoryNum,'operateTime':operateTime[0:19],'operatorName':username})
     else:
         return render_template('access_fail.html')
 

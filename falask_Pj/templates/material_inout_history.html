@@ -273,7 +273,7 @@
                                             <td>{{ i[10] }}</td>
                                             <td>{{ i[11] }}</td>
                                             <td>{{ i[12] }}</td>
-                                            <td><a data-toggle="modal" data-target="#materialInOutModal" onclick="materialInOutEdit('{{ i[0] }}','{{ i[11] }}','{{ i[3] }}','{{ i[5] }}','{{ i[6] }}','{{ i[7] }}','{{ i[9] }}','{{ i[10] }}')"> 修改 </a><a onclick="materialInOutDelete('{{ i[10] }}',this.parentNode.parentNode.rowIndex)"> 删除 </a></td>
+                                            <td><a data-toggle="modal" data-target="#materialInOutModal" onclick="materialInOutEdit('{{ i[0] }}','{{ i[11] }}','{{ i[3] }}','{{ i[5] }}','{{ i[6] }}','{{ i[7] }}','{{ i[9] }}','{{ i[10] }}')"> 修改 </a><a onclick="materialInOutDelete('{{ i[10] }}')"> 删除 </a></td>
                                         </tr>
                                     {% elif authority=="2"%}
                                         <tr>
@@ -356,7 +356,6 @@
                                             <td style="padding-left: 2px;padding-right: 2px;width: 40px">-</td>
                                             <td style="padding-left: 2px;padding-right: 2px;width: 180px">-</td>
                                             <td style="padding-left: 2px;padding-right: 2px;width: 40px">-</td>
-                                            <td>-</td>
                                         {% endif %}
                                     </tr>
                                 {% elif authority=="1"%}
@@ -373,12 +372,10 @@
                                             <td style="padding-left: 2px;padding-right: 2px;width: 40px">-</td>
                                             <td style="padding-left: 2px;padding-right: 2px;width: 180px">-</td>
                                             <td style="padding-left: 2px;padding-right: 2px;width: 40px">-</td>
-                                            <td>-</td>
                                         {% endif %}
                                     </tr>
                                 {% endif %}
                                 </tfoot>
-
 
                             </table>
                         </div>
@@ -410,7 +407,35 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#bootstrap-data-table-export').DataTable();
+        //$('#bootstrap-data-table-export').DataTable();
+        var table = $('#bootstrap-data-table').DataTable();
+
+        //DataTable过滤器响应事件
+        table.on('search.dt', function() {
+            //console.log(table.rows({ filter: 'applied'}).nodes());
+            //console.log(table.rows({ filter: 'applied'}).nodes().length);
+            //console.log(table.rows({ filter: 'applied'}).data());
+            //console.log(table.rows({ filter: 'applied'}).data().length);
+
+            var data=table.rows({ filter: 'applied'}).data();
+            var length=table.rows({ filter: 'applied'}).nodes().length;
+            var mInSumNum=0,mInSumAmount=0,mOutSumNum=0,mOutSumAmount=0;
+            for(var i=0;i<length;i++){
+                if(data[i][3]=="入库"){
+                    mInSumNum+=parseInt(data[i][5]);
+                   if(data[i].length>=14)mInSumAmount+=parseFloat(data[i][8]);
+                }else if(data[i][3]=="出库"){
+                    mOutSumNum+=parseInt(data[i][5]);
+                   if(data[i].length>=14)mOutSumAmount+=parseFloat(data[i][8]);
+                }
+            }
+
+            /*var trArr = $("#user_table tfoot").children("tr");
+            var tdArr = trArr.eq(0).find("td");
+            tdArr.eq(3).text(sum);*/
+            $("#bootstrap-data-table tfoot tr td").eq(5).text(mInSumNum+"/"+mOutSumNum);
+            if(length>0&&data[0].length>=14)$("#bootstrap-data-table tfoot tr td").eq(8).text(mInSumAmount.toFixed(1)+"/"+mOutSumAmount.toFixed(1));
+        });
     });
 
     function searchSubmit(authority) {
@@ -453,7 +478,7 @@
                             tableData[i][10] = materials[i][10];
                             tableData[i][11] = materials[i][11];
                             tableData[i][12] = materials[i][12];
-                            tableData[i][13] = "<a class='edit' data-toggle='modal' data-target='#materialInOutModal' onclick='materialInOutEdit(\"" + materials[i][0] + "\",\"" + materials[i][11] + "\",\"" + materials[i][3] + "\",\"" + materials[i][5] + "\",\"" + materials[i][6] + "\",\"" + materials[i][7] + "\",\"" + materials[i][9] + "\",\"" + materials[i][10] + "\")'> 修改 </a><a onclick='materialInOutDelete(\"" + materials[i][10] + "\",\"" + (i + 1) + "\")'> 删除 </a>";
+                            tableData[i][13] = "<a class='edit' data-toggle='modal' data-target='#materialInOutModal' onclick='materialInOutEdit(\"" + materials[i][0] + "\",\"" + materials[i][11] + "\",\"" + materials[i][3] + "\",\"" + materials[i][5] + "\",\"" + materials[i][6] + "\",\"" + materials[i][7] + "\",\"" + materials[i][9] + "\",\"" + materials[i][10] + "\")'> 修改 </a><a onclick='materialInOutDelete(\"" + materials[i][10] + "\")'> 删除 </a>";
                             //console.log("tableData[i][13]: "+tableData[i][13]);
                         }else if(authority=="2") {
                             tableData[i][0] = materials[i][0];
@@ -516,9 +541,9 @@
         $('#documentNumber').val(documentNumber);
     }
 
-    function materialInOutDelete(documentNumber,rowIndex) {
+    function materialInOutDelete(documentNumber) {
+        var element=event.currentTarget;
         if(confirm("确定取消此条物料出入库?")) {
-            console.log(rowIndex);
             var data = {
                 'documentNumber': documentNumber
             };
@@ -537,14 +562,44 @@
                     if (callback['ok']) {
                         console.log(callback['ok']);
 
-                        var realTable = $('#bootstrap-data-table').DataTable();
+                        /*var realTable = $('#bootstrap-data-table').DataTable();
                         var rows = realTable.rows().data();
                         rows.splice(rowIndex-1,1);
                         console.log(rows);
                         var currentPage = realTable.page();
                         realTable.clear();
                         realTable.rows.add(rows);
-                        realTable.page(currentPage).draw(false);
+                        realTable.page(currentPage).draw(false);*/
+
+                        console.log(element);
+                        console.log(element.parentElement.parentElement);
+                        var table = $('#bootstrap-data-table').DataTable();
+                        /*移除选中行*/
+                        var rowData=table.rows(element.parentElement.parentElement).data();
+                        console.log(table.rows(element.parentElement.parentElement));
+                        table.rows(element.parentElement.parentElement).remove();
+                        /*修改其他行内容*/
+                        //var length=table.rows({ filter: 'applied'}).nodes().length;
+                        //var tableData =table.rows({ filter: 'applied'}).data();
+                        var length=table.rows().nodes().length;
+                        var tableData =table.rows().data();
+                        for(var i=0;i<length;i++){
+                            console.log(tableData[i][4]);
+                            if(tableData[i][0]==rowData[0][0]&&tableData[i][11]>rowData[0][11])
+                                if (rowData[0][3] == "入库"){
+                                    tableData[i][4] -= rowData[0][5];
+                                    console.log(tableData[i][4]);
+                                }
+                                else if (rowData[0][3] == "出库") {
+                                    tableData[i][4] += rowData[0][5];
+                                    console.log(tableData[i][4]);
+                                }
+                        }
+                        //table.data(tableData);
+                        table.clear();
+                        table.rows.add(tableData);
+                        var currentPage = table.page();
+                        table.page(currentPage).draw(false);
                     }
                 },
                 error: function (xhr, textStatus, errorThrown) {
@@ -584,25 +639,13 @@
                 if(callback['ok']){
                     console.log(callback['ok']);
 
-                    var realTable = $('#bootstrap-data-table').DataTable();
+                    /*var realTable = $('#bootstrap-data-table').DataTable();
                     //console.log(realTable);
                     var rows=realTable.rows().data();
                     //console.log(realTable.row(1).data());
                     //console.log(rows);
                     for(var i=0;i<rows.length;i++){
-                        //console.log(rows[i]);
-                        /*var time1="2020-01-20 11:19:23";
-                        var time2="2020-01-20 11:19:10";
-                        console.log(time1>time2);
-                        console.log(time1.replace('-','/')>time2.replace('-','/'));*/
-                        /*console.log(rows[i][11]>$("#operateTime").val());
-                        console.log(new Date(rows[i][11].replace('-','/'))>new Date($("#operateTime").val().replace('-','/')));*/
                         if(rows[i][0]==$("#materialCode").val()&&rows[i][11]>$("#operateTime").val()){
-                            /*console.log(rows[i][4]);
-                            console.log($("#operateNum").val());
-                            console.log($("#beforeOperateNum").val());
-                            console.log($("#beforeIsInOrOut").val());
-                            console.log($("#isInOrOut").val());*/
                             if ($("#beforeIsInOrOut").val() == '0' && $("#isInOrOut").val() == '0')
                                 rows[i][4] = parseInt(rows[i][4]) + (parseInt($("#operateNum").val()) - parseInt($("#beforeOperateNum").val()));
                             if ($("#beforeIsInOrOut").val() == '1' && $("#isInOrOut").val() == '0')
@@ -621,9 +664,62 @@
                             rows[i][7] = $('#price').val();
                             rows[i][8] = parseInt($("#operateNum").val()) * parseFloat($('#price').val());
                             rows[i][9] = $('#supplier').val();
-                            rows[i][13]="<a class='edit' data-toggle='modal' data-target='#materialInOutModal' onclick='materialInOutEdit(\""+rows[i][0]+"\",\""+rows[i][11]+"\",\""+rows[i][3]+"\",\""+rows[i][5]+"\",\""+rows[i][6]+"\",\""+rows[i][7]+"\",\""+rows[i][9]+"\",\""+rows[i][10]+"\")'> 修改 </a><a onclick='materialInOutDelete(\""+rows[i][10]+"\",\""+(i+1)+"\")'> 删除 </a>";
+                            rows[i][13]="<a class='edit' data-toggle='modal' data-target='#materialInOutModal' onclick='materialInOutEdit(\""+rows[i][0]+"\",\""+rows[i][11]+"\",\""+rows[i][3]+"\",\""+rows[i][5]+"\",\""+rows[i][6]+"\",\""+rows[i][7]+"\",\""+rows[i][9]+"\",\""+rows[i][10]+"\")'> 修改 </a><a onclick='materialInOutDelete(\""+rows[i][10]+"\")'> 删除 </a>";
                         }
                     }
+                    var currentPage = realTable.page();
+                    realTable.clear();
+                    realTable.rows.add(rows);
+                    realTable.page(currentPage).draw(false);*/
+
+                    var beforeInventoryNum=callback['beforeInventoryNum'];
+                    var operateTime=callback['operateTime'];
+                    var operatorName=callback['operatorName'];
+                    var realTable = $('#bootstrap-data-table').DataTable();
+                    //console.log(realTable);
+                    var rows=realTable.rows().data();
+                    //console.log(realTable.row(1).data());
+                    //console.log(rows);
+                    var latestIndex=0,flag=0,rowIndex;
+                    for(var i=0;i<rows.length;i++){
+                        if(rows[i][0]==$("#materialCode").val()&&rows[i][11]>$("#operateTime").val()){
+                            if ($("#beforeIsInOrOut").val() == '0')
+                                rows[i][4] = parseInt(rows[i][4]) - parseInt($("#beforeOperateNum").val());
+                            else if ($("#beforeIsInOrOut").val() == '1')
+                                rows[i][4] = parseInt(rows[i][4]) + parseInt($("#beforeOperateNum").val());
+                            if(flag==0){
+                                latestIndex=i;//获取最近记录的行索引
+                                flag=1;
+                            }
+                        }
+
+                        if (rows[i][10] == $("#documentNumber").val()) {
+                            if($("#isInOrOut").val()=="0")rows[i][3]="入库";
+                            else if($("#isInOrOut").val()=="1")rows[i][3]="出库";
+                            if ($("#beforeIsInOrOut").val() == '0')
+                                rows[i][4]=beforeInventoryNum - parseInt($("#beforeOperateNum").val());
+                            else if ($("#beforeIsInOrOut").val() == '1')
+                                rows[i][4]=beforeInventoryNum + parseInt($("#beforeOperateNum").val());
+                            rows[i][5] = $("#operateNum").val();
+                            rows[i][6] = $("#unit").val();
+                            rows[i][7] = $('#price').val();
+                            rows[i][8] = parseInt($("#operateNum").val()) * parseFloat($('#price').val()).toFixed(2);
+                            rows[i][9] = $('#supplier').val();
+                            rows[i][11] = operateTime;
+                            rows[i][12] = operatorName;
+                            rows[i][13]="<a class='edit' data-toggle='modal' data-target='#materialInOutModal' onclick='materialInOutEdit(\""+rows[i][0]+"\",\""+rows[i][11]+"\",\""+$("#isInOrOut").val()+"\",\""+rows[i][5]+"\",\""+rows[i][6]+"\",\""+rows[i][7]+"\",\""+rows[i][9]+"\",\""+rows[i][10]+"\")'> 修改 </a><a onclick='materialInOutDelete(\""+rows[i][10]+"\")'> 删除 </a>";
+
+                            rowIndex=i;
+                        }
+                    }
+
+                    //移位
+                    console.log(latestIndex);
+                    console.log(rowIndex);
+                    //console.log(rows.splice(rowIndex,1)[0]);
+                    rows.splice(latestIndex,0,rows.splice(rowIndex,1)[0]);
+                    console.log(rows);
+
                     var currentPage = realTable.page();
                     realTable.clear();
                     realTable.rows.add(rows);

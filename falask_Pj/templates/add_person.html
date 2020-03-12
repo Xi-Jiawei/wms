@@ -82,17 +82,18 @@
                     <a href="{{ url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
                 </li>
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
+
                 <li>
-                    <a href="{{ url_for("show_person") }}"> <i class="menu-icon fa fa-cogs"></i>查看人员</a>
+                    <a href="{{ url_for("show_users") }}"> <i class="menu-icon fa fa-cogs"></i>查看人员</a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for("add_user") }}"> <i class="menu-icon fa fa-th"></i>添加人员</a>
                 </li>
                 <li>
-                    <a href="{{ url_for("add_person") }}"> <i class="menu-icon fa fa-th"></i>添加人员</a>
+                    <a href="{{ url_for("delete_user") }}"> <i class="menu-icon fa fa-table"></i>删除人员</a>
                 </li>
                 <li>
-                    <a href="{{ url_for("delete_person") }}"> <i class="menu-icon fa fa-table"></i>删除人员</a>
-                </li>
-                <li>
-                    <a href="{{ url_for("change_person") }}"> <i class="menu-icon fa fa-table"></i>修改人员权限</a>
+                    <a href="{{ url_for("change_authority") }}"> <i class="menu-icon fa fa-table"></i>修改人员权限</a>
                 </li>
 
             </ul>
@@ -145,7 +146,7 @@
                             <h3 class="text-center">添加人员</h3>
                         </div>
                         <hr>
-                        <form action="#" method="post" novalidate="novalidate">
+                        <form id="add_user_form" action="#" method="post" novalidate="novalidate">
                             <div class="form-group text-center">
                                 <ul class="list-inline">
                                     <li class="list-inline-item"><i class="text-muted fa fa-cc-visa fa-2x"></i></li>
@@ -156,24 +157,24 @@
                             </div>
                             <div class="form-group has-success">
                                 <label for="cc-name" class="control-label mb-1">用户姓名</label>
-                                <input id="name" name="name" type="text"
+                                <input id="username" name="username" type="text"
                                        class="form-control cc-name valid" data-val="true"
                                        data-val-required="Please enter the name on card" autocomplete="cc-name"
-                                       aria-required="true" aria-invalid="false" aria-describedby="cc-name">
+                                       aria-required="true" aria-invalid="false" aria-describedby="cc-name"/>
                                 <span class="help-block field-validation-valid" data-valmsg-for="cc-name"
                                       data-valmsg-replace="true"></span>
                             </div>
                             <div class="form-group">
                                 <label for="cc-payment" class="control-label mb-1">物料管理权限</label>
-                                {{ form.status(class="form-control")}}
+                                {{ form.materialAuth}}
                             </div>
                                 <div class="form-group">
                                 <label for="cc-payment" class="control-label mb-1">成品管理权限</label>
-                                {{ form.statusPro(class="form-control")}}
+                                {{ form.productAuth}}
                             </div>
                             <div class="form-group">
                                 <label for="cc-payment" class="control-label mb-1">采购管理权限</label>
-                                {{ form.statusPur(class="form-control")}}
+                                {{ form.procurementAuth}}
                             </div>
 
                             <div>
@@ -188,11 +189,6 @@
                             </div>
 
                         </form>
-
-                        <!--<form method="POST" action="{{ url_for('add_person') }}">
-                            {{ form.status() }}
-                            <input type="submit" value="Submit">
-                        </form>-->
                     </div>
                 </div>
 
@@ -420,6 +416,50 @@ cript>
             }
         });
         // Bar Chart #flotBarChart End
+    });
+</script>
+<script src="/static/jquery/jquery-2.1.4.min.js"></script>
+<script  type="text/javascript">
+    $(function() {
+        $("#add_user_form").submit(function (e) {
+            e.preventDefault();
+
+            var formData=$(this).serializeArray();
+            console.log(formData);
+            //alert(formData);
+            var data= {
+                'username': formData[0]['value'],
+                'materialAuth': formData[1]['value'],
+                'productAuth': formData[2]['value'],
+                'procurementAuth': formData[3]['value'],
+            };
+
+            $.ajax({
+                url: "/add_user",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if(callback['ok']){
+                        alert("成功添加人员");
+                        window.location.href="/add_user";//跳转地址
+                    }
+                    else{
+                        alert("已存在此人员");
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        });
     });
 </script>
 </body>

@@ -16,7 +16,7 @@ def show_products():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         products = select_all_products()
         return render_template('products_show.html', authority=authority[1], products=products, username=username)
     else:
@@ -29,7 +29,7 @@ def add_product():
     form=ProductForm()
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         if authority[1] == '1' or authority[1] == '2':
             return render_template('access_fail.html')
         elif authority[1]=='3' or authority[1]=='8':
@@ -99,7 +99,7 @@ def edit_product(productCode):
     form = ProductForm()
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         if authority[1]=='2':
             print("当前权限仅限查看")
 
@@ -231,7 +231,7 @@ def edit_product(productCode):
 def delete_products():
     if session.get('username'):
         username = session['username']
-        authority = login_Authority(username)
+        authority = select_user_authority(username)
         form = ProductForm()
         products = select_all_products()
         if request.method == "POST":
@@ -265,9 +265,21 @@ def check_uniqueness():
 
 # # xijiawei
 # # 物料编码校验
-# @product_app.route('/test', methods=['GET', 'POST'])
-# def test():
-#     if request.method == "GET":
-#         return render_template('test.html')
-#     else:
-#         return render_template('access_fail.html')
+@product_app.route('/test', methods=['GET', 'POST'])
+def test():
+    form=UserForm()
+    if request.method == "GET":
+        users=select_all_users()
+        sum=0
+        for i in users:
+            sum+=int(i[3])
+        choices=select_all_users_for_selector()
+        form.userid.choices = choices
+        return render_template('test.html',form=form,users=users,sum=sum)
+    elif request.method == "POST":
+        re=request
+        # data=request.form['personName']
+        # data=form.data['personName']
+        data=request.form['userid']
+        data=form.data['userid']
+        return data
