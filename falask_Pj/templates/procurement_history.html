@@ -43,6 +43,11 @@
             border-radius: .2em;
             padding:5px;
         }
+
+        .table{border:1px solid #000000;border-collapse: collapse}
+        .table th{border:1px solid #000000;}
+        .table td{border:1px solid #000000;}
+        .table > thead > tr > th {vertical-align: bottom;border-bottom: 1px solid #000000;}
     </style>
 
 </head>
@@ -107,21 +112,21 @@
 
             <div class="row">
 
-                <div class="col-md-12" style="overflow: hidden">
-                    <div class="card">
-                        <div class="card-header">
+                <div class="col-md-12">
+                    <div id="procurement_history_div" class="card" style="overflow: hidden">
+                        <div class="card-header" style="text-align: center;font-size: large">
                             <strong class="card-title">采购记录</strong>
                         </div>
-                        <div id="procurement_history_div" class="card-body">
+                        <div class="card-body">
                                 <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
                                 <!--“ table table-striped table-bordered ”两行之前有不同的颜色且水平方向上有分割线和边框-->
                                 <!--id="bootstrap-data-table" 引用datatables.min.js API-->
                                 <!--<table id="bootstrap-data-table" class="table table-striped table-bordered">-->
-                                <table id="procurement-history-table" class="table table-striped table-bordered">
+                                <table id="procurement-history-table" class="table table-striped">
                                     <thead>
                                     <tr>
                                         {% if authority=='3' or authority=="8"%}
-                                            <th><input type='checkbox' name='checkbox' value='checkbox' onclick="checkAll()"/></th>
+                                            <th class="hidden-print"><input type='checkbox' name='checkbox' value='checkbox' onclick="checkAll()"/></th>
                                             <th>序号</th>
                                             <th>采购代号</th>
                                             <th>成品编码</th>
@@ -146,7 +151,7 @@
                                     {% if authority=='3' or authority=="8"%}
                                         {% for procurement in procurements %}
                                             <tr align="center">
-                                                <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><input type='checkbox' name='checkbox' value='checkbox'/></td>
+                                                <td class="hidden-print" rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><input type='checkbox' name='checkbox' value='checkbox'/></td>
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"></td>
                                                 <td rowspan="{{ procurement[2].__len__() }}" style="vertical-align: middle"><a href="{{ url_for("procurement.edit_procurement",procurementCode=procurement[1])}}">{{ procurement[1] }}</a></td>
                                                 <td>{{ procurement[2][0][0] }}</td>
@@ -187,7 +192,7 @@
                                     {% endif %}
                                     </tbody>
                                 </table>
-                            <div id="pagiDiv" align="right" style="width:600px">
+                            <div id="pagiDiv" class="hidden-print" align="right" style="width:600px;">
                                 <span id="spanFirst">首页</span>
                                 <span id="spanPre">上一页</span>
                                 <span id="spanNext">下一页</span>
@@ -197,7 +202,7 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="printpage()">打印采购记录</button>
+                    <button class="hidden-print" type="button" onclick="printpage()">打印采购记录</button>
                 </div>
 
             </div>
@@ -447,27 +452,30 @@
     }
 
     function printpage(){
-        /*var oldstr = document.body.innerHTML;
-        var newstr = document.getElementById("procurement-history-table").outerHTML;
+        var oldstr = document.body.innerHTML;
+
+        /*var a=document.getElementsByTagName("a");
+        console.log(a);
+        for(var i=0;i<a.length;i++) {
+            console.log(a[i]);
+            console.log(a[i].getAttribute("href"));
+            a[i].setAttribute("href","");
+            console.log(a[i].getAttribute("href"));
+        }
+        console.log(a);*/
+
+        var newstr = document.getElementById("procurement_history_div").outerHTML;
+
+        //去除链接
+        console.log(newstr);
+        //newstr=newstr.replace(/href=/g,"");// /g代表全局，所有的href=都替换
+        newstr=newstr.replace(/<a[^>]+href=['"][^>]+['"]>/g,"<a>");// /g代表全局，所有的href=都替换
+        console.log(newstr);
+
         document.body.innerHTML = newstr;
         window.print();
-        document.body.innerHTML = oldstr;*/
-
-        var printHtml = '<style type="text/css">' +
-            'table {' +
-            'border-collapse: separate;'+
-            'border-spacing;0;' +
-            '}' +
-            'table th, table td {' +
-            'border:1px solid #000;' +
-            '}' +
-            '</style>';
-        printHtml += document.getElementById("procurement-history-table").outerHTML;
-        var wind = window.open("");
-        wind.document.body.innerHTML = printHtml;
-        //wind.document.write(printHtml);
-        wind.print();
-        wind.close();
+        document.body.innerHTML = oldstr;
+        return false;
     }
 </script>
 

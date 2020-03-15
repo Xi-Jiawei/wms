@@ -102,7 +102,7 @@ def calculate_procurement():
         # materials
         products = []
         for i in range(productCodeArr.__len__()):
-            materialsOfProduct = select_materialsOfProductByCode(productCodeArr[i])  # materialCode,,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost
+            materialsOfProduct = select_materialsOfProductByCode(productCodeArr[i])  # materialCode,materialName,materialType,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost
             productInfo = select_productInfoByCode(productCodeArr[i])  # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
             product = []
             material = []
@@ -111,12 +111,12 @@ def calculate_procurement():
             product.append(productNumArr[i])
             for materialOfProduct in materialsOfProduct:
                 materialInfo = select_materialInfoByCode(materialOfProduct[0])  # materialName,materialType,remark,inventoryNum,price,inventoryMoney,supplier
-                material.append([materialOfProduct[0], materialInfo[0][0], materialOfProduct[1]])
+                material.append([materialOfProduct[0], materialInfo[0][0], materialInfo[0][1], materialOfProduct[3]])
             product.append(material)
-            # productCode,productType,productNum,[materialCode,materialName,materialNum]
+            # productCode,productType,productNum,[materialCode,materialName,materialType,materialNum]
             products.append(product)
             update_productNumOfProductInfo(productCodeArr[i], productNumArr[i]) # 更新productNum字段，以便采购时进行物料汇总计算
-        materials=select_materialsOfProductByCodeArr(productCodeArr) # materialCode,materialName,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
+        materials=select_materialsOfProductByCodeArr(productCodeArr) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
         result={'products':products,'materials':materials}
         return jsonify({'ok': True, 'result': result})
     else: return jsonify({'ok': -1})
@@ -268,7 +268,7 @@ def edit_procurement(procurementCode):
             insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':
-            all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialNum
+            all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialType,materialNum
             products = []
             productCode = ''
             productCodeInput = ''
@@ -285,8 +285,8 @@ def edit_procurement(procurementCode):
                     else:
                         product.append("")
                     product.append(i[2])  # productNum
-                    if i[5] and i[6] and i[7]:
-                        material.append([i[5], i[6], i[7]])  # materialCode,materialName,materialNum
+                    if i[5] and i[6] and i[7] and i[8]:
+                        material.append([i[5], i[6], i[7], i[8]])  # materialCode,materialName,materialType,materialNum
                     else:
                         material.append(["","",""])
                     product.append(material)
@@ -300,9 +300,9 @@ def edit_procurement(procurementCode):
                         productTypeInput+=i[1]+'/'
                     productNumInput+=str(i[2])+'/'
                 else:
-                    material.append([i[5], i[6], i[7]])  # materialCode,materialName,materialNum
+                    material.append([i[5], i[6], i[7], i[8]])  # materialCode,materialName,materialType,materialNum
             # sum(materialNum) group by materialCode
-            materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
+            materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
             # form data
             form.productCodeOrType.data = 0
             form.productCodeOrTypeInput.data=productCodeInput
