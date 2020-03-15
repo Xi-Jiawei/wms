@@ -356,6 +356,8 @@
                                                 <tr align="center" bgcolor="deepskyblue">
                                                     <th width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
                                                     <th>物料编码</th>
+                                                    <th>物料名称</th>
+                                                    <th>物料型号</th>
                                                     <th>物料数量</th>
                                                     <th>物料单价</th>
                                                     <th>贴片数量</th>
@@ -367,20 +369,26 @@
                                                     {% for i in materialsOfProduct %}
                                                         <tr class='tr_i'>
                                                             <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
-                                                            <td><input type='text' style='width:150px' class='materialCode' list="materialCodeList"
+                                                            <td><input type='text' style='width:100px' class='materialCode' list="materialCodeList"
                                                                        value={{ i[0] }}
                                                             /></td>
-                                                            <td><input type='text' style='width:150px' class='materialsOfProduct'
+                                                            <td><input type='text' style='width:100px' class='materialName'
                                                                        value={{ i[1] }}
                                                             /></td>
-                                                            <td><input type='text' style='width:150px' class='materialsOfProduct'
+                                                            <td><input type='text' style='width:100px' class='materialType'
                                                                        value={{ i[2] }}
                                                             /></td>
-                                                            <td><input type='text' style='width:150px' class='materialsOfProduct'
+                                                            <td><input type='text' style='width:100px' class='materialsOfProduct'
+                                                                       value={{ i[3] }}
+                                                            /></td>
+                                                            <td><input type='text' style='width:100px' class='materialsOfProduct'
                                                                        value={{ i[4] }}
                                                             /></td>
-                                                            <td><input type='text' style='width:150px' class='materialsOfProduct'
-                                                                       value={{ i[5] }}
+                                                            <td><input type='text' style='width:100px' class='materialsOfProduct'
+                                                                       value={{ i[6] }}
+                                                            /></td>
+                                                            <td><input type='text' style='width:100px' class='materialsOfProduct'
+                                                                       value={{ i[7] }}
                                                             /></td>
                                                         </tr>
                                                     {% endfor %}
@@ -889,11 +897,13 @@
         rowNum++;
         var rowTemplate = "<tr class='tr_"+rowNum+"'>\n" +
             "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
-            "<td><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/></td>" +
-            "<td><input type='text' style='width:150px' class='materialsOfProduct' value='0'/></td>" +
-            "<td><input type='text' style='width:150px' class='materialsOfProduct' value='0.00'/></td>" +
-            "<td><input type='text' style='width:150px' class='materialsOfProduct' value='0'/></td>" +
-            "<td><input type='text' style='width:150px' class='materialsOfProduct' value='0.00'/></td></tr>";
+            "<td><input type='text' style='width:100px' class='materialCode' list='materialCodeList'/></td>" +
+            "<td><input type='text' style='width:100px' class='materialName'/></td>" +
+            "<td><input type='text' style='width:100px' class='materialType'/></td>" +
+            "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
+            "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td>" +
+            "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
+            "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td></tr>";
         var tableHtml = $("#materialsOfProduct tbody").html();
         console.log(tableHtml);
         tableHtml += rowTemplate;
@@ -946,6 +956,52 @@
                 }
             }
         }
+
+        //统计表格数据
+        var sum=0;
+        var trList = $("#materialsOfProduct tbody").children("tr");
+        console.log(trList);
+        for (var i=0;i<trList.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+
+            var materialNum = parseFloat(tdArr.eq(4).find("input").val());//物料数量
+            var materialPrice = parseFloat(tdArr.eq(5).find("input").val());//物料单价
+            var patchPoint = parseFloat(tdArr.eq(6).find("input").val());//贴片点数
+            var patchPrice = parseFloat(tdArr.eq(7).find("input").val());//贴片单价
+
+            console.log(materialNum);
+            console.log(materialPrice);
+            console.log(patchPoint);
+            console.log(patchPrice);
+            if($.isNumeric(materialNum) && $.isNumeric(materialPrice)){
+                sum += materialNum*materialPrice;
+            }
+            if($.isNumeric(patchPoint) && $.isNumeric(patchPrice)){
+                sum += patchPoint*patchPrice;
+            }
+        }
+        console.log(sum);
+        $("#materialCost").text(sum.toFixed(2));
+
+        /*totalCost*/
+        //console.log($("#processCost").text());//不要使用$("#processCost").val()，input有value，而td获取其text
+        var totalCost = sum +
+            parseFloat($("#processCost").text())+
+            parseFloat($("#adminstrationCost").text())+
+            parseFloat($("#supplementaryCost").text())+
+            parseFloat($("#operatingCost").text());
+        console.log(totalCost);
+        console.log($("#totalCost"));
+        //$("#totalCost").find("input").val(totalCost);
+        $("#totalCost").val(totalCost.toFixed(2));
+
+        /*price*/
+        console.log($("#taxRate").val());
+        console.log($("#profit").val());
+        //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);//不要写成var price=($("#taxRate").val()+1)*($("#profit").val()+totalCost);
+        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
+        console.log($("#price"));
+        $("#price").val(price.toFixed(2));
     }
     function deleteRow2() {
         var table=document.getElementById("otherCosts");
@@ -960,6 +1016,56 @@
                 }
             }
         }
+
+        //统计表格数据
+        var sum=0;
+        var processCost=0,adminstrationCost=0,supplementaryCost=0,operatingCost=0;
+        var trList = $("#otherCosts tbody").children("tr");
+
+        console.log(trList);
+        for (var i=0;i<trList.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+
+            var procesCost = parseFloat(tdArr.eq(3).find("input").val());//加工费
+            var adminsCost = parseFloat(tdArr.eq(5).find("input").val());//管理费
+            var suppleCost = parseFloat(tdArr.eq(7).find("input").val());//辅料费
+            var operatCost = parseFloat(tdArr.eq(9).find("input").val());//运营费
+
+            if($.isNumeric(procesCost)){
+                processCost+=procesCost;
+            }
+            if($.isNumeric(adminsCost)){
+                adminstrationCost+=adminsCost;
+            }
+            if($.isNumeric(suppleCost)){
+                supplementaryCost+=suppleCost;
+            }
+            if($.isNumeric(operatCost)){
+                operatingCost+=operatCost;
+            }
+        }
+        $("#processCost").text(processCost);
+        $("#adminstrationCost").text(adminstrationCost);
+        $("#supplementaryCost").text(supplementaryCost);
+        $("#operatingCost").text(operatingCost);
+
+        /*totalCost*/
+        var totalCost = parseFloat($("#materialCost").text()) +
+            processCost+
+            adminstrationCost+
+            supplementaryCost+
+            operatingCost;
+        console.log(totalCost);
+        //$("#totalCost").find("input").val(totalCost);
+        $("#totalCost").val(totalCost.toFixed(2));
+
+        /*price*/
+        console.log($("#taxRate").val());
+        console.log($("#profit").val());
+        //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
+        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
+        console.log($("#price"));
+        $("#price").val(price.toFixed(2));
     }
     /*全部勾选*/
     function checkAll() {
@@ -1030,10 +1136,10 @@
         for (var i=0;i<trList.length;i++) {
             var tdArr = trList.eq(i).find("td");
 
-            var materialNum = parseFloat(tdArr.eq(2).find("input").val());//物料数量
-            var materialPrice = parseFloat(tdArr.eq(3).find("input").val());//物料单价
-            var patchPoint = parseFloat(tdArr.eq(4).find("input").val());//贴片点数
-            var patchPrice = parseFloat(tdArr.eq(5).find("input").val());//贴片单价
+            var materialNum = parseFloat(tdArr.eq(4).find("input").val());//物料数量
+            var materialPrice = parseFloat(tdArr.eq(5).find("input").val());//物料单价
+            var patchPoint = parseFloat(tdArr.eq(6).find("input").val());//贴片点数
+            var patchPrice = parseFloat(tdArr.eq(7).find("input").val());//贴片单价
 
             console.log(materialNum);
             console.log(materialPrice);
@@ -1191,7 +1297,7 @@
         console.log($(this).parent().parent().prevAll().length);//input -> td -> tr，$(this).parent().parent().prevAll().length获取当前行数，$(this).parent().prevAll().length获取当前列数
 
         var tdArr=$(this).parent().parent().find("td");
-        $(this).parent().html('<input class="materialCode" style="width:150px" type="text" value="'+$(this).val()+'">');
+        $(this).parent().html('<input type="text" style="width:100px" class="materialCode" list="materialCodeList" value="'+$(this).val()+'">');
         console.log(tdArr);
         //var tdElementsArr=document.activeElement.parentElement.parentElement.getElementsByTagName("td");
         /*tdArr.eq(3).find("input").val(6);
@@ -1223,11 +1329,13 @@
                         console.log(material[0]);
                         console.log(material[0][3]);
                         console.log(tdArr);
-                        tdArr.eq(3).find("input").val(material[0][4]);
+                        tdArr.eq(2).find("input").val(material[0][0]);
+                        tdArr.eq(3).find("input").val(material[0][1]);
+                        tdArr.eq(5).find("input").val(material[0][4]);
 
                         //console.log(tdElementsArr);
                         //tdElementsArr[3].getElementsByTagName("input")[0].setAttribute("value", material[1]);
-                        tdArr.eq(3).html('<input class="materialsOfProduct" style="width:150px" type="text" value="'+material[0][4]+'">');
+                        tdArr.eq(5).html('<input type="text" style="width:100px" class="materialsOfProduct" value="'+material[0][4]+'">');
                         console.log(tdArr.eq(3).html());
                         console.log(tdArr);
 
@@ -1252,10 +1360,10 @@
         for (var i=0;i<trList.length;i++) {
             var tdArr = trList.eq(i).find("td");
 
-            var materialNum = parseFloat(tdArr.eq(2).find("input").val());//物料数量
-            var materialPrice = parseFloat(tdArr.eq(3).find("input").val());//物料单价
-            var patchPoint = parseFloat(tdArr.eq(4).find("input").val());//贴片点数
-            var patchPrice = parseFloat(tdArr.eq(5).find("input").val());//贴片单价
+            var materialNum = parseFloat(tdArr.eq(4).find("input").val());//物料数量
+            var materialPrice = parseFloat(tdArr.eq(5).find("input").val());//物料单价
+            var patchPoint = parseFloat(tdArr.eq(6).find("input").val());//贴片点数
+            var patchPrice = parseFloat(tdArr.eq(7).find("input").val());//贴片单价
 
             console.log(materialNum);
             console.log(materialPrice);

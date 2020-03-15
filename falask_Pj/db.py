@@ -345,7 +345,7 @@ def select_productInfoByCode(productCode):
 # xijiawei
 # 根据成品编码查询成品物料组成
 def select_materialsOfProductByCode(productCode):
-    sql = "select materialCode,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost from materialsOfProduct where productCode='%s';"%(productCode)
+    sql = "select mOP.materialCode,m.materialName,m.materialType,mOP.materialNum,mOP.materialPrice,mOP.materialCost,mOP.patchPoint,mOP.patchPrice,mOP.patchCost from materialsOfProduct mOP,materialInfo m where productCode='%s' and mOP.materialCode=m.materialCode;"%(productCode)
     cur.execute(sql)
     result=cur.fetchall()
     return result
