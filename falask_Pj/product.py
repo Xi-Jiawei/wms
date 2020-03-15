@@ -32,7 +32,7 @@ def add_product():
         authority = select_user_authority(username)
         if authority[1] == '1' or authority[1] == '2':
             return render_template('access_fail.html')
-        elif authority[1]=='3' or authority[1]=='8':
+        elif authority[1]=='3' or authority[1]=='8' or authority[1]=='4':
             # if form.validate_on_submit():
             if request.method == "POST":
                 data = request.get_json()
@@ -83,7 +83,7 @@ def add_product():
                 materialCodes=[]
                 for i in result:
                     materialCodes.append(i[0])
-                return render_template('product_edit.html', setting=0, form=form, username=username, materialCodes=materialCodes) # setting为0表示新添，setting为1表示编辑
+                return render_template('product_edit.html', authority=authority[1], setting=0, form=form, username=username, materialCodes=materialCodes) # setting为0表示新添，setting为1表示编辑
             else:
                 # create_materialsOfProduct_temp()
                 return render_template('product_edit.html', form=form, username=username)
@@ -136,7 +136,7 @@ def edit_product(productCode):
                                    supplementaryCost=supplementaryCost, operatingCost=operatingCost,
                                    materialsOfProduct=materialsOfProduct, otherCosts=otherCosts,
                                    username=username)
-        elif authority[1]=='3' or authority[1]=='8':
+        elif authority[1]=='3' or authority[1]=='8' or authority[1]=='4':
             print("当前权限可编辑")
 
             # if form.validate_on_submit():
@@ -212,7 +212,7 @@ def edit_product(productCode):
                     materialCodes.append(i[0])
 
                 # setting为0表示新添，setting为1表示编辑
-                return render_template('product_edit.html', setting=1, form=form, productCode=productCode, materialCost=materialCost,
+                return render_template('product_edit.html', authority=authority[1], setting=1, form=form, productCode=productCode, materialCost=materialCost,
                                        processCost=processCost, adminstrationCost=adminstrationCost,
                                        supplementaryCost=supplementaryCost, operatingCost=operatingCost,
                                        materialsOfProduct=materialsOfProduct, otherCosts=otherCosts, materialCodes=materialCodes,

@@ -75,7 +75,7 @@ class UserForm(Form):
             "id": "productAuth",
             "class": "form-control"
         },
-        choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改')]
+        choices=[('0', '无权限'), ('1', '查看（无金额）'), ('2', '查看（有金额）'), ('3', '修改'), ('4', '部分修改')]
     )
     procurementAuth = SelectField(
         # 标签

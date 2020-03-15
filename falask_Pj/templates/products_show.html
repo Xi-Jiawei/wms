@@ -44,10 +44,12 @@
                     <li class="active">
                         <a href="{{ url_for("product.show_products") }}  "><i class="menu-icon fa fa-cogs"></i>成品列表</a>
                     </li>
-                    {% if authority=='3' or authority=="8"%}
+                    {% if authority=='3' or authority=="8" or authority=="4"%}
                     <li>
                         <a href="{{ url_for("product.add_product") }}"> <i class="menu-icon fa fa-th"></i>添加成品</a>
                     </li>
+                    {% endif %}
+                    {% if authority=='3' or authority=="8"%}
                     <li>
                         <a href="{{ url_for("product.delete_products") }}"> <i class="menu-icon fa fa-th"></i>删除成品</a>
                     </li>
@@ -105,23 +107,23 @@
                                 <table id="bootstrap-data-table" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            {% if authority=='1'%}
-                                            <th>成品编码</th>
-                                            <th>成品型号</th>
-                                            <th>交易客户</th>
-                                            <th>备注</th>
-                                            <th>录入时间</th>
-                                            <th>录入员</th>
+                                            {% if authority=='1' or authority=="4"%}
+                                                <th>成品编码</th>
+                                                <th>成品型号</th>
+                                                <th>交易客户</th>
+                                                <th>备注</th>
+                                                <th>录入时间</th>
+                                                <th>录入员</th>
                                             {% elif authority=='2' or authority=='3' or authority=="8"%}
-                                            <th>成品编码</th>
-                                            <th>成品型号</th>
-                                            <th>交易客户</th>
-                                            <th>成品价格</th>
-                                            <th>成品利润</th>
-                                            <th>总成本</th>
-                                            <th>备注</th>
-                                            <th>录入时间</th>
-                                            <th>录入员</th>
+                                                <th>成品编码</th>
+                                                <th>成品型号</th>
+                                                <th>交易客户</th>
+                                                <th>成品价格</th>
+                                                <th>成品利润</th>
+                                                <th>总成本</th>
+                                                <th>备注</th>
+                                                <th>录入时间</th>
+                                                <th>录入员</th>
                                             {% endif %}
                                         </tr>
                                     </thead>
@@ -151,7 +153,18 @@
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[8] }}</a></td>
                                             </tr>
                                         {% endfor %}
-                                        {% endif %}
+                                    {% elif authority=='4'%}
+                                        {% for i in products %}
+                                            <tr>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[6] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[7] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[8] }}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
                                     </tbody>
                                 </table>
                             </div>

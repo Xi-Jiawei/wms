@@ -49,8 +49,9 @@ def delete_procurements():
     if request.method == "POST":
         data = request.get_json()
         procurementCodeArr = data['procurementCodeArr']
+        username = data['username']
         for procurementCode in procurementCodeArr:
-            delete_procurementByCode(procurementCode)
+            delete_procurementByCode(procurementCode, username)
         return jsonify({'ok': True})
     else:
         return jsonify({'ok': False})
@@ -263,7 +264,7 @@ def edit_procurement(procurementCode):
             #     insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, "系统账号", entryTime)
             # update procurement and update materialInfo
             # 简单方式：无论是否修改了产品编码，都是先撤回上次采，再插入新采购
-            delete_procurementByCode(procurementCode)  # 撤回上次采购
+            delete_procurementByCode(procurementCode, entryClerk)  # 撤回上次采购
             insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
             return jsonify({'ok': True})
         elif request.method == 'GET':

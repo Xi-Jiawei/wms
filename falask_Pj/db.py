@@ -659,7 +659,7 @@ def select_materialsOfProcurementByCode(procurementCode):
 
 # xijiawei
 # 取消采购
-def delete_procurementByCode(procurementCode):
+def delete_procurementByCode(procurementCode, entryClerk):
     try:
         # 更新materialInOut
         cur.execute("select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum),materialInfo.unit,materialInfo.price,materialInfo.supplier from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode;" % (procurementCode))
@@ -670,7 +670,8 @@ def delete_procurementByCode(procurementCode):
             # documentNumber=documentNumber[0:16] # 使用时间戳生成唯一代号
             documentNumber = procurementCode + documentNumber[10:16]  # 使用时间戳生成唯一代号
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-            insert_materialInOut(documentNumber, i[0], 0, i[1], i[2], i[3], i[4], entryTime, "系统账号")
+            # insert_materialInOut(documentNumber, i[0], 0, i[1], i[2], i[3], i[4], entryTime, "系统账号")
+            insert_materialInOut(documentNumber, i[0], 0, i[1], i[2], i[3], i[4], entryTime, entryClerk)
         # 更新materialInfo
         cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum+m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney+price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
         # 执行SQL语句
@@ -699,7 +700,8 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
             documentNumber=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
             documentNumber=procurementCode+documentNumber[10:16] # 使用时间戳生成唯一代号
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-            insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,"系统账号")
+            # insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,"系统账号")
+            insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk)
         # 更新materialInfo
         cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum-m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney-price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
         # 提交到数据库执行
