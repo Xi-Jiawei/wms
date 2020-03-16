@@ -821,6 +821,9 @@
                     //console.log("rowIndexCountArr["+index+"]!==0&&rowIndexArr["+i+"] === 1");
 
                     table.rows[i].cells[0].setAttribute("rowspan", rowIndexCountArr[index]);
+
+                    if(table.rows[i].cells[13].getElementsByTagName("textarea").length>0)
+                        table.rows[i].cells[13].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
                 }
                 else if(rowIndexCountArr[index]!==0&&rowIndexArr[i] === 0){
                     //console.log("rowIndexCountArr["+index+"]!==0&&rowIndexArr["+i+"] === 0");
