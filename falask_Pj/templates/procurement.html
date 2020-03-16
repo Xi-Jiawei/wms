@@ -275,7 +275,14 @@
                         </div>
                     </div>
 
-                    <button type="button" onclick="printpage()">打印采购清单</button>
+                    <div class="row" style="position:relative;width:1000px;height:60px;">
+                        <div class="col-xs-12" style="position:absolute;bottom:0;left: 0;width: 160px;">
+                            <button type="button" onclick="printpage()">打印采购清单</button>
+                        </div>
+                        <div class="col-xs-12" style="position:absolute;bottom:0;left: 120px;width: 160px;">
+                            <button type="button" onclick="export2excel()">导出为Excel</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -426,6 +433,7 @@
 </script>
 
 <script src="/static/jquery/jquery-2.1.4.min.js"></script>
+<script src="/static/jquery/jquery.table2excel.min.js"></script>
 <script>
     function ShowData(result) {
         console.log(result);
@@ -721,6 +729,25 @@
         var wind = window.open("",'newwindow', 'height=300, width=700, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=n o, status=no');
         wind.document.body.innerHTML = printHtml;
         wind.print();*/
+    }
+    
+    function export2excel() {
+        $("#procurement_div").table2excel({
+            // 不被导出的表格行的CSS class类
+            exclude: ".noExl",
+            // 导出的Excel文档的名称
+            name: "Excel Document Name",
+            // Excel文件的名称
+            filename: "test",
+            //文件后缀名
+            fileext: ".xlsx",
+            //是否排除导出图片
+            exclude_img: false,
+            //是否排除导出超链接
+            exclude_links: false,
+            //是否排除导出输入框中的内容
+            exclude_inputs: false
+        });
     }
 </script>
 
