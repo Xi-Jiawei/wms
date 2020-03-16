@@ -221,25 +221,87 @@
         //var data="要保存的文本";
         //export_raw('range.json', data);
 
-        /*// 使用outerHTML属性获取整个table元素的HTML代码（包括<table>标签），然后包装成一个完整的HTML文档，设置charset为urf-8以防止中文乱码
-        // var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementsByTagName("table")[0].outerHTML + "</body></html>";
-        var data = $('#user_table').DataTable().rows().data();
-        console.log(data);
-        data=new Array();
-        for(var i=0;i<3;i++) {
-            var row=new Array();
-            row[0]=1;row[1]=2;row[3]=3;
-            data[i] =row;
-        }
+        /*var html = '<html><head><meta charset=\'utf-8\' /></head><body><table id="user_table" class="table table-striped dataTable" role="grid" aria-describedby="user_table_info">\n' +
+            '            <thead>\n' +
+            '            <tr role="row"><th class="sorting_asc" tabindex="0" aria-controls="user_table" rowspan="1" colspan="1" aria-sort="ascending" aria-label="用户ID: activate to sort column descending" style="width: 80px;">用户ID</th><th class="sorting" tabindex="0" aria-controls="user_table" rowspan="1" colspan="1" aria-label="用户姓名: activate to sort column ascending" style="width: 101px;">用户姓名</th><th class="sorting" tabindex="0" aria-controls="user_table" rowspan="1" colspan="1" aria-label="用户密码: activate to sort column ascending" style="width: 101px;">用户密码</th><th class="sorting" tabindex="0" aria-controls="user_table" rowspan="1" colspan="1" aria-label="用户权限: activate to sort column ascending" style="width: 101px;">用户权限</th><th class="sorting" tabindex="0" aria-controls="user_table" rowspan="1" colspan="1" aria-label="编辑: activate to sort column ascending" style="width: 60px;">编辑</th></tr>\n' +
+            '            </thead>\n' +
+            '            <tbody>\n' +
+            '            <tr role="row" class="odd">\n' +
+            '                    <td class="sorting_1">34</td>\n' +
+            '                    <td>管理员</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>888</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="even">\n' +
+            '                    <td class="sorting_1">35</td>\n' +
+            '                    <td>admin</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>888</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="odd">\n' +
+            '                    <td class="sorting_1">36</td>\n' +
+            '                    <td>111</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>111</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="even">\n' +
+            '                    <td class="sorting_1">37</td>\n' +
+            '                    <td>112</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>112</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="odd">\n' +
+            '                    <td class="sorting_1">38</td>\n' +
+            '                    <td>113</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>113</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="even">\n' +
+            '                    <td class="sorting_1">39</td>\n' +
+            '                    <td>121</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>121</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="odd">\n' +
+            '                    <td class="sorting_1">40</td>\n' +
+            '                    <td>122</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>122</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="even">\n' +
+            '                    <td class="sorting_1">41</td>\n' +
+            '                    <td>123</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>123</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="odd">\n' +
+            '                    <td class="sorting_1">42</td>\n' +
+            '                    <td>131</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>131</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr><tr role="row" class="even">\n' +
+            '                    <td class="sorting_1">43</td>\n' +
+            '                    <td>132</td>\n' +
+            '                    <td>88888888</td>\n' +
+            '                    <td>132</td>\n' +
+            '                    <td><a class="edit" onclick="deleteRow()">删除</a></td>\n' +
+            '                </tr></tbody>\n' +
+            '            <tfoot>\n' +
+            '            <tr><td rowspan="1" colspan="1">-</td><td rowspan="1" colspan="1">-</td><td rowspan="1" colspan="1">-</td><td rowspan="1" colspan="1">10089</td><td rowspan="1" colspan="1">-</td></tr>\n' +
+            '            </tfoot>\n' +
+            '        </table></body></html>';*/
+        var html = "<html><head><meta charset='utf-8' /></head><body>" + document.getElementById("user_table").outerHTML + "</body></html>";// 使用outerHTML属性获取整个table元素的HTML代码（包括<table>标签），然后包装成一个完整的HTML文档，设置charset为urf-8以防止中文乱码
+        console.log(html);
         // 实例化一个Blob对象，其构造函数的第一个参数是包含文件内容的数组，第二个参数是包含文件类型属性的对象
-        var blob = new Blob(data, { type: "application/vnd.ms-excel" });
-        var a = document.getElementsByTagName("a")[0];
-        // 利用URL.createObjectURL()方法为a元素生成blob URL
+        var blob = new Blob([html], { type: "application/vnd.ms-excel" });
+        var a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        // 设置文件名，目前只有Chrome和FireFox支持此属性
-        a.download = "学生成绩表.xls";*/
+        a.download = "用户表.xls";
+        document.body.appendChild(a);
+        a.click();
 
-        $("#user_table_div").table2excel({
+        /*$("#user_table").table2excel({
             // 不被导出的表格行的CSS class类
             exclude: ".noExl",
             // 导出的Excel文档的名称
@@ -254,7 +316,7 @@
             exclude_links: false,
             //是否排除导出输入框中的内容
             exclude_inputs: false
-        });
+        });*/
     }
     function export_raw(name, data) {
         var urlObject = window.URL || window.webkitURL || window;
