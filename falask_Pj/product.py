@@ -269,13 +269,32 @@ def check_uniqueness():
 def test():
     form=UserForm()
     if request.method == "GET":
-        users=select_all_users()
-        sum=0
-        for i in users:
-            sum+=int(i[3])
+        # users=select_all_users()
+        # sum=0
+        # for i in users:
+        #     sum+=int(i[3])
+        # choices=select_all_users_for_selector()
+        # form.userid.choices = choices
+        # return render_template('test.html',form=form,users=users,sum=sum)
+
         choices=select_all_users_for_selector()
         form.userid.choices = choices
-        return render_template('test.html',form=form,users=users,sum=sum)
+        productCodeArr=["P00001","P00002","P00003"]
+        products=[]
+        for i in range(productCodeArr.__len__()):
+            product=[]
+            products.append(product)
+            product.append(productCodeArr[i])
+            productInfo=select_productInfoByCode(productCodeArr[i])
+            product.append(productInfo[0][0])
+            product.append(i)
+            materialsOfProduct=select_materialsOfProductByCode(productCodeArr[i])
+            materials=[]
+            product.append(materials)
+            for material in materialsOfProduct:
+                materials.append([material[0],material[1],material[3]])
+            product.append("无")
+        return render_template('test.html',form=form,products=products)
     elif request.method == "POST":
         re=request
         # data=request.form['personName']

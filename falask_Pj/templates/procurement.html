@@ -175,6 +175,9 @@
                             <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
                             <!--“ table table-striped table-bordered ”两行之前有不同的颜色且水平方向上有分割线和边框-->
                             <!--id="bootstrap-data-table" 引用datatables.min.js API-->
+                            <input type="text" id="query" class="form-control" style="float: right;width: 300px"/>
+                            <br>
+                            <br>
                             <table id="procurement_table" class="table table-striped">
                                 <thead>
                                 <tr>
@@ -732,7 +735,7 @@
     }
     
     function export2excel() {
-        $("#procurement_div").table2excel({
+        $("#procurement_table").table2excel({
             // 不被导出的表格行的CSS class类
             exclude: ".noExl",
             // 导出的Excel文档的名称
@@ -749,6 +752,135 @@
             exclude_inputs: false
         });
     }
+
+    var originTable=document.getElementById('procurement_table');
+    $("#query").on('input',function(e){
+        console.log($(this));
+        var filterStr=$(this).val();
+        console.log(filterStr);
+
+        //var table=document.getElementById('product_table');
+        //var table=$.extend(true, {}, originTable);
+
+        console.log(originTable);
+        var table=originTable.cloneNode(true);
+        console.log(table);
+        var data=new Array();var index=0;var rowIndexCountArr=new Array();var rowIndexArr=new Array(table.rows.length);
+        var mflag=0,flag=0,count=0;
+        for ( var i = 1; i < table.rows.length;i++) {
+            //console.log(table.rows[i]);
+            mflag=0;
+            flag=0;
+            //if(table.rows[i].cells[0].hasAttribute("rowspan"))console.log(table.rows[i].cells[0].getAttribute("rowspan"));
+            if(table.rows[i].cells[0].hasAttribute("rowspan")) {
+                rowIndexCountArr[index] = count;
+                index += 1;
+                count = 0;
+            }
+
+            for (var j = 0; j < table.rows[i].cells.length; j++) {
+                if(table.rows[i].cells[j].hasAttribute("rowspan")){
+                    if (table.rows[i].cells[j].innerHTML.indexOf(filterStr) != -1) {
+                        mflag = 1;
+                        break;
+                    }
+                }else {
+                    if (table.rows[i].cells[j].innerHTML.indexOf(filterStr) != -1) {
+                        flag = 1;
+                        break;
+                    }
+                }
+            }
+            //console.log(mflag);
+            //console.log(flag);
+            if (mflag == 1) {
+                count = parseInt(table.rows[i].cells[0].getAttribute("rowspan"));
+                for (var j = i; j < i+count; j++)
+                    rowIndexArr[j] = 1;
+
+                i+=count-1;
+            }
+            else if (mflag == 0&&flag == 1) {
+                count += 1;
+                rowIndexArr[i] = 1;
+            }else if (mflag == 0&&flag == 0) {
+                rowIndexArr[i] = 0;
+            }
+        }
+        rowIndexCountArr[index]=count;
+        console.log(rowIndexCountArr);
+        console.log(rowIndexArr);
+
+        index=1;
+        for ( var i = 1; i < table.rows.length;i++) {
+            //console.log("table.rows["+i+"]: "+table.rows[i]);
+            if(table.rows[i].cells[0].hasAttribute("rowspan")){
+                //console.log("main: "+i);
+
+                if(rowIndexCountArr[index]!==0&&rowIndexArr[i] === 1) {
+                    //console.log("rowIndexCountArr["+index+"]!==0&&rowIndexArr["+i+"] === 1");
+
+                    table.rows[i].cells[0].setAttribute("rowspan", rowIndexCountArr[index]);
+                }
+                else if(rowIndexCountArr[index]!==0&&rowIndexArr[i] === 0){
+                    //console.log("rowIndexCountArr["+index+"]!==0&&rowIndexArr["+i+"] === 0");
+                    //table.deleteRow(i);
+
+                    var firstRow=table.rows[i].cloneNode(true);
+                    //console.log(firstRow);
+                    for(var j = 0; j < table.rows[i].cells.length;j++)
+                            table.rows[i].cells[j].setAttribute("style", "display: none");
+
+                    for (var j = i+1; j < i+parseInt(table.rows[i].cells[0].getAttribute("rowspan")); j++){
+                        if(rowIndexArr[j]===1) {
+                            //console.log("add "+j);
+                            for(var k = 0; k < 9;k++) {
+                                //console.log(firstRow.cells[4 + k]);
+                                firstRow.cells[4 + k].innerHTML = table.rows[j].cells[k].innerHTML;
+                            }
+                            //console.log(firstRow.innerHTML);
+                            table.rows[j].innerHTML=firstRow.innerHTML;
+                            //console.log("rowIndexCountArr["+index+"]: "+rowIndexCountArr[index]);
+                            for(var k = 0; k < table.rows[j].cells.length;k++)
+                                if(table.rows[j].cells[k].hasAttribute("rowspan"))
+                                    table.rows[j].cells[k].setAttribute("rowspan", rowIndexCountArr[index]);
+                            //console.log(table.rows[j].cells[13].getElementsByTagName("textarea"));
+                            //console.log(table.rows[j].cells[13].childNodes[0]);
+                            if(table.rows[j].cells[13].getElementsByTagName("textarea").length>0)
+                                table.rows[j].cells[13].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
+                            //console.log(table.rows[j]);
+
+                            for(var k = i+1; k < j;k++)
+                                for(var l = 0; l < table.rows[k].cells.length;l++)
+                                    table.rows[k].cells[l].setAttribute("style", "display: none");
+
+                            i=j;
+                            break;
+                        }
+                    }
+                }
+                else if(rowIndexCountArr[index]===0){
+                    //console.log("rowIndexCountArr["+index+"]===0");
+
+                    for (var j = i; j < i+parseInt(table.rows[i].cells[0].getAttribute("rowspan")); j++){
+                        //table.deleteRow(j);
+                        for(var k = 0; k < table.rows[j].cells.length;k++)
+                            table.rows[j].cells[k].setAttribute("style", "display: none");
+                    }
+                }
+
+                index+=1;
+            }else {
+                if(rowIndexArr[i]===0)
+                    //table.deleteRow(i);
+                    for(var j = 0; j < table.rows[i].cells.length;j++)
+                            table.rows[i].cells[j].setAttribute("style", "display: none");
+            }
+        }
+
+        console.log(table);
+        document.getElementById('procurement_table').outerHTML=table.outerHTML;
+    });
 </script>
 
 </body>
