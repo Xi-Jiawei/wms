@@ -19,7 +19,7 @@ def show_material():
         username = session['username']
         authority = select_user_authority(username)
         materials = select_all_materials()
-        return render_template('material.html', authority=authority[1], materials=materials, username=username)
+        return render_template('material.html', authority=authority[0], materials=materials, username=username)
     else:
         return render_template('access_fail.html')
 
@@ -74,7 +74,7 @@ def material_inout():
         if request.method == "GET":
             materials = select_all_materials() # materialCode,materialName,materialType,inventoryNum,unit,price,inventoryMoney,supplier,remark
             inventoryMoneySum = select_sum_materials()
-            return render_template('material_inout.html', authority=authority[1], materials=materials, inventoryMoneySum=inventoryMoneySum[0][0], username=username)
+            return render_template('material_inout.html', authority=authority[0], materials=materials, inventoryMoneySum=inventoryMoneySum[0][0], username=username)
         if request.method == "POST":
             data = request.get_json()
             materialCode = data['materialCode']
@@ -125,7 +125,7 @@ def material_inout_history():
                     mSumNum = mSumNum + str(i[1])
                     mSumAmount = mSumAmount + str(i[2])
             nowTime = datetime.now().strftime('%Y-%m-%dT%H:%M')
-            return render_template('material_inout_history.html', authority=authority[1], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount], username=username,nowTime=nowTime)
+            return render_template('material_inout_history.html', authority=authority[0], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount], username=username,nowTime=nowTime)
         if request.method == "POST":
             data = request.get_json()
             materialCode = data['materialCode']

@@ -95,6 +95,7 @@ def person_authority(auth):
         '1': "读权限无金额",
         '2': "读权限有金额",
         '3': "修改权限",
+        '4': "部分修改权限",
     }.get(auth,'error')
 
 # xijiawei
