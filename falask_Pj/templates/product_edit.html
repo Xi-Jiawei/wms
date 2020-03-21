@@ -551,11 +551,11 @@
                                                 </table>
 
                                                 <datalist id="materialCodeList">
-                                                    {% if materialCodes %}
+                                                    {#{% if materialCodes %}
                                                         {% for i in materialCodes %}
                                                             <option value={{ i }}></option>
                                                         {% endfor %}
-                                                    {% endif %}
+                                                    {% endif %}#}
                                                 </datalist>
 
                                             </div>
@@ -624,11 +624,11 @@
                                                 </table>
 
                                                 <datalist id="materialCodeList">
-                                                    {% if materialCodes %}
+                                                    {#{% if materialCodes %}
                                                         {% for i in materialCodes %}
                                                             <option value={{ i }}></option>
                                                         {% endfor %}
-                                                    {% endif %}
+                                                    {% endif %}#}
                                                 </datalist>
 
                                             </div>
@@ -1565,33 +1565,48 @@
         //document.activeElement.setAttribute("value", $(this).val());
         $(this).attr("value",$(this).val());
     });
-    /*物料编码校验*/
-    /*$("#materialsOfProduct").on('input', '.materialCode', function () {
-        document.activeElement.setAttribute("value", $(this).val());
-        console.log(document.activeElement);
-        console.log($(this).parent().parent().prevAll().length);//input -> td -> tr
+    /*物料编码过滤*/
+    $("#materialsOfProduct").on('input', '.materialCode', function () {
+        var filterStr=$(this).val();
 
-        //统计表格数据
+        var data={'filterStr':filterStr};
+
         $.ajax({
-                url: "/check_uniqueness",
+                url: "/search_material",
                 type: "POST",
                 dataType: "json",
-                data:JSON.stringify({'id':$(this).parent().parent().prevAll().length,'materialCode':$(this).val()}),
+                data:JSON.stringify(data),
                 contentType: 'application/json; charset=UTF-8',
                 success: function (callback) {
-                    console.log(callback['ok']);
-                    if(callback['ok']){alert("已存在此物料，请再检查！");}
-                    else if(!callback['ok']){}
-                    else {alert("出错了！");}
+                    console.log(callback);
+                    if(callback['ok']){
+                        var materials=callback['materials'];//materialCode,materialName,materialType
+                        console.log(materials);
+
+                        $("#materialCodeList").empty();
+                        /*if(materials!=null) {
+                            for (var i = 0; i < materials.length; i++)
+                                $("#materialCodeList").append('<option value="' + materials[i][0] + '"/>');
+                        }*/
+                        var list=document.getElementById("materialCodeList");
+                        if(materials!=null) {
+                            for (var i = 0; i < materials.length; i++) {
+                                var option = document.createElement("option");
+                                option.value = materials[i][0];
+                                option.innerText = materials[i][1];
+                                list.appendChild(option);
+                            }
+                        }
+                    }
                 },
                 error: function(xhr, textStatus, errorThrown) {
                     console.log(xhr.status);// 状态码
                     console.log(xhr.readyState);// 状态
                     console.log(textStatus);// 错误信息
-                    alert('返回值错误');
+                    //alert('返回值错误');
                 }
             });
-    });*/
+    });
     /*物料编码校验*/
     /*'focus'获得焦点，'blur'失去焦点，'input'输入*/
     $("#materialsOfProduct").on('blur', '.materialCode', function() {
@@ -1607,19 +1622,6 @@
         var tdArr=$(this).parent().parent().find("td");
         $(this).parent().html('<input type="text" style="width:100px" class="materialCode" list="materialCodeList" value="'+$(this).val()+'">');
         console.log(tdArr);
-        //var tdElementsArr=document.activeElement.parentElement.parentElement.getElementsByTagName("td");
-        /*tdArr.eq(3).find("input").val(6);
-        console.log("mark");
-        console.log(tdArr.eq(3).html());//<input class="materialsOfProduct" style="width:150px" type="text" value="0.00">
-        console.log(tdArr.eq(3).innerHTML);//无效
-        console.log(tdArr.eq(3).find("input"));
-        console.log(tdArr.eq(3).find("input").html());
-        console.log(tdArr.eq(3).find("input").outerHTML);//无效
-        console.log(tdArr.eq(3).find("input").innerHTML);//无效
-        console.log(tdArr.eq(3).find("input").eq(0));
-        console.log(tdArr.eq(3).find("input").eq(0).outerHTML);//无效
-        console.log(tdArr.eq(3).find("input").eq(0).innerHTML);//无效
-        */
 
         if($(this).val()=="")return;
 
@@ -1631,7 +1633,7 @@
                 contentType: 'application/json; charset=UTF-8',
                 success: function (callback) {
                     console.log(callback);
-                    if(callback['ok']){
+                    if(callback['ok']&&callback['material']!=null){
                         var material=callback['material'];//materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier
 
                         console.log(material[0]);
@@ -1660,7 +1662,7 @@
                     console.log(xhr.status);// 状态码
                     console.log(xhr.readyState);// 状态
                     console.log(textStatus);// 错误信息
-                    alert('返回值错误');
+                    //alert('返回值错误');
                 }
             });
     });

@@ -761,7 +761,7 @@ def select_all_materials():
     conn.close()
 
 # xijiawei
-# 查询所有物料
+# 查询物料余库存金额
 def select_sum_materials():
     sql = "select round(sum(inventoryMoney),2) from materialInfo;"
     cur.execute(sql)
@@ -776,6 +776,37 @@ def select_materialInfoByCode(materialCode):
     cur.execute(sql)
     result=cur.fetchall()
     return result
+    conn.close()
+
+# xijiawei
+# 模糊查询物料信息
+def select_materialInfoForOptions(filterStr):
+    sql = "select materialCode,materialName,materialType from materialInfo where concat(materialCode,materialName,materialType) like '%%%s%%';"%(filterStr)
+    cur.execute(sql)
+    result = cur.fetchall()
+    if result:
+        return result
+    return None
+    conn.close()
+
+# xijiawei
+# 模糊查询物料信息
+def select_materialInfoByFilter(filterStr):
+    # sql = "select materialCode,materialName,materialType from materialInfo where concat(materialCode,materialName,materialType) like '%%%s%%';"%(filterStr)
+    # cur.execute(sql)
+    cur.execute("select materialCode,materialCode from materialInfo where materialCode like '%%%s%%';" % (filterStr))
+    result = cur.fetchall()
+    if result:
+        return result
+    cur.execute("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
+    result = cur.fetchall()
+    if result:
+        return result
+    cur.execute("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
+    result = cur.fetchall()
+    if result:
+        return result
+    return None
     conn.close()
 
 # xijiawei

@@ -18,13 +18,13 @@
 <body>
 
 <!--输入框下拉提示-->
-<!--<input type="text" list="query"/>
-<datalist id="query">
+<input id="search" type="text" list="list"/>
+<datalist id="list">
     <option value="xijiawei"/>
     <option value="xiajiang"/>
     <option value="liuyan"/>
     <option value="sichuan"/>
-</datalist>-->
+</datalist>
 
 <!--DataTable-->
 <div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
@@ -341,12 +341,59 @@
         document.getElementById('product_table').outerHTML=table.outerHTML;
     });
 
+    $("#search").on('input',function(e){
+        console.log($(this));
+        var filterStr=$(this).val();
+        console.log(filterStr);
+        var data={'filterStr':filterStr};
+
+        $.ajax({
+                url: "/search_material",
+                type: "POST",
+                dataType: "json",
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    if(callback['ok']){
+                        var materials=callback['materials'];//materialCode,materialName,materialType
+                        console.log(materials);
+
+                        /*var list=document.getElementById("list");
+                        console.log(list.childNodes);
+                        for(var i=0;i<list.childNodes.length;i++)
+                            list.removeChild(i);
+                        console.log(list.childNodes);
+                        for(var i=0;i<materials.length;i++) {
+                            var option=document.createElement("option");
+                            option.value=materials[i];
+                            list.appendChild(option);
+                        }
+                        console.log(list.childNodes);*/
+                        $("#list").empty();
+                        if(materials!=null)
+                            for(var i=0;i<materials.length;i++)
+                                $("#list").append('<option value="'+materials[i]+'"/>');
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    //alert('返回值错误');
+                }
+            });
+    });
+
     function deleteRow(){
         /*console.log(event);
         console.log(event.parentElement);*/
-        /*以下无效代码*/
+
+        /*获取当前元素*/
+        //方式一：弃用，无效
         /*var activeElement=document.activeElement;
         console.log(activeElement);*/
+        //方式二：
         var element=event.currentTarget;
         console.log(element);
         console.log(element.parentElement.parentElement);
@@ -389,9 +436,6 @@
             oSheet.Paste();
             oXL.Visible = true;
         }*/
-
-        //var data="要保存的文本";
-        //export_raw('range.json', data);
 
         /*var html = '<html><head><meta charset=\'utf-8\' /></head><body><table id="user_table" class="table table-striped dataTable" role="grid" aria-describedby="user_table_info">\n' +
             '            <thead>\n' +
@@ -489,20 +533,6 @@
             //是否排除导出输入框中的内容
             exclude_inputs: false
         });*/
-    }
-    function export_raw(name, data) {
-        var urlObject = window.URL || window.webkitURL || window;
-        var export_blob = new Blob([data]);
-        var save_link = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
-        save_link.href = urlObject.createObjectURL(export_blob);
-        save_link.download = name;
-
-        var ev = document.createEvent("MouseEvents");
-        ev.initMouseEvent(
-            "click", true, false, window, 0, 0, 0, 0, 0
-            , false, false, false, false, 0, null
-        );
-        save_link.dispatchEvent(ev);
     }
 </script>
 </body>

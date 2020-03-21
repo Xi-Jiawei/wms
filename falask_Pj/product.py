@@ -4,6 +4,7 @@ from db import *
 from form import *
 
 from datetime import datetime
+import time
 
 product_app=Blueprint('product',__name__)
 
@@ -251,17 +252,51 @@ def delete_products():
 
 # xijiawei
 # 物料编码校验
+# @product_app.route('/check_uniqueness', methods=['GET', 'POST'])
+# def check_uniqueness():
+#     if request.method == "POST":
+#         data = request.get_json()
+#         materialCode = data['materialCode']  # 不要写成productCode=request.data["productcode"]
+#         if check_materialInfo(materialCode):
+#             material=select_materialInfoByCode(materialCode)
+#             return jsonify({'ok': True,'material':material})
+#         else:
+#             return jsonify({'ok': False})
+#     else: return jsonify({'ok': -1})
+
+# xijiawei
+# 物料编码校验
 @product_app.route('/check_uniqueness', methods=['GET', 'POST'])
 def check_uniqueness():
     if request.method == "POST":
         data = request.get_json()
         materialCode = data['materialCode']  # 不要写成productCode=request.data["productcode"]
-        if check_materialInfo(materialCode):
-            material=select_materialInfoByCode(materialCode)
-            return jsonify({'ok': True,'material':material})
+        if materialCode:
+            if check_materialInfo(materialCode):
+                material=select_materialInfoByCode(materialCode)
+                return jsonify({'ok': True,'material':material})
+            else:
+                return jsonify({'ok': True,'material':None})
         else:
-            return jsonify({'ok': False})
-    else: return jsonify({'ok': -1})
+            return jsonify({'ok': True,'material':None})
+    else: return jsonify({'ok': False})
+
+# # xijiawei
+# # 查询物料
+@product_app.route('/search_materials_for_options', methods=['GET', 'POST'])
+def search_materials_for_options():
+    if request.method == "POST":
+        data = request.get_json()
+        filterStr = data['filterStr']  # 不要写成productCode=request.data["productcode"]
+        if filterStr:
+            time.sleep(0.1)
+            materials=select_materialInfoForOptions(filterStr)
+            if materials:
+                print(materials[0][0])
+            return jsonify({'ok': True, 'materials': materials})
+        else:
+            return jsonify({'ok': True, 'materials': None})
+    else: return jsonify({'ok': False})
 
 # # xijiawei
 # # 物料编码校验
@@ -302,3 +337,18 @@ def test():
         data=request.form['userid']
         data=form.data['userid']
         return data
+
+# # xijiawei
+# # 查询物料
+@product_app.route('/search_material', methods=['GET', 'POST'])
+def search_material():
+    if request.method == "POST":
+        data = request.get_json()
+        filterStr = data['filterStr']  # 不要写成productCode=request.data["productcode"]
+        if filterStr:
+            time.sleep(0.1)
+            materials=select_materialInfoByFilter(filterStr)
+            return jsonify({'ok': True, 'materials': materials})
+        else:
+            return jsonify({'ok': True, 'materials': None})
+    else: return jsonify({'ok': False})
