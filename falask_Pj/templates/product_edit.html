@@ -1565,29 +1565,6 @@
         //document.activeElement.setAttribute("value", $(this).val());
         $(this).attr("value",$(this).val());
     });
-    /*数据绑定*/
-    {#$("#otherCosts").on('input', '.project', function () {
-        document.activeElement.setAttribute("value", $(this).val());
-        console.log(document.activeElement);
-
-        //统计表格数据
-        var sum=0;
-        var processCost=0,adminstrationCost=0,supplementaryCost=0,operatingCost=0;
-        var trList = $("#otherCosts tbody").children("tr");
-
-        var tdArr=$(this).parent().parent().find("td");
-        tdArr.eq(2).find("input").val($(this).val());
-        tdArr.eq(4).find("input").val($(this).val());
-        tdArr.eq(6).find("input").val($(this).val());
-        tdArr.eq(8).find("input").val($(this).val());
-
-        var tdElementsArr=document.activeElement.parentElement.parentElement.getElementsByTagName("td");
-        tdElementsArr[2].getElementsByTagName("input")[0].setAttribute("value", $(this).val());
-        tdElementsArr[4].getElementsByTagName("input")[0].setAttribute("value", $(this).val());
-        tdElementsArr[6].getElementsByTagName("input")[0].setAttribute("value", $(this).val());
-        tdElementsArr[8].getElementsByTagName("input")[0].setAttribute("value", $(this).val());
-        console.log(document.activeElement.parentElement.parentElement);
-    });#}
     /*物料编码校验*/
     /*$("#materialsOfProduct").on('input', '.materialCode', function () {
         document.activeElement.setAttribute("value", $(this).val());
@@ -1663,6 +1640,10 @@
                         tdArr.eq(2).find("input").val(material[0][0]);
                         tdArr.eq(3).find("input").val(material[0][1]);
                         tdArr.eq(5).find("input").val(material[0][4]);
+
+                        /*输入框数据变成持久值*/
+                        tdArr.eq(2).find("input").attr("value",material[0][0]);
+                        tdArr.eq(3).find("input").attr("value",material[0][1]);
 
                         //console.log(tdElementsArr);
                         //tdElementsArr[3].getElementsByTagName("input")[0].setAttribute("value", material[1]);

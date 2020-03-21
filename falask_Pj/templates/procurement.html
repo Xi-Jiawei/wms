@@ -213,7 +213,7 @@
                                     <td>-</td>
                                     <td>-</td>
                                     <td>-</td>
-                                    <td rowspan="{{ product[3].__len__() }}"><textarea rows="{{ product[3].__len__()*1.5 }}" class='remark'>{{ product[4] }}</textarea></td>
+                                    <td rowspan="{{ product[3].__len__() }}"><textarea rows="{{ product[3].__len__()*1.5 }}" class='remark' placeholder='备注'>{{ product[4] }}</textarea></td>
                                 </tr>
                                     {% for material in product[3][1:product[3].__len__()] %}
                                         <tr>
@@ -357,11 +357,11 @@
             var table=document.getElementById('procurement_table');
             var j=0;
             for ( var i = 1; i < table.rows.length;i++) {
-                if(table.rows[i].cells[12]){
+                if(table.rows[i].cells[13]){
                     if(j<productCodeOrTypeInputArr.length){
-                        console.log(table.rows[i].cells[12].firstElementChild);
-                        console.log(table.rows[i].cells[12].firstElementChild.value);
-                        remarkArr[j]=table.rows[i].cells[12].firstElementChild.value; //不要用“remarkArr[j]=table.rows[i].cells[12].firstElementChild.innerHTML;”
+                        console.log(table.rows[i].cells[13].firstElementChild);
+                        console.log(table.rows[i].cells[13].firstElementChild.value);
+                        remarkArr[j]=table.rows[i].cells[13].firstElementChild.value; //不要用“remarkArr[j]=table.rows[i].cells[12].firstElementChild.innerHTML;”
                         j += 1;
                     }
                     else break;
@@ -719,19 +719,41 @@
 
         //去除所有的标签形如<textarea rows="6.0" class='remark'></textarea>，只保留其内容
         console.log(newstr);
-        newstr=newstr.replace(/<textarea[^>]+rows=['"][0-9]\.[0-9]['"][^>]+class=['"]remark['"]>/g,"");// /g代表全局
+        newstr=newstr.replace(/<textarea[^>]+rows=['"][0-9]+([\.][0-9]+)?['"][^>]+class=['"]remark['"][^>]+placeholder=['"]备注['"]>/g,"");// /g代表全局
         newstr=newstr.replace(/<\/textarea>/g,"");// /g代表全局
         console.log(newstr);
 
-        document.body.innerHTML = newstr;
+        newstr=newstr.replace(/<input[^>]type=['"]text['"][^>]id=['"]query['"][^>]class=['"]hidden-print['"][^>]style=['"]float:[^>]right;width:[^>]300px['"]>/g,"");
+
+        /*document.body.innerHTML = newstr;
         window.print();
         document.body.innerHTML = oldstr;
-        return false;
+        return false;*/
 
-        /*var printHtml = document.getElementById("procurement_div").innerHTML;
-        var wind = window.open("",'newwindow', 'height=300, width=700, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=n o, status=no');
-        wind.document.body.innerHTML = printHtml;
-        wind.print();*/
+        //var wind = window.open("",'newwindow', 'height=700, width=1000, top=100, left=100, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, status=no');
+        var wind = window.open();
+        wind.document.body.innerHTML = "<!DOCTYPE html>\n" +
+            "<html lang=\"en\">\n" +
+            "<head>\n" +
+            "    <meta charset=\"UTF-8\">\n" +
+            "    <title>Title</title>\n" +
+            "\n" +
+            "    <link rel=\"stylesheet\" href=\"/static/bootstrap/bootstrap.min.css\">\n" +
+            "\n" +
+            "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/jquery/jquery.dataTables.css\">\n" +
+            "\n" +
+            "    <style type=\"text/css\">\n" +
+            "        .table{border:1px solid #000000;border-collapse: collapse}\n" +
+            "        .table th{border:1px solid #000000;}\n" +
+            "        .table td{border:1px solid #000000;}\n" +
+            "        .table > thead > tr > th {vertical-align: bottom;border-bottom: 1px solid #000000;}\n" +
+            "    </style>\n" +
+            "</head>\n" +
+            "<body>"+
+            newstr+
+            "</body>";
+        wind.print();
+        return false;
     }
     
     function export2excel() {
