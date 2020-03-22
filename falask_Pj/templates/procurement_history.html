@@ -126,24 +126,24 @@
                                     <thead>
                                     <tr>
                                         {% if authority=='3' or authority=="8"%}
-                                            <th width="40px" class="hidden-print"><input type='checkbox' name='checkbox' value='checkbox' onclick="checkAll()"/></th>
-                                            <th width="40px">序号</th>
-                                            <th width="180px">采购代号</th>
-                                            <th width="180px">成品编码</th>
-                                            <th width="180px">成品型号</th>
-                                            <th width="100px">成品数量</th>
-                                            <th width="100px">客户</th>
-                                            <th width="100px">录入员</th>
-                                            <th width="200px">日期</th>
+                                            <th width="60px" style="text-align:center;vertical-align:middle;" class="hidden-print"><input type='checkbox' name='checkbox' value='checkbox' onclick="checkAll()"/></th>
+                                            <th width="60px" style="text-align:center;vertical-align:middle;">序号</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">采购代号</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">成品编码</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">成品型号</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">成品数量</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">客户</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">录入员</th>
+                                            <th width="200px" style="text-align:center;vertical-align:middle;">日期</th>
                                         {% elif authority=='1' or authority=="2"%}
-                                            <th width="40px">序号</th>
-                                            <th width="180px">采购代号</th>
-                                            <th width="180px">成品编码</th>
-                                            <th width="180px">成品型号</th>
-                                            <th width="100px">成品数量</th>
-                                            <th width="100px">客户</th>
-                                            <th width="100px">录入员</th>
-                                            <th width="200px">日期</th>
+                                            <th width="60px" style="text-align:center;vertical-align:middle;">序号</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">采购代号</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">成品编码</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">成品型号</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">成品数量</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">客户</th>
+                                            <th width="120px" style="text-align:center;vertical-align:middle;">录入员</th>
+                                            <th width="200px" style="text-align:center;vertical-align:middle;">日期</th>
                                         {% endif %}
                                     </tr>
                                     </thead>
@@ -211,14 +211,14 @@
         <br>
 
         {% if authority=='3' or authority=="8"%}
-                <form id="procurement_history_form" action="#" method="post" novalidate="novalidate">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            {{ form.delete_submit }}
-                            {{ form.csrf_token }}
-                        </div>
+            <form id="procurement_history_form" action="#" method="post" novalidate="novalidate">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {{ form.delete_submit }}
+                        {{ form.csrf_token }}
                     </div>
-                </form>
+                </div>
+            </form>
         {% endif %}
     </div><!-- .content -->
 </div>
