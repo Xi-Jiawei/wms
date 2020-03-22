@@ -126,24 +126,24 @@
                                     <thead>
                                     <tr>
                                         {% if authority=='3' or authority=="8"%}
-                                            <th class="hidden-print"><input type='checkbox' name='checkbox' value='checkbox' onclick="checkAll()"/></th>
-                                            <th>序号</th>
-                                            <th>采购代号</th>
-                                            <th>成品编码</th>
-                                            <th>成品型号</th>
-                                            <th>成品数量</th>
-                                            <th>客户</th>
-                                            <th>录入员</th>
-                                            <th>日期</th>
+                                            <th width="40px" class="hidden-print"><input type='checkbox' name='checkbox' value='checkbox' onclick="checkAll()"/></th>
+                                            <th width="40px">序号</th>
+                                            <th width="180px">采购代号</th>
+                                            <th width="180px">成品编码</th>
+                                            <th width="180px">成品型号</th>
+                                            <th width="100px">成品数量</th>
+                                            <th width="100px">客户</th>
+                                            <th width="100px">录入员</th>
+                                            <th width="200px">日期</th>
                                         {% elif authority=='1' or authority=="2"%}
-                                            <th>序号</th>
-                                            <th>采购代号</th>
-                                            <th>成品编码</th>
-                                            <th>成品型号</th>
-                                            <th>成品数量</th>
-                                            <th>客户</th>
-                                            <th>录入员</th>
-                                            <th>日期</th>
+                                            <th width="40px">序号</th>
+                                            <th width="180px">采购代号</th>
+                                            <th width="180px">成品编码</th>
+                                            <th width="180px">成品型号</th>
+                                            <th width="100px">成品数量</th>
+                                            <th width="100px">客户</th>
+                                            <th width="100px">录入员</th>
+                                            <th width="200px">日期</th>
                                         {% endif %}
                                     </tr>
                                     </thead>
@@ -208,8 +208,9 @@
             </div>
         </div><!-- .animated -->
 
+        <br>
+
         {% if authority=='3' or authority=="8"%}
-            <div class="footer">
                 <form id="procurement_history_form" action="#" method="post" novalidate="novalidate">
                     <div class="row">
                         <div class="col-xs-12">
@@ -218,7 +219,6 @@
                         </div>
                     </div>
                 </form>
-            </div>
         {% endif %}
     </div><!-- .content -->
 </div>
@@ -352,7 +352,7 @@
         currPageSpan = document.getElementById("spanPageNum");
 
         columnsCounts = blockTable.rows[0].cells.length;
-        pageCount = 5;
+        pageCount = 10;
 
         /*rowCountArr，将每次采购的行数以列表存储。*/
         rowsLength = document.getElementById("procurement-history-table").rows.length;
@@ -472,9 +472,41 @@
         newstr=newstr.replace(/<a[^>]+href=['"][^>]+['"]>/g,"<a>");// /g代表全局，所有的href=都替换
         console.log(newstr);
 
-        document.body.innerHTML = newstr;
+        newstr=newstr.replace(/<div[^>]+id=['"]pagiDiv['"][^>]+class=['"]hidden-print['"][^>]+align=['"]right['"][^>]+style=['"]width:600px;['"]>/g,"");
+        newstr=newstr.replace(/<span[^>]+id=['"]spanFirst['"]>(<a>)?首页(<\/a>)?<\/span>/g,"");
+        newstr=newstr.replace(/<span[^>]+id=['"]spanPre['"]>(<a>)?上一页(<\/a>)?<\/span>/g,"");
+        newstr=newstr.replace(/<span[^>]+id=['"]spanNext['"]>(<a>)?下一页(<\/a>)?<\/span>/g,"");
+        newstr=newstr.replace(/<span[^>]+id=['"]spanLast['"]>(<a>)?末页(<\/a>)?<\/span>/g,"");
+        newstr=newstr.replace(/第[^>]+<span[^>]+id=['"]spanPageNum['"]>[0-9]+<\/span>[^>]+页\/共[^>]+<span[^>]+id=['"]spanTotalPage['"]>[0-9]+<\/span>[^>]+页/g,"");
+        console.log(newstr);
+
+        /*document.body.innerHTML = newstr;
         window.print();
         document.body.innerHTML = oldstr;
+        return false;*/
+
+        var wind = window.open();
+        wind.document.body.innerHTML = "<!DOCTYPE html>\n" +
+            "<html lang=\"en\">\n" +
+            "<head>\n" +
+            "    <meta charset=\"UTF-8\">\n" +
+            "    <title>Title</title>\n" +
+            "\n" +
+            "    <link rel=\"stylesheet\" href=\"/static/bootstrap/bootstrap.min.css\">\n" +
+            "\n" +
+            "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/jquery/jquery.dataTables.css\">\n" +
+            "\n" +
+            "    <style type=\"text/css\">\n" +
+            "        .table{border:1px solid #000000;border-collapse: collapse}\n" +
+            "        .table th{border:1px solid #000000;}\n" +
+            "        .table td{border:1px solid #000000;}\n" +
+            "        .table > thead > tr > th {vertical-align: bottom;border-bottom: 1px solid #000000;}\n" +
+            "    </style>\n" +
+            "</head>\n" +
+            "<body>"+
+            newstr+
+            "</body>";
+        wind.print();
         return false;
     }
 </script>
