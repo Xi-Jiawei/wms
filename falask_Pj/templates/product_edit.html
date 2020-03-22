@@ -1110,16 +1110,22 @@
             console.log(otherCostsArr);
 
             rows=document.getElementById("Costs").rows;
+
+            var authority=document.getElementById("authority").innerHTML;
+            console.log("authority: ");
+            console.log(authority);
             console.log($(this));
             console.log($(this).serialize());
             console.log($(this).serializeArray());
             var formData=$(this).serializeArray();
-            /*console.log(formData[7]);
-            alert(formData[7]['value']);
-            if(formData[7]['value']==""){
-                alert("请输入录入员姓名！");
+            if(formData[4]['value']==""&&authority!='4'){
+                alert("请输入利润！");
                 return;
-            }*/
+            }
+            if(formData[5]['value']==""&&authority!='4'){
+                alert("请输入税率！");
+                return;
+            }
             var data={'productCode':formData[0]['value'],
                 'productType':formData[1]['value'],
                 'client':formData[2]['value'],
@@ -1157,9 +1163,9 @@
                         alert("数据库中已存在此成品！");
                     }*/
                     else if(callback['ok']=='code'){
-                        alert("编码输入错误！");
+                        alert("已存在同编号的成品！");
                     }else if(callback['ok']=='type'){
-                        alert("型号输入错误！");
+                        alert("已存在同型号的成品！");
                     }
                 },
                 error: function(xhr, textStatus, errorThrown) {

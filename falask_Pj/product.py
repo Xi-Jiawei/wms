@@ -72,8 +72,10 @@ def add_product():
                 entryClerk=username
                 if not check_productInfoByCode(productCode) and not check_productInfoByType(productType):
                     print("数据库中不存在此成品。")
-                    insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate,
-                                       materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                    if authority[1] == '4':
+                        insert_productInfoInPart(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk)
+                    else:
+                        insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
                     for materialsOfProduct in materialsOfProductArr:
                         insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
                                                   materialsOfProduct[2], materialsOfProduct[3], materialsOfProduct[4],
@@ -176,8 +178,10 @@ def edit_product(productCode):
                 entryTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
                 # entryClerk = data['entryClerk']
                 entryClerk=username
-                update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost,
-                                   processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                if authority[1]=='4':
+                    update_productInfoInPart(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                else:
+                    update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
                 delete_materialsOfProduct(productCode)
                 if len(materialsOfProductArr) > 0:
                     for materialsOfProduct in materialsOfProductArr:
