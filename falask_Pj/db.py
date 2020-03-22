@@ -772,11 +772,17 @@ def select_sum_materials():
 # xijiawei
 # 根据物料编码查询物料信息
 def select_materialInfoByCode(materialCode):
-    sql = "select materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier from materialInfo where materialCode='%s';"%materialCode
-    cur.execute(sql)
-    result=cur.fetchall()
-    return result
-    conn.close()
+    try:
+        sql = "select materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier from materialInfo where materialCode='%s';" % materialCode
+        cur.execute(sql)
+        result = cur.fetchall()
+        return result
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
 
 # xijiawei
 # 模糊查询物料信息
@@ -792,22 +798,28 @@ def select_materialInfoForOptions(filterStr):
 # xijiawei
 # 模糊查询物料信息
 def select_materialInfoByFilter(filterStr):
-    # sql = "select materialCode,materialName,materialType from materialInfo where concat(materialCode,materialName,materialType) like '%%%s%%';"%(filterStr)
-    # cur.execute(sql)
-    cur.execute("select materialCode,materialCode from materialInfo where materialCode like '%%%s%%';" % (filterStr))
-    result = cur.fetchall()
-    if result:
-        return result
-    cur.execute("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
-    result = cur.fetchall()
-    if result:
-        return result
-    cur.execute("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
-    result = cur.fetchall()
-    if result:
-        return result
-    return None
-    conn.close()
+    try:
+        # sql = "select materialCode,materialName,materialType from materialInfo where concat(materialCode,materialName,materialType) like '%%%s%%';"%(filterStr)
+        # cur.execute(sql)
+        cur.execute("select materialCode,materialCode from materialInfo where materialCode like '%%%s%%';" % (filterStr))
+        result = cur.fetchall()
+        if result:
+            return result
+        cur.execute("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
+        result = cur.fetchall()
+        if result:
+            return result
+        cur.execute("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
+        result = cur.fetchall()
+        if result:
+            return result
+        return None
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
 
 # xijiawei
 # 添加或更新物料
@@ -1039,32 +1051,42 @@ def update_materialInOutByCode(materialCode, differenceOperateNum, operateTime):
 # xijiawei
 # 根据单据号删除物料出入库记录，更新相关物料出入库记录物料数量，并更新materialInfo表
 def delete_materialInOutByDocNum(documentNumber):
-    cur.execute("select materialCode,isInOrOut,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
-    result = cur.fetchall()
-    if result:
-        materialCode = result[0][0]
-        isInOrOut = result[0][1]
-        operateNum = result[0][2]
-        operateTime=result[0][3]
-    if isInOrOut == 0:
-        cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
-        # 更新materialInfo表
-        cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
-    if isInOrOut == 1:
-        cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
-        # 更新materialInfo表
-        cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
-    # 删除记录
-    sql = "delete from materialInOut where documentNumber='%s';" % (documentNumber)
     try:
-        # 执行SQL语句
-        cur.execute(sql)
+        cur.execute("select materialCode,isInOrOut,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
+        result = cur.fetchall()
+        if result:
+            materialCode = result[0][0]
+            isInOrOut = result[0][1]
+            operateNum = result[0][2]
+            operateTime = result[0][3]
+        if isInOrOut == 0:
+            cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
+            # 更新materialInfo表
+            cur.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
+        if isInOrOut == 1:
+            cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
+            # 更新materialInfo表
+            cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
+        # 更新materialInfo表price
+        cur.execute(("select * from materialInOut a,(select materialCode,operateTime from materialInOut where documentNumber='%s') b where a.operateTime>b.operateTime and a.materialCode=b.materialCode;") % documentNumber)
+        result = cur.fetchall()  # 如果记录为此物料最新记录，则查询结果为空
+        if not result:
+            cur.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
+            # cur.execute(("select materialCode,price from materialInOut,(select a.materialCode as mCode,max(a.operateTime) as latest from materialInOut a,(select materialCode from materialInOut where documentNumber='%s') b where a.materialCode=b.materialCode) m where materialCode=m.mCode and operateTime=m.latest;") % documentNumber)
+            cur.execute(("select materialInOut.price from materialInOut,(select materialCode,max(operateTime) as latest from materialInOut where materialCode='%s') m where materialInOut.materialCode=m.materialCode and operateTime=m.latest;") % materialCode)
+            price = cur.fetchall()
+            cur.execute("update materialInfo set price='%f' where materialCode='%s';" % (price[0][0], materialCode))
+        else:
+            cur.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
         return True
         conn.close()
-    except:
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
         conn.rollback()
 
 

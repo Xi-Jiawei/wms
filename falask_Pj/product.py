@@ -18,7 +18,20 @@ def show_products():
     if session.get('username'):
         username = session['username']
         authority = select_user_authority(username)
-        products = select_all_products()
+        result = select_all_products()
+        products=[]
+        for i in result:
+            product=[]
+            products.append(product)
+            product.append(i[0])
+            product.append(i[1])
+            product.append(i[2])
+            product.append(i[3])
+            product.append(i[4])
+            product.append(i[5])
+            product.append(i[6])
+            product.append(i[7].strftime('%Y-%m-%d %H:%M:%S.%f')[0:21])
+            product.append(i[8])
         return render_template('products_show.html', authority=authority[1], products=products, username=username)
     else:
         return render_template('access_fail.html')
@@ -346,6 +359,7 @@ def search_material():
         data = request.get_json()
         filterStr = data['filterStr']  # 不要写成productCode=request.data["productcode"]
         if filterStr:
+            print(filterStr)
             time.sleep(0.1)
             materials=select_materialInfoByFilter(filterStr)
             return jsonify({'ok': True, 'materials': materials})
