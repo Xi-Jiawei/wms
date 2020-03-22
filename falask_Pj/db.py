@@ -943,6 +943,8 @@ def update_materialInfo(materialCode, materialName, materialType, operateNum, pr
     try:
         # 执行SQL语句
         cur.execute(sql)
+        # 更新余库存金额
+        cur.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
@@ -1105,6 +1107,8 @@ def update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, sup
                 cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((-operateNum+beforeOperateNum), (-operateNum*price+beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
                 # 插入materialInOut表
                 cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum+beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
+            # 更新余库存金额
+            cur.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
@@ -1168,6 +1172,8 @@ def delete_materialInOutByDocNum(documentNumber):
                 cur.execute("update materialInfo set price='%f' where materialCode='%s';" % (price[0][0], materialCode))
         else:
             cur.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
+        # 更新余库存金额
+        cur.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
