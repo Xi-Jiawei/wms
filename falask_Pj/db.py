@@ -4,208 +4,60 @@ import pymysql
 import uuid
 from datetime import datetime
 
-conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
-cur = conn.cursor()
-class dbHelper:
-    def __init__(self):
-        self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
-
-    def connect(self):
-        self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
-
-    def query(self, sql):
-        try:
-            cursor = self.conn.cursor()
-            cursor.execute(sql)
-        except pymysql.OperationalError:
-            self.connect()
-            cursor = self.conn.cursor()
-            cursor.execute(sql)
-        return cursor
-db = dbHelper()
-
-# xijiawei
 # 同步锁
 lock=threading.Lock()
 
-# def select(table, conf):
-#     sql = 'select * from ' + table + ' where 1 = 1'
-#     for item in conf:
-#         sql += item
-#     print(sql)
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     return result
+conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
+cur = conn.cursor()
+# class dbHelper:
+#     def __init__(self):
+#         self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
 #
-# # 登录
-# def loginCheck(name, pwd):
-#     sql = "select * from authority where username='%s' and password='%s'" % (name, pwd)
-#     conn.ping(reconnect=True)
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     if (len(result)) == 0:
-#         return False
-#     else:
-#         return True
-#     conn.close()
+#     def connect(self):
+#         self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
 #
-# # 登录查询返回用户类型
-# def login_Authority(username):
-#     conn.ping(reconnect=True)
-#     sql = "select authority from authority where username='%s'" % (username)
-#     # sql = "select authority from  authority where username='"+id+"';"
-#     cur.execute(sql)
-#     result = cur.fetchone()
-#     if result != None:
-#         for record in result:
-#             return record
-#     conn.close()
-#
-# # 登录查询返回用户密码
-# def select_pwd(name):
-#     sql = "select password from  passwd where accountingid='%s'" % (name)
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     for record in result:
-#         return record
-#     conn.close()
-#
-#
-# # 修改用户密码
-# def update_pwd(name, pwd):
-#     sql = "update passwd set password= '%s'  where accountingid='%s'" % (pwd, name)
-#     try:
-#         # 执行SQL语句
-#         cur.execute(sql)
-#         # 提交到数据库执行
-#         conn.commit()
-#         print("语句已经提交")
-#     except:
-#         conn.rollback()
-#
-#     conn.close()
-#
-#
-# # lh 管理员 增加用户
-# def db_add_account(id, name, pwd, gender, email, tel, introduce, ruletype):
-#
-#     sql_account = "insert into account value ('%s','%s','%s','%s','%s','%s' ) " % (id, name, gender, email,tel,introduce)
-#     sql_pwd = "insert into passwd value ('%s','%s',%s)" % (id, pwd, ruletype)
-#     print(sql_account + " " + sql_pwd)
-#         # 执行SQL语句
-#     try:
-#         cur.execute(sql_account)
-#         cur.execute(sql_pwd)
-#         # 提交到数据库执行
-#         conn.commit()
-#         conn.close()
-#     except:
-#         conn.rollback()
-#
-# # lh 管理员 查看全部人员返回所有结果
-# def show_allacount():
-#     sql = "select * from  account "
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     # for record in result:
-#     return result
-#     conn.close()
-#
-# # cc 管理员_人员管理_查看人员
-# def show_allperson():
-#     sql = "select * from authority;"
-#     # print(sql)
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     return result
-#     conn.close()
-#
-# # cc 管理员增加人员
-# def cc_add_account(name, pwd, power):
-#     sql_account = "insert into authority (username,password,authority) values ('%s','%s','%s');" % (name, pwd, power)
-#     print(sql_account)
-#     # 执行SQL语句
-#     try:
-#         cur.execute(sql_account)
-#         # 提交到数据库执行
-#         conn.commit()
-#         result = cur.fetchall()
-#         return result
-#         conn.close()
-#     except Exception as e:
-#         print(e)
-#         conn.rollback()
-#
-# # cc 管理员增加人员
-# def cc_findname():
-#     sql_find = 'select userid,username from authority;'
-#     # 执行SQL语句
-#     try:
-#         cur.execute(sql_find)
-#         # 提交到数据库执行
-#         conn.commit()
-#         result = cur.fetchall()
-#         return result
-#         conn.close()
-#     except Exception as e:
-#         print(e)
-#         conn.rollback()
-#
-# # cc 管理员删除人员
-# def cc_deletename(id):
-#     sql_delete = 'DELETE FROM authority WHERE userid = ' + id
-#     print(sql_delete)
-#     # 执行SQL语句
-#     try:
-#         cur.execute(sql_delete)
-#         # 提交到数据库执行
-#         conn.commit()
-#         result = cur.fetchall()
-#         return result
-#         conn.close()
-#     except Exception as e:
-#         print(e)
-#         conn.rollback()
-#
-# # cc 修改人员权限
-# def cc_changeAuthority(id,authority):
-#     sql_change = 'UPDATE authority SET authority = \'' + authority + '\' WHERE userid ='+ id
-#     # print(sql_change)
-#     # 执行SQL语句
-#     try:
-#         cur.execute(sql_change)
-#         # 提交到数据库执行
-#         conn.commit()
-#         result = cur.fetchall()
-#         return result
-#         conn.close()
-#     except Exception as e:
-#         print(e)
-#         conn.rollback()
-#
-# # cc 查询密码
-# def select_pass(name):
-#     sql = "select password from authority where username='%s'" % (name)
-#     conn.ping(reconnect=True)
-#     cur.execute(sql)
-#     result = cur.fetchall()
-#     for record in result:
-#         return record
-#     conn.close()
-#
-# # cc 修改用户密码
-# def update_pass(name, pwd):
-#     sql = "update authority set password= '%s'  where username='%s'" % (pwd, name)
-#     print(sql)
-#     try:
-#         # 执行SQL语句
-#         cur.execute(sql)
-#         # 提交到数据库执行
-#         conn.commit()
-#         # print("语句已经提交")
-#     except:
-#         conn.rollback()
-#     conn.close()
+#     def query(self, sql):
+#         try:
+#             cursor = self.conn.cursor()
+#             cursor.execute(sql)
+#         except pymysql.OperationalError:
+#             self.connect()
+#             cursor = self.conn.cursor()
+#             cursor.execute(sql)
+#         return cursor
+# db = dbHelper()
+
+# xijiawei
+class dbHelper(object):
+    def __init__(self, host=None, port=None, user=None, passwd=None, db=None, charset=None):
+        self.pool = {}
+        self.host = host
+        self.port = port
+        self.user = user
+        self.passwd = passwd
+        self.db = db
+        self.charset = charset
+
+    def conn(self, ):
+        name = threading.current_thread().name
+        if name not in self.pool:
+            conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.db, charset=self.charset)
+            self.pool[name] = conn
+        return self.pool[name]
+db = dbHelper(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
+
+class MyThread:
+    def __init__(self, target, args):
+        threading.Thread.__init__(self)
+        self.target = target
+        self.args = args
+        self.result = self.target(*self.args)
+
+    def get_result(self):
+        try:
+            return self.result
+        except Exception:
+            return None
 
 # xijiawei
 # 管理员_人员管理_查看人员
@@ -648,36 +500,44 @@ def delete_otherCosts(productCode):
 # xijiawei
 # 检查物料组成表
 def check_materialsOfProduct(productCode,materialCode):
+    conn=db.conn()
+    cursor=conn.cursor()
     sql = "select * from materialsOfProduct where productCode= '%s' and materialCode='%s';"% (productCode,materialCode)
-    curor = db.query(sql)
-    result = curor.fetchall()
+    cursor.execute(sql)
+    result = cursor.fetchall()
     return result
     conn.close()
 
 # xijiawei
 # 根据成品编码检查成品表
 def check_productInfoByCode(productCode):
+    conn=db.conn()
+    cursor=conn.cursor()
     sql = "select * from productInfo where productCode= '%s';"% (productCode)
-    curor = db.query(sql)
-    result = curor.fetchall()
+    cursor.execute(sql)
+    result = cursor.fetchall()
     return result
     conn.close()
 
 # xijiawei
 # 根据成品型号检查成品表
 def check_productInfoByType(productType):
+    conn=db.conn()
+    cursor=conn.cursor()
     sql = "select * from productInfo where productType= '%s';"% (productType)
-    curor = db.query(sql)
-    result = curor.fetchall()
+    cursor.execute(sql)
+    result = cursor.fetchall()
     return result
     conn.close()
 
 # xijiawei
 # 检查物料表
 def check_materialInfo(materialCode):
+    conn=db.conn()
+    cursor=conn.cursor()
     sql = "select * from materialInfo where materialCode= '%s';"% (materialCode)
-    curor=db.query(sql)
-    result = curor.fetchall()
+    cursor.execute(sql)
+    result = cursor.fetchall()
     return result
     conn.close()
 
@@ -837,9 +697,11 @@ def select_sum_materials():
 # xijiawei
 # 根据物料编码查询物料信息
 def select_materialInfoByCode(materialCode):
+    conn=db.conn()
+    cursor=conn.cursor()
     try:
         sql = "select materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier from materialInfo where materialCode='%s';" % materialCode
-        cursor = db.query(sql)
+        cursor.execute(sql)
         result = cursor.fetchall()
         return result
     # except:
@@ -887,21 +749,91 @@ def select_materialInfoForOptions(filterStr):
 
 # xijiawei
 # 模糊查询物料信息
+# def select_materialInfoByFilter(filterStr):
+#     try:
+#         # sql = "select materialCode,materialName,materialType from materialInfo where concat(materialCode,materialName,materialType) like '%%%s%%';"%(filterStr)
+#         # cur.execute(sql)
+#         cursor=db.query("select materialCode,materialCode from materialInfo where materialCode like '%%%s%%';" % (filterStr))
+#         result = cursor.fetchall()
+#         if result:
+#             print(result[0][0])
+#             return result
+#         cursor = db.query("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
+#         result = cursor.fetchall()
+#         if result:
+#             print(result[0][0])
+#             return result
+#         cursor = db.query("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
+#         result = cursor.fetchall()
+#         if result:
+#             print(result[0][0])
+#             return result
+#         return None
+#     # except:
+#     #     conn.rollback()
+#     except Exception as e:
+#         print("数据库操作异常：",e)
+#         conn.rollback()
+
+# xijiawei
+# 模糊查询物料信息
+# def select_materialInfoByFilter(filterStr):
+#     thread=threading.Thread(target=select_materialInfoByFilterThread,args=(filterStr))
+#     try:
+#         thread.start()
+#     except Exception as e:
+#         print("线程异常：",e)
+#
+# def select_materialInfoByFilterThread(filterStr):
+#     conn=db.conn()
+#     cursor=conn.cursor()
+#     try:
+#         # sql = "select materialCode,materialName,materialType from materialInfo where concat(materialCode,materialName,materialType) like '%%%s%%';"%(filterStr)
+#         # cur.execute(sql)
+#         cursor.execute("select materialCode,materialCode from materialInfo where materialCode like '%%%s%%';" % (filterStr))
+#         result = cursor.fetchall()
+#         if result:
+#             print(result[0][0])
+#             return result
+#         cursor.execute("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
+#         result = cursor.fetchall()
+#         if result:
+#             print(result[0][0])
+#             return result
+#         cursor.execute("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
+#         result = cursor.fetchall()
+#         if result:
+#             print(result[0][0])
+#             return result
+#         return None
+#     # except:
+#     #     conn.rollback()
+#     except Exception as e:
+#         print("数据库操作异常：",e)
+#         conn.rollback()
+
+# xijiawei
+# 模糊查询物料信息
 def select_materialInfoByFilter(filterStr):
+    conn=db.conn()
+    cursor=conn.cursor()
     try:
         # sql = "select materialCode,materialName,materialType from materialInfo where concat(materialCode,materialName,materialType) like '%%%s%%';"%(filterStr)
         # cur.execute(sql)
-        cursor=db.query("select materialCode,materialCode from materialInfo where materialCode like '%%%s%%';" % (filterStr))
+        cursor.execute("select materialCode,materialCode from materialInfo where materialCode like '%%%s%%';" % (filterStr))
         result = cursor.fetchall()
         if result:
+            print(result[0][0])
             return result
-        cursor = db.query("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
+        cursor.execute("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
         result = cursor.fetchall()
         if result:
+            print(result[0][0])
             return result
-        cursor = db.query("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
+        cursor.execute("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
         result = cursor.fetchall()
         if result:
+            print(result[0][0])
             return result
         return None
     # except:

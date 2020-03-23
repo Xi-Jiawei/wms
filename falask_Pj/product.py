@@ -70,7 +70,11 @@ def add_product():
                 entryTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
                 # entryClerk = data['entryClerk']
                 entryClerk=username
-                if not check_productInfoByCode(productCode) and not check_productInfoByType(productType):
+                thread=MyThread(target=check_productInfoByCode,args=(productCode,))
+                product1=thread.get_result()
+                thread=MyThread(target=check_productInfoByType,args=(productType,))
+                product2=thread.get_result()
+                if not product1 and not product2:
                     print("数据库中不存在此成品。")
                     if authority[1] == '4':
                         insert_productInfoInPart(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk)
@@ -289,8 +293,12 @@ def check_uniqueness():
         data = request.get_json()
         materialCode = data['materialCode']  # 不要写成productCode=request.data["productcode"]
         if materialCode:
-            if check_materialInfo(materialCode):
-                material=select_materialInfoByCode(materialCode)
+            thread=MyThread(target=check_materialInfo,args=(materialCode,))
+            temp=thread.get_result()
+            if temp:
+                # material=select_materialInfoByCode(materialCode)
+                thread=MyThread(target=select_materialInfoByCode,args=(materialCode,))
+                material=thread.get_result()
                 return jsonify({'ok': True,'material':material})
             else:
                 return jsonify({'ok': True,'material':None})
@@ -365,7 +373,9 @@ def search_material():
         if filterStr:
             print(filterStr)
             time.sleep(0.1)
-            materials=select_materialInfoByFilter(filterStr)
+            # materials=select_materialInfoByFilter(filterStr)
+            thread = MyThread(target=select_materialInfoByFilter,args=(filterStr,))
+            materials=thread.get_result()
             return jsonify({'ok': True, 'materials': materials})
         else:
             return jsonify({'ok': True, 'materials': None})
