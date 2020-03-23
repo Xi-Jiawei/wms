@@ -46,7 +46,7 @@ class dbHelper(object):
         return self.pool[name]
 db = dbHelper(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
 
-class MyThread:
+class myThread:
     def __init__(self, target, args):
         threading.Thread.__init__(self)
         self.target = target
