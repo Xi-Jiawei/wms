@@ -43,6 +43,8 @@ class dbHelper(object):
         if name not in self.pool:
             conn = pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.db, charset=self.charset)
             self.pool[name] = conn
+        if self.pool[name]._closed:
+            self.pool[name]=pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.db, charset=self.charset)
         return self.pool[name]
 db = dbHelper(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
 
@@ -505,8 +507,8 @@ def check_materialsOfProduct(productCode,materialCode):
     sql = "select * from materialsOfProduct where productCode= '%s' and materialCode='%s';"% (productCode,materialCode)
     cursor.execute(sql)
     result = cursor.fetchall()
-    return result
     conn.close()
+    return result
 
 # xijiawei
 # 根据成品编码检查成品表
@@ -516,8 +518,8 @@ def check_productInfoByCode(productCode):
     sql = "select * from productInfo where productCode= '%s';"% (productCode)
     cursor.execute(sql)
     result = cursor.fetchall()
-    return result
     conn.close()
+    return result
 
 # xijiawei
 # 根据成品型号检查成品表
@@ -527,8 +529,8 @@ def check_productInfoByType(productType):
     sql = "select * from productInfo where productType= '%s';"% (productType)
     cursor.execute(sql)
     result = cursor.fetchall()
-    return result
     conn.close()
+    return result
 
 # xijiawei
 # 检查物料表
@@ -538,8 +540,8 @@ def check_materialInfo(materialCode):
     sql = "select * from materialInfo where materialCode= '%s';"% (materialCode)
     cursor.execute(sql)
     result = cursor.fetchall()
-    return result
     conn.close()
+    return result
 
 # xijiawei
 # 查询所有采购
@@ -703,6 +705,7 @@ def select_materialInfoByCode(materialCode):
         sql = "select materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier from materialInfo where materialCode='%s';" % materialCode
         cursor.execute(sql)
         result = cursor.fetchall()
+        conn.close()
         return result
     # except:
     #     conn.rollback()
@@ -824,16 +827,19 @@ def select_materialInfoByFilter(filterStr):
         result = cursor.fetchall()
         if result:
             print(result[0][0])
+            conn.close()
             return result
         cursor.execute("select materialCode,materialName from materialInfo where materialName like '%%%s%%';" % (filterStr))
         result = cursor.fetchall()
         if result:
             print(result[0][0])
+            conn.close()
             return result
         cursor.execute("select materialCode,materialType from materialInfo where materialType like '%%%s%%';" % (filterStr))
         result = cursor.fetchall()
         if result:
             print(result[0][0])
+            conn.close()
             return result
         return None
     # except:
@@ -1115,118 +1121,4 @@ def delete_materialInOutByDocNum(documentNumber):
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
-        conn.rollback()
-
-
-# lh1  查看物料
-def dao_show_material(materialCode, materialName, materialType, materialFactory):
-
-    sql = 'select t1.materialCode,t1.materialName,t1.type,t1.department,t2.afterAmount,t2.afterMoney,' \
-          't1.supplierFactory,t2.isInOrOut,t1.price,t2.amount,t2.totalPrice,t2.documentNumber,t2.time,t2.username' \
-          ' from materialOfInfo as t1 LEFT JOIN  materialOfInOut as t2  on t1.materialCode = t2.materialCode where 1=1 '
-    if materialCode != '':
-        sql += ' and t1.materialCode = \'' + materialCode + '\''
-    if materialName != '':
-        sql += ' and t1.materialName = \'' + materialName + '\''
-    if materialType != '':
-        sql += ' and t1.type = \'' + materialType + '\''
-    if materialFactory != '':
-        sql += ' and t1.supplierFactory =\'' + materialFactory + '\''
-    print(sql)
-    cur.execute(sql)
-    result = cur.fetchall()
-    return result
-    conn.close()
-
-# lh1  查看物料物料静态表
-def dao_show_materialinfo():
-    conf = []
-    result = select('materialOfInfo',conf)
-    conn.ping(reconnect=True)
-    return result
-    conn.close()
-
-# lh1  查看物料出入库信息
-def dao_show_materialoutin():
-    conf = []
-    result = select('materialOfInOut',conf)
-    return result
-    conn.close()
-
-# lh1  点击物料自动补全
-def dao_show_materialoutorin(materialCode):
-    conf = []
-    if materialCode != '':
-        conf.append(' and materialCode = \'' + materialCode + '\'')
-    result = select('materialOfInfo',conf)
-    return result
-    conn.close()
-
-# lh1  出库物料1
-def dao_material_out(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,username):
-    # sql = "delete from materialOfInfo where materialName = '%s' "%( materialName )
-    # print("sql语句: "+sql)
-    # 更新余库存
-    sql3 = " update materialOfInfo set remainderAmount = remainderAmount - '%d',remainderMoney = remainderMoney + '%lf'   where materialCode = '%s'" % (int(mNum), float(m_price) * int(mNum), materialCode)
-    sql4 = "select * from materialOfInfo where materialCode = '%s' " % (materialCode)
-
-    try:
-        cur.execute(sql3)
-        cur.execute(sql4)
-        result = cur.fetchall()
-        sql2 = "insert into materialOfInOut(username,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
-               " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',1,'%s','%d','%lf')" % \
-               (username, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
-                float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
-        cur.execute(sql2)
-        conn.commit()
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-# lh1  入库物料0
-def dao_material_in(materialCode, materialName, materialType, m_price,materialFactory,mNum,mDepartment,mDcNum,materialTime,username):
-    sql = "insert into materialOfInfo(materialCode,materialName,type,department,price,supplierFactory) " \
-          "values('%s','%s','%s' ,'%s', '%lf', '%s')" % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory)
-    #更新静态表余库存
-    sql3 = " update materialOfInfo set remainderAmount = remainderAmount + '%d',remainderMoney = remainderMoney + '%lf'   where materialName = '%s'" % (int(mNum), float(m_price) * int(mNum), materialName)
-    sql4 = "select * from materialOfInfo where materialCode = '%s' " % (materialCode)
-    res = cur.execute(sql4)
-
-    try:
-        if(res == 0):
-            cur.execute(sql)
-        cur.execute(sql3)
-        cur.execute(sql4)
-        result = cur.fetchall()
-        if result:
-            sql2 = "insert into materialOfInOut(username,materialCode,materialName,type,amount,department,price,totalprice,documentNumber,supplierFactory, isInOrOut,time,afterAmount,afterMoney)" \
-               " values('%s','%s','%s','%s', '%d','%s','%lf','%s','%s','%s',0,'%s','%d','%lf')" % \
-               (username, materialCode, materialName, materialType, int(mNum), mDepartment, float(m_price),
-                float(m_price) * int(mNum), mDcNum, materialFactory, materialTime, result[0][5], result[0][6])
-            cur.execute(sql2)
-        conn.commit()
-        return True
-        conn.close()
-    except:
-        conn.rollback()
-
-
-# lh1  修改物料
-def dao_material_edit(materialCode, materialName, materialType, mDepartment,m_price,materialFactory,mCode):
-    sql = "update materialOfInfo " \
-          "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialCode='%s'" \
-          % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory,mCode)
-    sql2 = "update materialOfInOut " \
-          "set materialCode='%s',materialName='%s',type='%s',department ='%s', price ='%lf',supplierFactory='%s' where materialCode='%s'" \
-          % (materialCode, materialName, materialType, mDepartment, float(m_price), materialFactory, mCode)
-    # print("sql语句: "+sql)
-    try:
-        cur.execute(sql)
-        cur.execute(sql2)
-        conn.commit()
-        return True
-        conn.close()
-    except:
         conn.rollback()
