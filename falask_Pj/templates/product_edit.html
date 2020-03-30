@@ -523,13 +523,13 @@
                                                         {% for i in materialsOfProduct %}
                                                             <tr class='tr_i'>
                                                                 <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
-                                                                <td><input type='text' style='width:100px' class='materialCode' list="materialCodeList"
+                                                                <td><input type='text' style='width:150px' class='materialCode' list="materialCodeList"
                                                                            value='{{ i[0] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialName'
+                                                                <td><input type='text' style='width:150px' class='materialName'
                                                                            value='{{ i[1] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialType'
+                                                                <td><input type='text' style='width:150px' class='materialType'
                                                                            value='{{ i[2] }}'
                                                                 /></td>
                                                                 <td><input type='text' style='width:100px' class='materialsOfProduct'
@@ -596,13 +596,13 @@
                                                         {% for i in materialsOfProduct %}
                                                             <tr class='tr_i'>
                                                                 <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
-                                                                <td><input type='text' style='width:100px' class='materialCode' list="materialCodeList"
+                                                                <td><input type='text' style='width:150px' class='materialCode' list="materialCodeList"
                                                                            value='{{ i[0] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialName'
+                                                                <td><input type='text' style='width:150px' class='materialName'
                                                                            value='{{ i[1] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialType'
+                                                                <td><input type='text' style='width:150px' class='materialType'
                                                                            value='{{ i[2] }}'
                                                                 /></td>
                                                                 <td><input type='text' style='width:100px' class='materialsOfProduct'
@@ -1097,13 +1097,13 @@
                     alert("请输入费用！");
                     return;
                 }
-                otherCostsArr[i][0]=tdArr.eq(2).find("input").val();//项目名称
-                otherCostsArr[i][1]=parseInt(tdArr.eq(3).find("input").val());//加工费
-                otherCostsArr[i][2]=tdArr.eq(4).find("input").val();//项目名称
+                otherCostsArr[i][0] = tdArr.eq(2).find("input").val();//项目名称
+                otherCostsArr[i][1] = parseFloat(tdArr.eq(3).find("input").val());//加工费
+                otherCostsArr[i][2] = tdArr.eq(4).find("input").val();//项目名称
                 otherCostsArr[i][3] = parseFloat(tdArr.eq(5).find("input").val());//管理费
-                otherCostsArr[i][4]=tdArr.eq(6).find("input").val();//项目名称
-                otherCostsArr[i][5]=parseInt(tdArr.eq(7).find("input").val());//辅料费
-                otherCostsArr[i][6]=tdArr.eq(8).find("input").val();//项目名称
+                otherCostsArr[i][4] = tdArr.eq(6).find("input").val();//项目名称
+                otherCostsArr[i][5] = parseFloat(tdArr.eq(7).find("input").val());//辅料费
+                otherCostsArr[i][6] = tdArr.eq(8).find("input").val();//项目名称
                 otherCostsArr[i][7] = parseFloat(tdArr.eq(9).find("input").val());//运营费
             }
             console.log("otherCostsArr: ");
@@ -1217,9 +1217,9 @@
             rowNum++;
             var rowTemplate = "<tr class='tr_" + rowNum + "'>\n" +
                 "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
-                "<td><input type='text' style='width:100px' class='materialCode' list='materialCodeList'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialName'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialType'/></td>" +
+                "<td><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/></td>" +
+                "<td><input type='text' style='width:150px' class='materialName'/></td>" +
+                "<td><input type='text' style='width:150px' class='materialType'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
                 "<td style='width:100px;display: none'><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
@@ -1233,9 +1233,9 @@
             rowNum++;
             var rowTemplate = "<tr class='tr_" + rowNum + "'>\n" +
                 "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
-                "<td><input type='text' style='width:100px' class='materialCode' list='materialCodeList'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialName'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialType'/></td>" +
+                "<td><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/></td>" +
+                "<td><input type='text' style='width:150px' class='materialName'/></td>" +
+                "<td><input type='text' style='width:150px' class='materialType'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
@@ -1473,9 +1473,9 @@
         for (var i=0;i<trList.length;i++) {
             var tdArr = trList.eq(i).find("td");
 
-            var materialNum = parseFloat(tdArr.eq(4).find("input").val());//物料数量
+            var materialNum = parseInt(tdArr.eq(4).find("input").val());//物料数量
             var materialPrice = parseFloat(tdArr.eq(5).find("input").val());//物料单价
-            var patchPoint = parseFloat(tdArr.eq(6).find("input").val());//贴片点数
+            var patchPoint = parseInt(tdArr.eq(6).find("input").val());//贴片点数
             var patchPrice = parseFloat(tdArr.eq(7).find("input").val());//贴片单价
 
             console.log(materialNum);
@@ -1626,7 +1626,7 @@
         console.log($(this).parent().parent().prevAll().length);//input -> td -> tr，$(this).parent().parent().prevAll().length获取当前行数，$(this).parent().prevAll().length获取当前列数
 
         var tdArr=$(this).parent().parent().find("td");
-        $(this).parent().html('<input type="text" style="width:100px" class="materialCode" list="materialCodeList" value="'+$(this).val()+'">');
+        $(this).parent().html('<input type="text" style="width:150px" class="materialCode" list="materialCodeList" value="'+$(this).val()+'">');
         console.log(tdArr);
 
         if($(this).val()=="")return;
