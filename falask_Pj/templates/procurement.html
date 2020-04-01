@@ -479,31 +479,60 @@
         }
 
         if(result['materials']) {
-            rowTemplate = "<tr><td rowspan=" + result['materials'].length + ">汇总</td>\n" +
-                "<td rowspan=" + result['materials'].length + ">" + productCodeStr + "</td>\n" +
-                "<td rowspan=" + result['materials'].length + ">" + productTypeStr + "</td>\n" +
-                "<td rowspan=" + result['materials'].length + ">" + productNumStr + "</td>\n" +
-                "<td>" + result['materials'][0][0] + "</td>\n" +
-                "<td>" + result['materials'][0][1] + "</td>\n" +
-                "<td>" + result['materials'][0][2] + "</td>\n" +
-                "<td>" + result['materials'][0][3] + "</td>\n" +
-                "<td>" + result['materials'][0][4] + "</td>\n" +
-                "<td>" + result['materials'][0][5] + "</td>\n" +
-                "<td>" + result['materials'][0][5] + "</td>\n" +
-                "<td>" + result['materials'][0][6] + "</td>\n" +
-                "<td>" + result['materials'][0][7] + "</td>\n" +
-                "<td rowspan=" + result['materials'].length + "></td></tr>";
+            if(result['materials'][0][6]<0) {
+                rowTemplate = "<tr><td rowspan=" + result['materials'].length + ">汇总</td>\n" +
+                    "<td rowspan=" + result['materials'].length + ">" + productCodeStr + "</td>\n" +
+                    "<td rowspan=" + result['materials'].length + ">" + productTypeStr + "</td>\n" +
+                    "<td rowspan=" + result['materials'].length + ">" + productNumStr + "</td>\n" +
+                    "<td>" + result['materials'][0][0] + "</td>\n" +
+                    "<td>" + result['materials'][0][1] + "</td>\n" +
+                    "<td>" + result['materials'][0][2] + "</td>\n" +
+                    "<td>" + result['materials'][0][3] + "</td>\n" +
+                    "<td>" + result['materials'][0][4] + "</td>\n" +
+                    "<td>" + result['materials'][0][5] + "</td>\n" +
+                    "<td>" + result['materials'][0][6] + "</td>\n" +
+                    "<td>" + (-result['materials'][0][6]) + "</td>\n" +
+                    "<td>" + result['materials'][0][7] + "</td>\n" +
+                    "<td rowspan=" + result['materials'].length + "></td></tr>";
+            }else {
+                rowTemplate = "<tr><td rowspan=" + result['materials'].length + ">汇总</td>\n" +
+                    "<td rowspan=" + result['materials'].length + ">" + productCodeStr + "</td>\n" +
+                    "<td rowspan=" + result['materials'].length + ">" + productTypeStr + "</td>\n" +
+                    "<td rowspan=" + result['materials'].length + ">" + productNumStr + "</td>\n" +
+                    "<td>" + result['materials'][0][0] + "</td>\n" +
+                    "<td>" + result['materials'][0][1] + "</td>\n" +
+                    "<td>" + result['materials'][0][2] + "</td>\n" +
+                    "<td>" + result['materials'][0][3] + "</td>\n" +
+                    "<td>" + result['materials'][0][4] + "</td>\n" +
+                    "<td>" + result['materials'][0][5] + "</td>\n" +
+                    "<td>" + result['materials'][0][6] + "</td>\n" +
+                    "<td>-</td>\n" +
+                    "<td>" + result['materials'][0][7] + "</td>\n" +
+                    "<td rowspan=" + result['materials'].length + "></td></tr>";
+            }
             tableHtml += rowTemplate;
             for (var i = 1; i < result['materials'].length; i++) {
-                rowTemplate = "<tr><td>" + result['materials'][i][0] + "</td>\n" +
-                    "<td>" + result['materials'][i][1] + "</td>\n" +
-                    "<td>" + result['materials'][i][2] + "</td>\n" +
-                    "<td>" + result['materials'][i][3] + "</td>\n" +
-                    "<td>" + result['materials'][i][4] + "</td>\n" +
-                    "<td>" + result['materials'][i][5] + "</td>\n" +
-                    "<td>" + result['materials'][i][5] + "</td>\n" +
-                    "<td>" + result['materials'][i][6] + "</td>\n" +
-                    "<td>" + result['materials'][i][7] + "</td></tr>";
+                if(result['materials'][i][6]<0) {
+                    rowTemplate = "<tr><td>" + result['materials'][i][0] + "</td>\n" +
+                        "<td>" + result['materials'][i][1] + "</td>\n" +
+                        "<td>" + result['materials'][i][2] + "</td>\n" +
+                        "<td>" + result['materials'][i][3] + "</td>\n" +
+                        "<td>" + result['materials'][i][4] + "</td>\n" +
+                        "<td>" + result['materials'][i][5] + "</td>\n" +
+                        "<td>" + result['materials'][i][6] + "</td>\n" +
+                        "<td>" + (-result['materials'][i][6]) + "</td>\n" +
+                        "<td>" + result['materials'][i][7] + "</td></tr>";
+                }else {
+                    rowTemplate = "<tr><td>" + result['materials'][i][0] + "</td>\n" +
+                        "<td>" + result['materials'][i][1] + "</td>\n" +
+                        "<td>" + result['materials'][i][2] + "</td>\n" +
+                        "<td>" + result['materials'][i][3] + "</td>\n" +
+                        "<td>" + result['materials'][i][4] + "</td>\n" +
+                        "<td>" + result['materials'][i][5] + "</td>\n" +
+                        "<td>" + result['materials'][i][6] + "</td>\n" +
+                        "<td>-</td>\n" +
+                        "<td>" + result['materials'][i][7] + "</td></tr>";
+                }
                 tableHtml += rowTemplate;
             }
         }

@@ -214,8 +214,8 @@
                                             <input type="text" id="price" name="price" class="form-control">
                                         </div>
                                         <div class="col-xs-12" style="position:absolute;bottom:0;left: 780px;width: 240px;">
-                                            <label class="control-label mb-1">单据号</label>
-                                            <input type="text" id="documentNumber" name="documentNumber" class="form-control">
+                                            <label class="control-label mb-1">单据日期</label>
+                                            <input type="date" id="documentTime" name="documentTime" class="form-control">
                                         </div>
                                     </div>
 
@@ -286,8 +286,8 @@
                                             <input type="text" id="price" name="price" class="form-control">
                                         </div>
                                         <div class="col-xs-12" style="position:absolute;bottom:0;left: 780px;width: 240px;">
-                                            <label class="control-label mb-1">单据号</label>
-                                            <input type="text" id="documentNumber" name="documentNumber" class="form-control">
+                                            <label class="control-label mb-1">单据日期</label>
+                                            <input type="date" id="documentTime" name="documentTime" class="form-control">
                                         </div>
                                     </div>
 
@@ -384,7 +384,7 @@
             'unit':$("#unit").val(),
             'price':$('#price').val(),
             'supplier':$('#supplier').val(),
-            'documentNumber':$('#documentNumber').val(),
+            'documentTime':$('#documentTime').val(),
             'isInOrOut':$('#isInOrOut').val()
         };
 
@@ -415,12 +415,13 @@
                             rows[i][7]=$('#supplier').val();
                             if($('#isInOrOut').val()=='0') {
                                 rows[i][3] = parseInt(rows[i][3]) + parseInt($('#operateNum').val());
-                                rows[i][6] = parseFloat(rows[i][6]) + parseInt($('#operateNum').val()) * parseFloat($('#price').val());
+                                //rows[i][6] = parseFloat(rows[i][6]) + parseInt($('#operateNum').val()) * parseFloat($('#price').val());
                             }
                             else if($('#isInOrOut').val()=='1') {
                                 rows[i][3] = parseInt(rows[i][3]) - parseInt($('#operateNum').val());
-                                rows[i][6] = parseFloat(rows[i][6]) - parseInt($('#operateNum').val()) * parseFloat($('#price').val());
+                                //rows[i][6] = parseFloat(rows[i][6]) - parseInt($('#operateNum').val()) * parseFloat($('#price').val());
                             }
+                            rows[i][6] = parseInt(rows[i][3]) * parseFloat($('#price').val());
                             rows[i][8]="<input type='checkbox' name='checkbox' value='checkbox' onclick='checkboxClick(\""+rows[i][0]+"\",\""+rows[i][1]+"\",\""+rows[i][2]+"\",\""+rows[i][4]+"\",\""+rows[i][5]+"\",\""+rows[i][7]+"\")'/>";
                         }
                     }
@@ -437,7 +438,7 @@
                     $('#unit').val("");
                     $('#price').val("");
                     $('#supplier').val("");
-                    $('#documentNumber').val("");
+                    $('#documentTime').val("");
                     $('#isInOrOut').val("-1");
                 }
             },

@@ -83,14 +83,16 @@ def material_inout():
             unit = data['unit']
             price = float(data['price'])
             supplier = data['supplier']
-            documentNumber = data['documentNumber']
             isInOrOut = int(data['isInOrOut'])
             if not (isInOrOut == 0 or isInOrOut == 1):
                 return jsonify({'ok': False})
             operateNum = int(data['operateNum'])
             nowTime = datetime.now()
             operateTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
-            insert_materialInOut(documentNumber, materialCode, isInOrOut, operateNum, unit, price, supplier, operateTime, username)
+            documentTime = data['documentTime']
+            documentNumber = datetime.now().strftime('%Y%m%d%H%M%S%f')  # 使用时间戳生成唯一代号
+            documentNumber = documentNumber[0:16]  # 使用时间戳生成唯一代号
+            insert_materialInOut(documentNumber, documentTime, materialCode, isInOrOut, operateNum, unit, price, supplier, operateTime, username)
             if isInOrOut==0:
                 update_materialInfo(materialCode, materialName, materialType, operateNum, price,unit,supplier)
             elif isInOrOut==1:
@@ -110,7 +112,11 @@ def material_inout_history():
         username = session['username']
         authority = select_user_authority(username)
         if request.method == "GET":
-            materialInOut = select_all_materialInOut()
+            # materialInOut = select_all_materialInOut()
+            result = select_all_materialInOut()
+            materialInOut=[]
+            for i in result:
+                materialInOut.append([i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11],i[12][0:21],i[13]])
             materialInOutSums = select_sum_materialInOut()
             mSumTitle=""
             mSumNum=""
@@ -124,7 +130,7 @@ def material_inout_history():
                     mSumTitle+="出库"
                     mSumNum = mSumNum + str(i[1])
                     mSumAmount = mSumAmount + str(i[2])
-            nowTime = datetime.now().strftime('%Y-%m-%dT%H:%M')
+            nowTime = datetime.now().strftime('%Y-%m-%d')
             return render_template('material_inout_history.html', authority=authority[0], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount], username=username,nowTime=nowTime)
         if request.method == "POST":
             data = request.get_json()
@@ -135,12 +141,13 @@ def material_inout_history():
             price = data['price']
             supplier = data['supplier']
             documentNumber = data['documentNumber']
+            documentTime=data['documentTime']
             operateTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             materialInfo=select_materialInfoByCode(materialCode)
             beforeInventoryNum=0
             if materialInfo:
                 beforeInventoryNum=materialInfo[0][3]
-            update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, supplier, operateTime, username, beforeInventoryNum)
+            update_materialInOut(documentNumber, documentTime, isInOrOut, operateNum, unit, price, supplier, operateTime, username, beforeInventoryNum)
             return jsonify({'ok': True,'beforeInventoryNum':beforeInventoryNum,'operateTime':operateTime[0:19],'operatorName':username})
     else:
         return render_template('access_fail.html')
@@ -157,7 +164,11 @@ def material_inout_history_search():
             data = request.get_json()
             startDate = data['startDate']
             endDate = data['endDate']
-            materials=select_all_materialInOutFilterByDate(startDate, endDate)
+            # materials=select_all_materialInOutFilterByDate(startDate, endDate)
+            result = select_all_materialInOutFilterByDate(startDate, endDate)
+            materials=[]
+            for i in result:
+                materials.append([i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11],i[12][0:21],i[13]])
             return jsonify({'materials': materials})
     else:
         return jsonify({'ok': False})

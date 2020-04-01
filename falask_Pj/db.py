@@ -596,9 +596,10 @@ def delete_procurementByCode(procurementCode, entryClerk):
             documentNumber=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
             # documentNumber=documentNumber[0:16] # 使用时间戳生成唯一代号
             documentNumber = procurementCode + documentNumber[10:16]  # 使用时间戳生成唯一代号
+            documentTime=datetime.now().strftime('%Y-%m-%d')
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             # insert_materialInOut(documentNumber, i[0], 0, i[1], i[2], i[3], i[4], entryTime, "系统账号")
-            insert_materialInOut(documentNumber, i[0], 0, i[1], i[2], i[3], i[4], entryTime, entryClerk)
+            insert_materialInOut(documentNumber, documentTime, i[0], 0, i[1], i[2], i[3], i[4], entryTime, entryClerk)
         # 更新materialInfo
         cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum+m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney+price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
         # 执行SQL语句
@@ -626,9 +627,10 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
             # documentNumber=uuid.uuid1() # 使用uuid生成唯一代号
             documentNumber=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
             documentNumber=procurementCode+documentNumber[10:16] # 使用时间戳生成唯一代号
+            documentTime=datetime.now().strftime('%Y-%m-%d')
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             # insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,"系统账号")
-            insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk)
+            insert_materialInOut(documentNumber,documentTime,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk)
         # 更新materialInfo
         cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum-m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney-price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
         # 提交到数据库执行
@@ -883,6 +885,9 @@ def update_materialInfo(materialCode, materialName, materialType, operateNum, pr
         cur.execute(sql)
         # 更新余库存金额
         cur.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
+        # 更新成品费用
+        cur.execute("update materialsOfProduct mOP,materialInfo m set materialPrice=m.price,materialCost=m.price*materialNum where mOP.materialCode='%s' and mOP.materialCode=m.materialCode;" % materialCode)
+        cur.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
@@ -912,7 +917,7 @@ def delete_materialByCode(materialCode):
 def select_all_materialInOut():
     try:
         # sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInfo.price,materialInOut.operateNum*materialInfo.price,materialInOut.supplier,materialInOut.documentNumber,materialInOut.operateTime,materialInOut.operatorName from materialInOut left join materialInfo on materialInOut.materialCode=materialInfo.materialCode;"
-        sql = "select m.materialCode,materialInfo.materialName,materialInfo.materialType,m.isInOrOut,m.beforeinventoryNum,m.operateNum,m.unit,m.price,round(m.operateNum*m.price,2),m.supplier,m.documentNumber,date_format(m.operateTime,'%Y-%m-%d %H:%i:%s'),m.operatorName from (select a.* from materialInOut a where 3>(select count(*) from materialInOut b where b.materialCode=a.materialCode and b.operateTime>a.operateTime)) m left join materialInfo on m.materialCode=materialInfo.materialCode order by m.materialCode,m.operateTime desc;"
+        sql = "select m.materialCode,materialInfo.materialName,materialInfo.materialType,m.isInOrOut,m.beforeinventoryNum,m.operateNum,m.unit,m.price,round(m.operateNum*m.price,2),m.supplier,m.documentNumber,date_format(m.documentTime,'%Y-%m-%d'),date_format(m.operateTime,'%Y-%m-%d %H:%i:%s.%f'),m.operatorName from (select a.* from materialInOut a where 3>(select count(*) from materialInOut b where b.materialCode=a.materialCode and b.operateTime>a.operateTime)) m left join materialInfo on m.materialCode=materialInfo.materialCode order by m.materialCode,m.operateTime desc;"
         cur.execute(sql)
         result = cur.fetchall()
         return result
@@ -938,7 +943,7 @@ def select_sum_materialInOut():
 # xijiawei
 # 根据时间段查询物料出入库记录
 def select_all_materialInOutFilterByDate(startDate,endDate):
-    sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInOut.price,round(materialInOut.operateNum*materialInOut.price,2),materialInOut.supplier,materialInOut.documentNumber,date_format(materialInOut.operateTime,'%%Y-%%m-%%d %%H:%%i:%%S'),materialInOut.operatorName from materialInOut, materialInfo where materialInOut.materialCode=materialInfo.materialCode and materialInOut.operateTime>='%s' and materialInOut.operateTime<='%s' order by materialInOut.materialCode,materialInOut.operateTime desc;"%(startDate,endDate)
+    sql = "select materialInOut.materialCode,materialInfo.materialName,materialInfo.materialType,materialInOut.isInOrOut,materialInOut.beforeinventoryNum,materialInOut.operateNum,materialInOut.unit,materialInOut.price,round(materialInOut.operateNum*materialInOut.price,2),materialInOut.supplier,materialInOut.documentNumber,date_format(materialInOut.documentTime,'%%Y-%%m-%%d'),date_format(materialInOut.operateTime,'%%Y-%%m-%%d %%H:%%i:%%S.%%f'),materialInOut.operatorName from materialInOut, materialInfo where materialInOut.materialCode=materialInfo.materialCode and materialInOut.documentTime>='%s' and materialInOut.documentTime<='%s' order by materialInOut.materialCode,materialInOut.operateTime desc;"%(startDate,endDate)
     print(sql)
     cur.execute(sql)
     result=cur.fetchall()
@@ -956,16 +961,16 @@ def select_materialInOutByCode(materialCode):
 
 # xijiawei
 # 插入物料出入库记录
-def insert_materialInOut(documentNumber,materialCode,isInOrOut,operateNum,unit,price,supplier,operateTime,operatorName):
+def insert_materialInOut(documentNumber,documentTime,materialCode,isInOrOut,operateNum,unit,price,supplier,operateTime,operatorName):
     try:
         cur.execute("select inventoryNum from materialInfo where materialCode='%s';"%(materialCode))
         result = cur.fetchall()
         if result:
-            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" \
-                  % (documentNumber, materialCode, isInOrOut, result[0][0], operateNum, unit, price, supplier, operateTime,operatorName)
+            sql = "insert into materialInOut (documentNumber,documentTime,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" \
+                  % (documentNumber, documentTime, materialCode, isInOrOut, result[0][0], operateNum, unit, price, supplier, operateTime,operatorName)
         else:
-            sql = "insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" \
-                  % (documentNumber, materialCode, isInOrOut, 0, operateNum, unit, price, supplier, operateTime,operatorName)
+            sql = "insert into materialInOut (documentNumber,documentTime,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" \
+                  % (documentNumber, documentTime, materialCode, isInOrOut, 0, operateNum, unit, price, supplier, operateTime,operatorName)
         # 执行SQL语句
         cur.execute(sql)
         # 提交到数据库执行
@@ -981,7 +986,7 @@ def insert_materialInOut(documentNumber,materialCode,isInOrOut,operateNum,unit,p
 
 # xijiawei
 # 更新物料出入库记录，更新相关物料出入库记录物料数量，并更新materialInfo表
-def update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, supplier, operateTime, operatorName, beforeInventoryNum):
+def update_materialInOut(documentNumber, documentTime, isInOrOut, operateNum, unit, price, supplier, operateTime, operatorName, beforeInventoryNum):
     try:
         # cur.execute("select materialCode,isInOrOut,operateNum,operateTime from materialInOut where documentNumber='%s';" % (documentNumber))
         # result = cur.fetchall()
@@ -1026,27 +1031,30 @@ def update_materialInOut(documentNumber, isInOrOut, operateNum, unit, price, sup
                 # 更新materialInfo表
                 cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((operateNum-beforeOperateNum), (operateNum*price-beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
                 # 插入materialInOut表
-                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum-beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
+                cur.execute("insert into materialInOut (documentNumber,documentTime,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, documentTime, materialCode, isInOrOut, beforeInventoryNum-beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
             elif beforeIsInOrOut==1 and isInOrOut==0:
                 cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (beforeOperateNum,materialCode,beforeOperateTime))
                 # 更新materialInfo表
                 cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((operateNum+beforeOperateNum), (operateNum*price+beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
                 # 插入materialInOut表
-                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum+beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
+                cur.execute("insert into materialInOut (documentNumber,documentTime,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, documentTime, materialCode, isInOrOut, beforeInventoryNum+beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
             elif beforeIsInOrOut==0 and isInOrOut==1:
                 cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (-beforeOperateNum,materialCode,beforeOperateTime))
                 # 更新materialInfo表
                 cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((-operateNum-beforeOperateNum), (-operateNum*price-beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
                 # 插入materialInOut表
-                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum-beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
+                cur.execute("insert into materialInOut (documentNumber,documentTime,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, documentTime, materialCode, isInOrOut, beforeInventoryNum-beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
             elif beforeIsInOrOut==1 and isInOrOut==1:
                 cur.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (beforeOperateNum,materialCode,beforeOperateTime))
                 # 更新materialInfo表
                 cur.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%f',unit='%s',price='%f',supplier='%s' where materialCode='%s';" % ((-operateNum+beforeOperateNum), (-operateNum*price+beforeOperateNum*beforePrice), unit, price, supplier, materialCode))
                 # 插入materialInOut表
-                cur.execute("insert into materialInOut (documentNumber,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, materialCode, isInOrOut, beforeInventoryNum+beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
+                cur.execute("insert into materialInOut (documentNumber,documentTime,materialCode,isInOrOut,beforeinventoryNum,operateNum,unit,price,supplier,operateTime,operatorName)value('%s','%s','%s','%d','%d','%d','%s','%f','%s','%s','%s');" % (documentNumber, documentTime, materialCode, isInOrOut, beforeInventoryNum+beforeOperateNum, operateNum, unit, price, supplier, operateTime, operatorName))
             # 更新余库存金额
             cur.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
+            # 更新成品费用
+            cur.execute("update materialsOfProduct mOP,materialInfo m set materialPrice=m.price,materialCost=m.price*materialNum where mOP.materialCode='%s' and mOP.materialCode=m.materialCode;" % materialCode)
+            cur.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
@@ -1112,6 +1120,9 @@ def delete_materialInOutByDocNum(documentNumber):
             cur.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
         # 更新余库存金额
         cur.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
+        # 更新成品费用
+        cur.execute("update materialsOfProduct mOP,materialInfo m set materialPrice=m.price,materialCost=m.price*materialNum where mOP.materialCode='%s' and mOP.materialCode=m.materialCode;" % materialCode)
+        cur.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
         # 提交到数据库执行
         conn.commit()
         print("语句已经提交")
