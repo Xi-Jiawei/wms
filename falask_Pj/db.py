@@ -189,7 +189,7 @@ def delete_userByID(userid):
 # xijiawei
 # 展示所有成品
 def select_all_products():
-    sql = "select productCode,productType,client,price,profit,totalCost,remark,entryTime,entryClerk from productInfo;"
+    sql = "select productCode,productType,client,price,profit,totalCost,remark,date_format(entryTime,'%Y-%m-%d %H:%i:%s.%f'),entryClerk from productInfo;"
     cur.execute(sql)
     result=cur.fetchall()
     return result
@@ -424,6 +424,25 @@ def update_productInfoInPart(productCode,productType,client,totalCost,materialCo
         return True
         conn.close()
     except:
+        conn.rollback()
+
+# xijiawei
+# 删除成品
+def copy_productInfo(productCode):
+    try:
+        # 执行SQL语句
+        cur.execute("insert into productInfo (productCode, productType, client, price, profit, totalCost, taxRate, materialCost, adminstrationCost, processCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk) select '新加产品' as productCode, productType, client, 0 as price, 0 as profit, 0 as totalCost, 1 as taxRate, materialCost, 0 as adminstrationCost, 0 as processCost, 0 as supplementaryCost, 0 as operatingCost, remark, entryTime, entryClerk from productInfo where productCode='%s'"%productCode)
+        cur.execute("insert into materialsOfProduct (productCode, materialCode, materialNum, materialPrice, materialCost, patchPoint, patchPrice, patchCost, remark) select '新加产品' as productCode, materialCode, materialNum, materialPrice, materialCost, patchPoint, patchPrice, patchCost, remark from materialsOfProduct where productCode='%s';"% productCode)
+        cur.execute("update productInfo set totalCost=materialCost where productCode='新加产品';")
+        # 提交到数据库执行
+        conn.commit()
+        print("语句已经提交")
+        return True
+        conn.close()
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("删除异常：",e)
         conn.rollback()
 
 # xijiawei

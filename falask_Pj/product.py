@@ -30,7 +30,7 @@ def show_products():
             product.append(i[4])
             product.append(i[5])
             product.append(i[6])
-            product.append(i[7].strftime('%Y-%m-%d %H:%M:%S.%f')[0:21])
+            product.append(i[7][0:21])
             product.append(i[8])
         return render_template('products_show.html', authority=authority[1], products=products, username=username)
     else:
@@ -249,13 +249,32 @@ def edit_product(productCode):
 
 # xijiawei
 # 删除成品
+@product_app.route('/copy_product', methods=['GET', 'POST'])
+def copy_product():
+    if request.method == "POST":
+        data = request.get_json()
+        productCode = data['productCode']  # 不要写成productCode=request.data["productcode"]
+        copy_productInfo(productCode)
+        result = select_all_products()
+        products = []
+        for i in result:
+            products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7][0:21], i[8]])
+        return jsonify({'ok': True,'products':products})
+    else:
+        return jsonify({'ok': False})
+
+# xijiawei
+# 删除成品
 @product_app.route('/delete_products', methods=['GET', 'POST'])
 def delete_products():
     if session.get('username'):
         username = session['username']
         authority = select_user_authority(username)
         form = ProductForm()
-        products = select_all_products()
+        result = select_all_products()
+        products = []
+        for i in result:
+            products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7][0:21], i[8]])
         if request.method == "POST":
             data = request.get_json()
             productCodeArr = data['productCodeArr']  # 不要写成productCode=request.data["productcode"]

@@ -103,18 +103,40 @@
                             <div class="card-header">
                                 <strong class="card-title">所有成品信息概览</strong>
                             </div>
+
+                            <label style="display: none" id="authority">{{ authority }}</label>
+
                             <div class="card-body">
-                                <table id="bootstrap-data-table" class="table table-striped table-bordered">
+                                <table id="products_table" class="table table-striped table-bordered">
                                     <thead>
                                         <tr>
-                                            {% if authority=='1' or authority=="4"%}
+                                            {% if authority=='1'%}
                                                 <th>成品编码</th>
                                                 <th>成品型号</th>
                                                 <th>交易客户</th>
                                                 <th>备注</th>
                                                 <th>录入时间</th>
                                                 <th>录入员</th>
-                                            {% elif authority=='2' or authority=='3' or authority=="8"%}
+                                            {% elif authority=='4'%}
+                                                <th>操作</th>
+                                                <th>成品编码</th>
+                                                <th>成品型号</th>
+                                                <th>交易客户</th>
+                                                <th>备注</th>
+                                                <th>录入时间</th>
+                                                <th>录入员</th>
+                                            {% elif authority=='2'%}
+                                                <th>成品编码</th>
+                                                <th>成品型号</th>
+                                                <th>交易客户</th>
+                                                <th>成品价格</th>
+                                                <th>成品利润</th>
+                                                <th>总成本</th>
+                                                <th>备注</th>
+                                                <th>录入时间</th>
+                                                <th>录入员</th>
+                                            {% elif authority=='3' or authority=="8"%}
+                                                <th>操作</th>
                                                 <th>成品编码</th>
                                                 <th>成品型号</th>
                                                 <th>交易客户</th>
@@ -139,9 +161,24 @@
                                                 <td>{{ i[8] }}</td>
                                             </tr>
                                         {% endfor %}
-                                    {% elif authority=='2' or authority=='3' or authority=="8"%}
+                                    {% elif authority=='2'%}
                                         {% for i in products %}
                                             <tr>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[3] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[4] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[5] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[6] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[7] }}</a></td>
+                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[8] }}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% elif authority=='3' or authority=="8"%}
+                                        {% for i in products %}
+                                            <tr>
+                                                <td><a onclick="productCopy('{{ i[0] }}')"> 复制 </a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
@@ -156,6 +193,7 @@
                                     {% elif authority=='4'%}
                                         {% for i in products %}
                                             <tr>
+                                                <td><a onclick="productCopy('{{ i[0] }}')"> 复制 </a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
@@ -196,41 +234,76 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-          $('#bootstrap-data-table-export').DataTable();
-      } );
-    </script>
+            $('#products_table').DataTable();
+        } );
 
-    <script src="/static/jquery/jquery-2.1.4.min.js"></script>
-    <script>
-        /*$(function () {
-            $("#bootstrap-data-table tr:gt(0)").dblclick(function () {
-                console.log(this);//this为被点击行<tr></tr>
-                var productCode = $(this).find("td").eq(0).html();//取该行的第一列单元格的text，即成品编码
-                //var TaskType = $(this).find("td").eq(2).html();//取该行的第三列单元格的text
-                alert(productCode);
+        function productCopy(productCode) {
+            if(confirm("确定复制此产品?")) {
+                var authority=document.getElementById("authority").innerHTML;
+
+                var data = {
+                    'productCode': productCode
+                };
+                console.log(data);
 
                 $.ajax({
-                    url: "/add_product",
+                    url: "/copy_product",
                     type: "POST",
                     dataType: "json",
-                    data:JSON.stringify({'productCode':productCode}),
+                    //data:$(this).serialize(),
+                    data: JSON.stringify(data),
                     contentType: 'application/json; charset=UTF-8',
                     success: function (callback) {
                         console.log(callback);
-                        if(callback.valueOf('ok')){
-                            window.location.href="/add_product";//跳转地址
+                        //alert(callback['ok']);//不要用callback.valueOf('ok')
+                        if (callback['ok']) {
+                            console.log(callback['ok']);
+
+                            var products=callback['products'];
+                            console.log(products);
+
+                            var table = $('#products_table').DataTable();
+                            var tableData =new Array();
+                            for(var i=0;i<products.length;i++){
+                                tableData[i] =new Array();
+                                if(authority=='4') {
+                                    tableData[i][0] = "<a onclick='productCopy(\"" + products[i][0] + "\")'> 复制 </a>";
+                                    //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                    tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                    tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
+                                    tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
+                                    tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
+                                    tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
+                                    tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
+                                }else {
+                                    tableData[i][0] = "<a onclick='productCopy(\"" + products[i][0] + "\")'> 复制 </a>";
+                                    //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                    tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                    tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
+                                    tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
+                                    tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][3]+ "</a>";
+                                    tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][4]+ "</a>";
+                                    tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][5]+ "</a>";
+                                    tableData[i][7] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
+                                    tableData[i][8] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
+                                    tableData[i][9] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
+                                }
+                            }
+                            table.clear();
+                            table.rows.add(tableData);
+                            var currentPage = table.page();
+                            table.page(currentPage).draw(false);
                         }
                     },
-                    error: function(xhr, textStatus, errorThrown) {
+                    error: function (xhr, textStatus, errorThrown) {
                         console.log(xhr.status);// 状态码
                         console.log(xhr.readyState);// 状态
                         console.log(textStatus);// 错误信息
-                        alert('错误');
+                        alert('返回值错误');
                     }
                 });
-            })
-        })*/
+            }
+        };
     </script>
-
 </body>
 </html>

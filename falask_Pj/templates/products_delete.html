@@ -255,40 +255,40 @@
             })
         })
 
-    /*全部勾选*/
-    function checkAll() {
-        var mckeckbox=document.activeElement;
-        var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
-        console.log(mckeckbox);
-        console.log(table);
-        console.log(table.rows);
-        console.log(table.label);
-        console.log(table.tagName);
-        console.log(mckeckbox.checked);
-        if(table.tagName=="TABLE"){
-            if(mckeckbox.checked){
-                for(var i=1;i<table.rows.length;i++){
-                    var chkOrder = table.rows[i].cells[0].firstChild;
-                    if(chkOrder){
-                        if(chkOrder.type = "CHECKBOX"){
-                            chkOrder.checked=true;
-                            //chkOrder.setAttribute("checked", true);
+        /*全部勾选*/
+        function checkAll() {
+            var mckeckbox=document.activeElement;
+            var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
+            console.log(mckeckbox);
+            console.log(table);
+            console.log(table.rows);
+            console.log(table.label);
+            console.log(table.tagName);
+            console.log(mckeckbox.checked);
+            if(table.tagName=="TABLE"){
+                if(mckeckbox.checked){
+                    for(var i=1;i<table.rows.length;i++){
+                        var chkOrder = table.rows[i].cells[0].firstChild;
+                        if(chkOrder){
+                            if(chkOrder.type = "CHECKBOX"){
+                                chkOrder.checked=true;
+                                //chkOrder.setAttribute("checked", true);
+                            }
                         }
                     }
-                }
-            }else if(!mckeckbox.checked){
-                for(var i=1;i<table.rows.length;i++){
-                    var chkOrder = table.rows[i].cells[0].firstChild;
-                    if(chkOrder){
-                        if(chkOrder.type = "CHECKBOX"){
-                            chkOrder.checked=false;
-                            //chkOrder.setAttribute("checked", false);
+                }else if(!mckeckbox.checked){
+                    for(var i=1;i<table.rows.length;i++){
+                        var chkOrder = table.rows[i].cells[0].firstChild;
+                        if(chkOrder){
+                            if(chkOrder.type = "CHECKBOX"){
+                                chkOrder.checked=false;
+                                //chkOrder.setAttribute("checked", false);
+                            }
                         }
                     }
                 }
             }
         }
-    }
     </script>
 
 </body>
