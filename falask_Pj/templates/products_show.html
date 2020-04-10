@@ -106,6 +106,49 @@
 
                             <label style="display: none" id="authority">{{ authority }}</label>
 
+<div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                &times;
+                            </button>
+                            <h4 class="modal-title" id="myModalLabel">
+                                复制成品
+                            </h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                <label class="control-label mb-1" style="padding-left: 20px;">被复制成品编码</label>
+                                <div class="col-xs-12">
+                                    <input id="productCode" type="text" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                <label class="control-label mb-1" style="padding-left: 20px;">新成品编码</label>
+                                <div class="col-xs-12">
+                                    <input id="newProductCode" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                <label class="control-label mb-1" style="padding-left: 20px;">新成品型号</label>
+                                <div class="col-xs-12">
+                                    <input id="newProductType" type="text" class="form-control">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="modalCancel()">关闭
+                            </button>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="modalSubmit()">
+                                确认
+                            </button>
+                        </div>
+                    </div><!-- /.modal-content -->
+                </div><!-- /.modal -->
+            </div>
+
                             <div class="card-body">
                                 <table id="products_table" class="table table-striped table-bordered">
                                     <thead>
@@ -178,7 +221,7 @@
                                     {% elif authority=='3' or authority=="8"%}
                                         {% for i in products %}
                                             <tr>
-                                                <td><a onclick="productCopy('{{ i[0] }}')"> 复制 </a></td>
+                                                <td><a data-toggle="modal" data-target="#productModal" onclick="modalEdit('{{ i[0] }}')"> 复制 </a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
@@ -193,7 +236,7 @@
                                     {% elif authority=='4'%}
                                         {% for i in products %}
                                             <tr>
-                                                <td><a onclick="productCopy('{{ i[0] }}')"> 复制 </a></td>
+                                                <td><a data-toggle="modal" data-target="#productModal" onclick="modalEdit('{{ i[0] }}')"> 复制 </a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
@@ -236,6 +279,85 @@
         $(document).ready(function() {
             $('#products_table').DataTable();
         } );
+
+        function modalEdit(productCode){
+            $('#productCode').val(productCode);
+        };
+
+        function modalCancel() {
+            $('#productCode').val("");
+            $('#newProductCode').val("");
+            $('#newProductType').val("");
+        }
+
+        function modalSubmit()
+        {
+            var authority=document.getElementById("authority").innerHTML;
+
+            var data = {
+                'productCode': $("#productCode").val(),
+                'newProductCode':$("#newProductCode").val(),
+                'newProductType':$("#newProductType").val()
+            };
+            console.log(data);
+
+            $.ajax({
+                url: "/copy_product",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if (callback['ok']) {
+                        console.log(callback['ok']);
+
+                        var products=callback['products'];
+                        console.log(products);
+
+                        var table = $('#products_table').DataTable();
+                        var tableData =new Array();
+                        for(var i=0;i<products.length;i++){
+                            tableData[i] =new Array();
+                            if(authority=='4') {
+                                tableData[i][0] = "<a data-toggle='modal' data-target='#productModal' onclick='modalEdit(\""+i[0]+"\")'> 复制 </a>";
+                                //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
+                                tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
+                                tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
+                                tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
+                                tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
+                            }else {
+                                tableData[i][0] = "<a data-toggle='modal' data-target='#productModal' onclick='modalEdit(\""+i[0]+"\")'> 复制 </a>";
+                                //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
+                                tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
+                                tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
+                                tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][3]+ "</a>";
+                                tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][4]+ "</a>";
+                                tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][5]+ "</a>";
+                                tableData[i][7] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
+                                tableData[i][8] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
+                                tableData[i][9] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
+                            }
+                        }
+                        table.clear();
+                        table.rows.add(tableData);
+                        var currentPage = table.page();
+                        table.page(currentPage).draw(false);
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
 
         function productCopy(productCode) {
             if(confirm("确定复制此产品?")) {

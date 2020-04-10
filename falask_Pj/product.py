@@ -254,7 +254,9 @@ def copy_product():
     if request.method == "POST":
         data = request.get_json()
         productCode = data['productCode']  # 不要写成productCode=request.data["productcode"]
-        copy_productInfo(productCode)
+        newProductCode = data['newProductCode']
+        newProductType = data['newProductType']
+        copy_productInfo(productCode, newProductCode, newProductType)
         result = select_all_products()
         products = []
         for i in result:
