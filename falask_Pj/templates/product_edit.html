@@ -1753,6 +1753,14 @@
         $("#price").val(price.toFixed(2));
     };
     /*输入利润、税率，自动计算*/
+    $("#price").on('input', function () {
+        var profit=0,totalCost=0;
+        if($("#totalCost").val()!="")totalCost=parseFloat($("#totalCost").val());
+        if($.isNumeric(parseFloat($("#taxRate").val())) && $.isNumeric(parseFloat($("#profit").val())))
+            //price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())-totalCost;
+        $("#profit").val(profit.toFixed(2));
+    });
     $("#profit").on('input', function () {
         var price=0,totalCost=0;
         if($("#totalCost").val()!="")totalCost=parseFloat($("#totalCost").val());
@@ -1762,12 +1770,19 @@
         $("#price").val(price.toFixed(2));
     });
     $("#taxRate").on('input', function () {
-        var price=0,totalCost=0;
+        /*var price=0,totalCost=0;
         if($("#totalCost").val()!="")totalCost=parseFloat($("#totalCost").val());
         if($.isNumeric(parseFloat($("#taxRate").val())) && $.isNumeric(parseFloat($("#profit").val())))
             //price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
             price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
-        $("#price").val(price.toFixed(2));
+        $("#price").val(price.toFixed(2));*/
+
+        var profit=0,totalCost=0;
+        if($("#totalCost").val()!="")totalCost=parseFloat($("#totalCost").val());
+        if($.isNumeric(parseFloat($("#taxRate").val())) && $.isNumeric(parseFloat($("#profit").val())))
+            //price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())-totalCost;
+        $("#profit").val(profit.toFixed(2));
     });
     /*为表格添加序号*/
     window.onload = function() {

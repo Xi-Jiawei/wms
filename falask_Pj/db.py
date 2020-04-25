@@ -733,6 +733,7 @@ def select_materialInfoByCode(materialCode):
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
+        conn.close()
 
 # xijiawei
 # 模糊查询物料信息
@@ -862,12 +863,14 @@ def select_materialInfoByFilter(filterStr):
             print(result[0][0])
             conn.close()
             return result
+        conn.close()
         return None
     # except:
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
+        conn.close()
 
 # xijiawei
 # 添加或更新物料
