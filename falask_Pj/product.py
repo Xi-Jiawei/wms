@@ -17,8 +17,12 @@ def show_products():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        authority = select_user_authority(username)
-        result = select_all_products()
+        # authority = select_user_authority(username)
+        thread = myThread(target=select_user_authority,args=(username,))
+        authority = thread.get_result()
+        # result = select_all_products()
+        thread = myThread(target=select_all_products, args=())
+        result = thread.get_result()
         products=[]
         for i in result:
             product=[]
@@ -43,7 +47,9 @@ def add_product():
     form=ProductForm()
     if session.get('username'):
         username = session['username']
-        authority = select_user_authority(username)
+        # authority = select_user_authority(username)
+        thread = myThread(target=select_user_authority,args=(username,))
+        authority = thread.get_result()
         if authority[1] == '1' or authority[1] == '2':
             return render_template('access_fail.html')
         elif authority[1]=='3' or authority[1]=='8' or authority[1]=='4':
@@ -77,29 +83,38 @@ def add_product():
                 if not product1 and not product2:
                     print("数据库中不存在此成品。")
                     if authority[1] == '4':
-                        insert_productInfoInPart(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk)
+                        # insert_productInfoInPart(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk)
+                        myThread(target=insert_productInfoInPart, args=(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk,))
                     else:
-                        insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                        # insert_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                        myThread(target=insert_productInfo, args=(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk, ))
                     for materialsOfProduct in materialsOfProductArr:
-                        insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
+                        # insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
+                        #                           materialsOfProduct[2], materialsOfProduct[3], materialsOfProduct[4],
+                        #                           materialsOfProduct[5], materialsOfProduct[6])
+                        myThread(target=insert_materialsOfProduct, args=(productCode, materialsOfProduct[0], materialsOfProduct[1],
                                                   materialsOfProduct[2], materialsOfProduct[3], materialsOfProduct[4],
-                                                  materialsOfProduct[5], materialsOfProduct[6])
+                                                  materialsOfProduct[5], materialsOfProduct[6],))
                     for otherCosts in otherCostsArr:
-                        insert_otherCosts(productCode,otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7], otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
+                        # insert_otherCosts(productCode,otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7], otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
+                        myThread(target=insert_otherCosts, args=(productCode,otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7], otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6],))
 
                     updateOfContent = "新加"
-                    insert_productChange(productCode, entryClerk, updateOfContent, entryTime)
+                    # insert_productChange(productCode, entryClerk, updateOfContent, entryTime)
+                    myThread(target=insert_productChange, args=(productCode, entryClerk, updateOfContent, entryTime,))
 
                     return jsonify({'ok': "ok"})
-                elif check_productInfoByCode(productCode):
+                elif product1:
                     print("数据库中已存在同编号的成品。")
                     return jsonify({'ok': "code"})
-                elif check_productInfoByType(productType):
+                if product2:
                     print("数据库中已存在同型号的成品。")
                     return jsonify({'ok': "type"})
             elif request.method == 'GET':
                 # create_materialsOfProduct_temp()
-                result=select_all_materials()
+                # result=select_all_materials()
+                thread = myThread(target=select_all_materials, args=())
+                result = thread.get_result()
                 materialCodes=[]
                 for i in result:
                     materialCodes.append(i[0])
@@ -119,11 +134,15 @@ def edit_product(productCode):
     form = ProductForm()
     if session.get('username'):
         username = session['username']
-        authority = select_user_authority(username)
+        # authority = select_user_authority(username)
+        thread = myThread(target=select_user_authority,args=(username,))
+        authority = thread.get_result()
         if authority[1]=='2':
             print("当前权限仅限查看")
 
-            productInfo = select_productInfoByCode(productCode) # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+            # productInfo = select_productInfoByCode(productCode) # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+            thread = myThread(target=select_productInfoByCode, args=(productCode,))
+            productInfo = thread.get_result()
             form.productCode.data = productCode
             form.productType.data = productInfo[0][0]
             form.client.data = productInfo[0][1]
@@ -147,8 +166,12 @@ def edit_product(productCode):
             supplementaryCost = str(productInfo[0][9])
             operatingCost = str(productInfo[0][10])
 
-            materialsOfProduct = select_materialsOfProductByCode(productCode)
-            otherCosts = select_otherCostsByCode(productCode)
+            # materialsOfProduct = select_materialsOfProductByCode(productCode)
+            thread = myThread(target=select_materialsOfProductByCode, args=(productCode,))
+            materialsOfProduct = thread.get_result()
+            # otherCosts = select_otherCostsByCode(productCode)
+            thread = myThread(target=select_otherCostsByCode, args=(productCode,))
+            otherCosts = thread.get_result()
 
             return render_template('product_view.html', authority=authority[1], form=form, productCode=productCode,
                                    materialCost=materialCost,
@@ -183,30 +206,44 @@ def edit_product(productCode):
                 # entryClerk = data['entryClerk']
                 entryClerk=username
                 if authority[1]=='4':
-                    update_productInfoInPart(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                    # update_productInfoInPart(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                    myThread(target=update_productInfoInPart, args=(productCode, productType, client, totalCost, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk,))
                 else:
-                    update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
-                delete_materialsOfProduct(productCode)
+                    # update_productInfo(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk)
+                    myThread(target=update_productInfo, args=(productCode, productType, client, price, profit, totalCost, taxRate, materialCost, processCost, adminstrationCost, supplementaryCost, operatingCost, remark,entryTime,entryClerk,))
+                # delete_materialsOfProduct(productCode)
+                myThread(target=delete_materialsOfProduct, args=(productCode,))
                 if len(materialsOfProductArr) > 0:
                     for materialsOfProduct in materialsOfProductArr:
-                        insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
+                        # insert_materialsOfProduct(productCode, materialsOfProduct[0], materialsOfProduct[1],
+                        #                           materialsOfProduct[2],
+                        #                           materialsOfProduct[3], materialsOfProduct[4], materialsOfProduct[5],
+                        #                           materialsOfProduct[6])
+                        myThread(target=insert_materialsOfProduct,
+                                 args=(productCode, materialsOfProduct[0], materialsOfProduct[1],
                                                   materialsOfProduct[2],
                                                   materialsOfProduct[3], materialsOfProduct[4], materialsOfProduct[5],
-                                                  materialsOfProduct[6])
+                                                  materialsOfProduct[6],))
 
-                delete_otherCosts(productCode)
+                # delete_otherCosts(productCode)
+                myThread(target=delete_otherCosts, args=(productCode,))
                 for otherCosts in otherCostsArr:
-                    insert_otherCosts(productCode, otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7],
-                                      otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
+                    # insert_otherCosts(productCode, otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7],
+                    #                   otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6])
+                    myThread(target=insert_otherCosts, args=(productCode, otherCosts[1], otherCosts[3], otherCosts[5], otherCosts[7],
+                                                             otherCosts[0], otherCosts[2], otherCosts[4], otherCosts[6],))
 
                 updateOfContent = "修改"
-                insert_productChange(productCode, entryClerk, updateOfContent, entryTime)
+                # insert_productChange(productCode, entryClerk, updateOfContent, entryTime)
+                myThread(target=insert_productChange, args=(productCode, entryClerk, updateOfContent, entryTime,))
 
                 return jsonify({'ok': True})
             elif request.method == 'GET':
                 # create_materialsOfProduct_temp()
 
-                productInfo = select_productInfoByCode(productCode)
+                # productInfo = select_productInfoByCode(productCode)
+                thread = myThread(target=select_productInfoByCode, args=(productCode,))
+                productInfo = thread.get_result()
                 form.productCode.data = productCode
                 form.productType.data = productInfo[0][0]
                 form.client.data = productInfo[0][1]
@@ -225,10 +262,16 @@ def edit_product(productCode):
                 supplementaryCost = str(productInfo[0][9])
                 operatingCost = str(productInfo[0][10])
 
-                materialsOfProduct = select_materialsOfProductByCode(productCode)
-                otherCosts = select_otherCostsByCode(productCode)
+                # materialsOfProduct = select_materialsOfProductByCode(productCode)
+                thread = myThread(target=select_materialsOfProductByCode, args=(productCode,))
+                materialsOfProduct = thread.get_result()
+                # otherCosts = select_otherCostsByCode(productCode)
+                thread = myThread(target=select_otherCostsByCode, args=(productCode,))
+                otherCosts = thread.get_result()
 
-                result=select_all_materials()
+                # result=select_all_materials()
+                thread = myThread(target=select_all_materials, args=())
+                result = thread.get_result()
                 materialCodes=[]
                 for i in result:
                     materialCodes.append(i[0])
@@ -256,8 +299,11 @@ def copy_product():
         productCode = data['productCode']  # 不要写成productCode=request.data["productcode"]
         newProductCode = data['newProductCode']
         newProductType = data['newProductType']
-        copy_productInfo(productCode, newProductCode, newProductType)
-        result = select_all_products()
+        # copy_productInfo(productCode, newProductCode, newProductType)
+        myThread(target=copy_productInfo, args=(productCode, newProductCode, newProductType,))
+        # result = select_all_products()
+        thread = myThread(target=select_all_products, args=())
+        result = thread.get_result()
         products = []
         for i in result:
             products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7][0:21], i[8]])
@@ -271,9 +317,13 @@ def copy_product():
 def delete_products():
     if session.get('username'):
         username = session['username']
-        authority = select_user_authority(username)
+        # authority = select_user_authority(username)
+        thread = myThread(target=select_user_authority,args=(username,))
+        authority = thread.get_result()
         form = ProductForm()
-        result = select_all_products()
+        # result = select_all_products()
+        thread = myThread(target=select_all_products, args=())
+        result = thread.get_result()
         products = []
         for i in result:
             products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7][0:21], i[8]])
@@ -281,7 +331,8 @@ def delete_products():
             data = request.get_json()
             productCodeArr = data['productCodeArr']  # 不要写成productCode=request.data["productcode"]
             for productCode in productCodeArr:
-                delete_productInfo(productCode)  # 注意外键约束
+                # delete_productInfo(productCode)  # 注意外键约束
+                myThread(target=delete_productInfo, args=(productCode,))
                 # delete_materialsOfProduct(productCode)
                 # delete_otherCosts(productCode)
             return jsonify({'ok': True})
@@ -318,7 +369,7 @@ def check_uniqueness():
             temp=thread.get_result()
             if temp:
                 # material=select_materialInfoByCode(materialCode)
-                thread=myThread(target=select_materialInfoByCode,args=(materialCode,))
+                thread = myThread(target=select_materialInfoByCode,args=(materialCode,))
                 material=thread.get_result()
                 return jsonify({'ok': True,'material':material})
             else:
@@ -336,7 +387,9 @@ def search_materials_for_options():
         filterStr = data['filterStr']  # 不要写成productCode=request.data["productcode"]
         if filterStr:
             time.sleep(0.1)
-            materials=select_materialInfoForOptions(filterStr)
+            # materials=select_materialInfoForOptions(filterStr)
+            thread = myThread(target=select_materialInfoForOptions, args=(filterStr,))
+            materials = thread.get_result()
             if materials:
                 print(materials[0][0])
             return jsonify({'ok': True, 'materials': materials})
@@ -358,7 +411,9 @@ def test():
         # form.userid.choices = choices
         # return render_template('test.html',form=form,users=users,sum=sum)
 
-        choices=select_all_users_for_selector()
+        # choices = select_all_users_for_selector()
+        thread = myThread(target=select_all_users_for_selector, args=())
+        choices = thread.get_result()
         form.userid.choices = choices
         productCodeArr=["P00001","P00002","P00003"]
         products=[]
@@ -366,10 +421,14 @@ def test():
             product=[]
             products.append(product)
             product.append(productCodeArr[i])
-            productInfo=select_productInfoByCode(productCodeArr[i])
+            # productInfo=select_productInfoByCode(productCodeArr[i])
+            thread = myThread(target=select_productInfoByCode, args=(productCodeArr[i],))
+            productInfo = thread.get_result()
             product.append(productInfo[0][0])
             product.append(i)
-            materialsOfProduct=select_materialsOfProductByCode(productCodeArr[i])
+            # materialsOfProduct=select_materialsOfProductByCode(productCodeArr[i])
+            thread = myThread(target=select_materialsOfProductByCode, args=(productCodeArr[i],))
+            materialsOfProduct = thread.get_result()
             materials=[]
             product.append(materials)
             for material in materialsOfProduct:

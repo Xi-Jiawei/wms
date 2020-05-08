@@ -16,25 +16,31 @@ def procurement_history():
     if request.method == 'GET':
         if session.get('username'):
             username = session['username']
-            authority = select_user_authority(username)
-            all_procurements = select_procurement() # count(p.procurementCode),procurementCode,productCode,materialCodeConcatStr,materialNameConcatStr,materialNumConcatStr,productType,productNum,client,entryClerk,entryDate
+            # authority = select_user_authority(username)
+            thread = myThread(target=select_user_authority, args=(username,))
+            authority = thread.get_result()
+            # all_procurements = select_procurement() # count(p.procurementCode),procurementCode,productCode,materialCodeConcatStr,materialNameConcatStr,materialNumConcatStr,productType,productNum,client,entryClerk,entryDate
+            thread = myThread(target=select_procurement, args=())
+            all_procurements = thread.get_result()
             procurements=[]
             procurementCode=''
-            for i in all_procurements:
-                if not i[1]==procurementCode:
-                    procurementCode = i[1]
-                    procurement=[]
-                    product=[]
-                    procurements.append(procurement)
-                    procurement.append(i[0]) # count(p.procurementCode)
-                    procurement.append(i[1]) # procurementCode
-                    product.append([i[2],i[6],i[7],i[3],i[4],i[5]]) # productCode,productType,productNum,materialCodeConcatStr,materialNameConcatStr,materialNumConcatStr
-                    procurement.append(product)
-                    procurement.append(i[8]) # client
-                    procurement.append(i[9]) # entryClerk
-                    procurement.append(i[10].strftime('%Y-%m-%d %H:%M:%S.%f')[0:21]) # entryDate
-                else:
-                    product.append([i[2], i[6], i[7],i[3],i[4],i[5]])
+            if all_procurements:
+                for i in all_procurements:
+                    if not i[1] == procurementCode:
+                        procurementCode = i[1]
+                        procurement = []
+                        product = []
+                        procurements.append(procurement)
+                        procurement.append(i[0])  # count(p.procurementCode)
+                        procurement.append(i[1])  # procurementCode
+                        product.append([i[2], i[6], i[7], i[3], i[4], i[
+                            5]])  # productCode,productType,productNum,materialCodeConcatStr,materialNameConcatStr,materialNumConcatStr
+                        procurement.append(product)
+                        procurement.append(i[8])  # client
+                        procurement.append(i[9])  # entryClerk
+                        procurement.append(i[10].strftime('%Y-%m-%d %H:%M:%S.%f')[0:21])  # entryDate
+                    else:
+                        product.append([i[2], i[6], i[7], i[3], i[4], i[5]])
             return render_template('procurement_history.html', form=form,
                                    procurements=procurements,
                                    authority=authority[2],
@@ -51,7 +57,8 @@ def delete_procurements():
         procurementCodeArr = data['procurementCodeArr']
         username = data['username']
         for procurementCode in procurementCodeArr:
-            delete_procurementByCode(procurementCode, username)
+            # delete_procurementByCode(procurementCode, username)
+            myThread(target=delete_procurementByCode, args=(procurementCode, username,))
         return jsonify({'ok': True})
     else:
         return jsonify({'ok': False})
@@ -73,24 +80,38 @@ def calculate_procurement():
         if productCodeOrType == "0":
             productCodeArr = productCodeOrTypeInputArr
             for productCode in productCodeArr[0:len(productCodeArr) - 1]:
-                if select_productTypeByCode(productCode):
-                    productTypeArr.append(select_productTypeByCode(productCode)[0][0])
+                # result = select_productTypeByCode(productCode)
+                thread = myThread(target=select_productTypeByCode, args=(productCode,))
+                result = thread.get_result()
+                if result:
+                    productTypeArr.append(result[0][0])
                 else:
                     return jsonify({'ok': False})
-            if select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
-                productTypeArr.append(select_productTypeByCode(productCodeArr[len(productCodeArr) - 1])[0][0])
+            # result = select_productTypeByCode(productCodeArr[len(productCodeArr) - 1])
+            thread = myThread(target=select_productTypeByCode, args=(productCodeArr[len(productCodeArr) - 1],))
+            result = thread.get_result()
+            if result:
+                productTypeArr.append(result[0][0])
             else:
                 productCodeArr.pop(len(productCodeArr) - 1)
         elif productCodeOrType == "1":
             productTypeArr = productCodeOrTypeInputArr
             # productTypeArrTemp=productTypeArr[0:len(productTypeArr) - 1]
             for productType in productTypeArr[0:len(productTypeArr) - 1]:
-                if select_productCodeByType(productType):
-                    productCodeArr.append(select_productCodeByType(productType)[0][0])
+                # result = select_productCodeByType(productType)
+                thread = myThread(target=select_productCodeByType, args=(productType,))
+                result = thread.get_result()
+                if result:
+                    # productCodeArr.append(select_productCodeByType(productType)[0][0])
+                    productCodeArr.append(result[0][0])
                 else:
                     return jsonify({'ok': False})
-            if select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
-                productCodeArr.append(select_productCodeByType(productTypeArr[len(productTypeArr) - 1])[0][0])
+            # result = select_productCodeByType(productTypeArr[len(productTypeArr) - 1])
+            thread = myThread(target=select_productCodeByType, args=(productTypeArr[len(productTypeArr) - 1],))
+            result = thread.get_result()
+            if result:
+                # productCodeArr.append(select_productCodeByType(productTypeArr[len(productTypeArr) - 1])[0][0])
+                productCodeArr.append(result[0][0])
             else:
                 productTypeArr.pop(len(productTypeArr) - 1)
 
@@ -102,21 +123,30 @@ def calculate_procurement():
         # materials
         products = []
         for i in range(productCodeArr.__len__()):
-            materialsOfProduct = select_materialsOfProductByCode(productCodeArr[i])  # materialCode,materialName,materialType,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost
-            productInfo = select_productInfoByCode(productCodeArr[i])  # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+            # materialsOfProduct = select_materialsOfProductByCode(productCodeArr[i])  # materialCode,materialName,materialType,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost
+            thread = myThread(target=select_materialsOfProductByCode, args=(productCodeArr[i],))
+            materialsOfProduct = thread.get_result()
+            # productInfo = select_productInfoByCode(productCodeArr[i])  # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+            thread = myThread(target=select_productInfoByCode, args=(productCodeArr[i],))
+            productInfo = thread.get_result()
             product = []
             material = []
             product.append(productCodeArr[i])
             product.append(productInfo[0][0])
             product.append(productNumArr[i])
             for materialOfProduct in materialsOfProduct:
-                materialInfo = select_materialInfoByCode(materialOfProduct[0])  # materialName,materialType,remark,inventoryNum,price,inventoryMoney,supplier
+                # materialInfo = select_materialInfoByCode(materialOfProduct[0])  # materialName,materialType,remark,inventoryNum,price,inventoryMoney,supplier
+                thread = myThread(target=select_materialInfoByCode, args=(materialOfProduct[0],))
+                materialInfo = thread.get_result()
                 material.append([materialOfProduct[0], materialInfo[0][0], materialInfo[0][1], materialOfProduct[3]])
             product.append(material)
             # productCode,productType,productNum,[materialCode,materialName,materialType,materialNum]
             products.append(product)
-            update_productNumOfProductInfo(productCodeArr[i], productNumArr[i]) # 更新productNum字段，以便采购时进行物料汇总计算
-        materials=select_materialsOfProductByCodeArr(productCodeArr) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
+            # update_productNumOfProductInfo(productCodeArr[i], productNumArr[i]) # 更新productNum字段，以便采购时进行物料汇总计算
+            myThread(target=update_productNumOfProductInfo, args=(productCodeArr[i], productNumArr[i],))
+        # materials=select_materialsOfProductByCodeArr(productCodeArr) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
+        thread = myThread(target=select_materialsOfProductByCodeArr, args=(productCodeArr,))
+        materials = thread.get_result()
         result={'products':products,'materials':materials}
         return jsonify({'ok': True, 'result': result})
     else: return jsonify({'ok': -1})
@@ -130,7 +160,9 @@ def productTypeByCode():
         productCodeArr = data['productCodeArr']  # 不要写成productCode=request.data["productcode"]
         productTypeArrStr=""
         for productCode in productCodeArr:
-            result=select_productTypeByCode(productCode)
+            # result = select_productTypeByCode(productCode)
+            thread = myThread(target=select_productTypeByCode, args=(productCode,))
+            result = thread.get_result()
             if result:
                 productTypeArrStr+=result[0][0]+"/"
         return jsonify({'ok': True, 'productTypeArrStr': productTypeArrStr})
@@ -145,7 +177,9 @@ def productCodeByType():
         productTypeArr = data['productTypeArr']  # 不要写成productCode=request.data["productcode"]
         productCodeArrStr = ""
         for productType in productTypeArr:
-            result = select_productCodeByType(productType)
+            # result = select_productCodeByType(productType)
+            thread = myThread(target=select_productCodeByType, args=(productType,))
+            result = thread.get_result()
             if result:
                 productCodeArrStr += result[0][0] + "/"
         return jsonify({'ok': True, 'productCodeArrStr': productCodeArrStr})
@@ -160,7 +194,9 @@ def procurement():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        authority = select_user_authority(username)
+        # authority = select_user_authority(username)
+        thread = myThread(target=select_user_authority,args=(username,))
+        authority = thread.get_result()
         if request.method == "POST":
             data = request.get_json()
             productCodeOrTypeInputArr = data['productCodeOrTypeInputArr']
@@ -179,23 +215,36 @@ def procurement():
             productTypeArr=[]
             if productCodeOrType == "0":
                 productCodeArr = productCodeOrTypeInputArr
-                if not select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
+                # result = select_productTypeByCode(productCodeArr[len(productCodeArr) - 1])
+                thread = myThread(target=select_productTypeByCode, args=(productCodeArr[len(productCodeArr) - 1],))
+                result = thread.get_result()
+                if not result:
                     return jsonify({'ok': False})
                 else:
                     for productCode in productCodeArr:
-                        productTypeArr.append(select_productTypeByCode(productCode)[0][0])
+                        # productTypeArr.append(select_productTypeByCode(productCode)[0][0])
+                        thread = myThread(target=select_productTypeByCode, args=(productCode,))
+                        result = thread.get_result()
+                        productTypeArr.append(result[0][0])
             elif productCodeOrType == "1":
                 productTypeArr = productCodeOrTypeInputArr
-                if not select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
+                # result = select_productCodeByType(productTypeArr[len(productTypeArr) - 1])
+                thread = myThread(target=select_productCodeByType, args=(productTypeArr[len(productTypeArr) - 1],))
+                result = thread.get_result()
+                if not result:
                     return jsonify({'ok': False})
                 else:
                     for productType in productTypeArr:
-                        productCodeArr.append(select_productCodeByType(productType)[0][0])
+                        # productCodeArr.append(select_productCodeByType(productType)[0][0])
+                        thread = myThread(target=select_productCodeByType, args=(productType,))
+                        result = thread.get_result()
+                        productCodeArr.append(result[0][0])
 
             # procurementCode=uuid.uuid1() # 使用uuid生成唯一代号
             procurementCode=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
             procurementCode="PM"+procurementCode[0:16] # 使用时间戳生成唯一代号
-            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            # insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            myThread(target=insert_procurement, args=(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime,))
             return jsonify({'ok': True})
         elif request.method == 'GET':
             form = ProductForm()
@@ -213,7 +262,9 @@ def edit_procurement(procurementCode):
     form = ProductForm()
     if session.get('username'):
         username = session['username']
-        authority = select_user_authority(username)
+        # authority = select_user_authority(username)
+        thread = myThread(target=select_user_authority,args=(username,))
+        authority = thread.get_result()
 
         # POST
         if request.method == "POST":
@@ -234,19 +285,29 @@ def edit_procurement(procurementCode):
             productTypeArr=[0 for key in range(len(productCodeOrTypeInputArr))]
             if productCodeOrType == "0":
                 productCodeArr = productCodeOrTypeInputArr
-                if not select_productTypeByCode(productCodeArr[len(productCodeArr) - 1]):
+                # result = select_productTypeByCode(productCodeArr[len(productCodeArr) - 1])
+                thread = myThread(target=select_productTypeByCode, args=(productCodeArr[len(productCodeArr) - 1],))
+                result = thread.get_result()
+                if not result:
                     return jsonify({'ok': False})
                 else:
                     for i in range(len(productCodeArr)):
-                        productType = select_productTypeByCode(productCodeArr[i])
+                        # productType = select_productTypeByCode(productCodeArr[i])
+                        thread = myThread(target=select_productTypeByCode, args=(productCodeArr[i],))
+                        productType = thread.get_result()
                         productTypeArr[i]=productType[0][0]
             elif productCodeOrType == "1":
                 productTypeArr = productCodeOrTypeInputArr
-                if not select_productCodeByType(productTypeArr[len(productTypeArr) - 1]):
+                # result = select_productCodeByType(productTypeArr[len(productTypeArr) - 1])
+                thread = myThread(target=select_productCodeByType, args=(productTypeArr[len(productTypeArr) - 1],))
+                result = thread.get_result()
+                if not result:
                     return jsonify({'ok': False})
                 else:
                     for i in range(len(productTypeArr)):
-                        productCode = select_productCodeByType(productTypeArr[i])
+                        # productCode = select_productCodeByType(productTypeArr[i])
+                        thread = myThread(target=select_productCodeByType, args=(productTypeArr[i],))
+                        productCode = thread.get_result()
                         productCodeArr[i] = productCode[0][0]
 
             # 复杂方式：判断更新的采购是否修改了产品编码，如果只是修改数量，则只在内部更新出入库
@@ -264,11 +325,15 @@ def edit_procurement(procurementCode):
             #     insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, "系统账号", entryTime)
             # update procurement and update materialInfo
             # 简单方式：无论是否修改了产品编码，都是先撤回上次采，再插入新采购
-            delete_procurementByCode(procurementCode, entryClerk)  # 撤回上次采购
-            insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            # delete_procurementByCode(procurementCode, entryClerk)  # 撤回上次采购
+            myThread(target=delete_procurementByCode, args=(procurementCode, entryClerk,))
+            # insert_procurement(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime)
+            myThread(target=insert_procurement, args=(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime,))
             return jsonify({'ok': True})
         elif request.method == 'GET':
-            all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialType,materialNum
+            # all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialType,materialNum
+            thread = myThread(target=select_procurementByCode, args=(procurementCode,))
+            all_products = thread.get_result()
             products = []
             productCode = ''
             productCodeInput = ''
@@ -302,7 +367,9 @@ def edit_procurement(procurementCode):
                 else:
                     material.append([i[5], i[6], i[7], i[8]])  # materialCode,materialName,materialType,materialNum
             # sum(materialNum) group by materialCode
-            materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
+            # materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
+            thread = myThread(target=select_materialsOfProcurementByCode, args=(procurementCode,))
+            materials = thread.get_result()
             # form data
             form.productCodeOrType.data = 0
             form.productCodeOrTypeInput.data=productCodeInput

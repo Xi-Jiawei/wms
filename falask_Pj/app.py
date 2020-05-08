@@ -46,7 +46,9 @@ def user_login():
     if session.get('username'):
         username = session['username']
         # session.pop('username
-        authority = select_user_authority(username)
+        # authority = select_user_authority(username)
+        thread = myThread(target=select_user_authority, args=(username,))
+        authority = thread.get_result()
         if authority == '888':
             print("admin login!")
             return redirect(url_for('index_adm'))
@@ -60,9 +62,14 @@ def user_login():
         username = request.form["username"]
         password = request.form["password"]
         print("name:  pwd:", username, password)
-        if login_check(username,password):
+        # result = login_check(username, password)
+        thread = myThread(target=login_check, args=(username,password,))
+        result = thread.get_result()
+        if result:
             session['username'] = username
-            authority = select_user_authority(username)
+            # authority = select_user_authority(username)
+            thread = myThread(target=select_user_authority, args=(username,))
+            authority = thread.get_result()
             session['authority'] = authority
             if authority == '888':
                 print("admin login!")
@@ -100,7 +107,9 @@ def person_authority(auth):
 
 # xijiawei
 def show_all_users():
-    result = select_all_users()
+    # result = select_all_users()
+    thread = myThread(target=select_all_users, args=())
+    result = thread.get_result()
     users = []
     for i in result:
         user = [i[0], i[1], i[2]]
@@ -129,10 +138,14 @@ def add_user():
         data = request.get_json()
         username = data["username"]
         authority = data['materialAuth'] + data['productAuth'] + data['procurementAuth']
-        if select_user(username):
+        # result = select_user(username)
+        thread = myThread(target=select_user, args=(username,))
+        result = thread.get_result()
+        if result:
             return jsonify({'ok': False})
         else:
-            insert_user(username, '88888888', authority)
+            # insert_user(username, '88888888', authority)
+            myThread(target=insert_user, args=(username, '88888888', authority,))
             return jsonify({'ok': True})
     elif request.method == "GET":
         return render_template('add_person.html',form=form)
@@ -143,15 +156,20 @@ def delete_user():
     form = UserForm()
     if request.method == "POST":
         userid = form.data['userid']
-        delete_userByID(userid)
+        # delete_userByID(userid)
+        myThread(target=delete_userByID, args=(userid,))
         delete_message = "删除成功"
         users = show_all_users()
-        choices = select_all_users_for_selector()
+        # choices = select_all_users_for_selector()
+        thread = myThread(target=select_all_users_for_selector, args=())
+        choices = thread.get_result()
         form.userid.choices = choices
         return render_template('delete_person.html', delete_message=delete_message, form=form, users=users)
     elif request.method == "GET":
         users = show_all_users()
-        choices = select_all_users_for_selector()
+        # choices = select_all_users_for_selector()
+        thread = myThread(target=select_all_users_for_selector, args=())
+        choices = thread.get_result()
         form.userid.choices = choices
         return render_template('delete_person.html', form=form, users=users)
 
@@ -162,15 +180,20 @@ def change_authority():
     if request.method == "POST":
         userid = form.data['userid']
         authority = form.data['materialAuth'] + form.data['productAuth'] + form.data['procurementAuth']
-        update_user_authority(userid, authority)
+        # update_user_authority(userid, authority)
+        myThread(target=update_user_authority, args=(userid, authority,))
         change_message = "修改成功"
         users = show_all_users()
-        choices = select_all_users_for_selector()
+        # choices = select_all_users_for_selector()
+        thread = myThread(target=select_all_users_for_selector, args=())
+        choices = thread.get_result()
         form.userid.choices = choices
         return render_template('change_person.html', change_message=change_message, form=form, users=users)
     elif request.method == "GET":
         users = show_all_users()
-        choices = select_all_users_for_selector()
+        # choices = select_all_users_for_selector()
+        thread = myThread(target=select_all_users_for_selector, args=())
+        choices = thread.get_result()
         form.userid.choices = choices
         return render_template('change_person.html', form=form, users=users)
 
@@ -182,7 +205,9 @@ def change_password():
     # fun_changepassword(user)
     if request.method == "POST":
         username = session['username']
-        password = select_user_password(username)
+        # password = select_user_password(username)
+        thread = myThread(target=select_user_password, args=(username,))
+        password = thread.get_result()
         oldpassword = request.form["oldpassword"]
         newpassword = request.form["newpassword"]
         renewpassword = request.form["renewpassword"]
@@ -196,7 +221,8 @@ def change_password():
                 print("两次密码不一致，请重新输入")
                 return render_template('changepassword.html', message=message)
             else:
-                update_user_password(username, newpassword)
+                # update_user_password(username, newpassword)
+                myThread(target=update_user_password, args=(username, newpassword,))
                 message = "密码修改成功，请重新登陆"
                 # session.pop(user.name)
                 session.clear()
