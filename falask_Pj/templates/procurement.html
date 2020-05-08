@@ -192,7 +192,7 @@
                                     <th width="90px">库存数量</th>
                                     <th width="100px">需出库数量</th>
                                     <th width="100px">余库存数量</th>
-                                    <th width="90px">欠料数量</th>
+                                    <!--<th width="90px">欠料数量</th>-->
                                     <th width="90px">供货厂家</th>
                                     <th width="60px">备注</th>
                                 </tr>
@@ -211,7 +211,7 @@
                                     <td>-</td>
                                     <td>{{ product[3][0][3] }}</td>
                                     <td>-</td>
-                                    <td>-</td>
+                                    <!--<td>-</td>-->
                                     <td>-</td>
                                     <td rowspan="{{ product[3].__len__() }}"><textarea rows="{{ product[3].__len__()*1.5 }}" class='remark' placeholder='备注'>{{ product[4] }}</textarea></td>
                                 </tr>
@@ -224,7 +224,7 @@
                                             <td>-</td>
                                             <td>{{ material[3] }}</td>
                                             <td>-</td>
-                                            <td>-</td>
+                                            <!--<td>-</td>-->
                                             <td>-</td>
                                         </tr>
                                     {% endfor %}
@@ -242,13 +242,13 @@
                                         <td>{{ materials[0][4] }}</td>
                                         <td>{{ materials[0][5] }}</td>
                                         <td>{{ materials[0][6] }}</td>
-                                        <td>
+                                        <!--<td>
                                             {% if materials[0][6]<0 %}
                                                 {{ -materials[0][6] }}
                                             {% else %}
                                                 -
                                             {% endif %}
-                                        </td>
+                                        </td>-->
                                         <td>{{ materials[0][7] }}</td>
                                         <td rowspan="{{ materials.__len__() }}">-</td>
                                     </tr>
@@ -261,13 +261,13 @@
                                             <td>{{ material[4] }}</td>
                                             <td>{{ material[5] }}</td>
                                             <td>{{ material[6] }}</td>
-                                            <td>
+                                            <!--<td>
                                                 {% if material[6]<0 %}
                                                     {{ -material[6] }}
                                                 {% else %}
                                                     -
                                                 {% endif %}
-                                            </td>
+                                            </td>-->
                                             <td>{{ material[7] }}</td>
                                         </tr>
                                     {% endfor %}
@@ -357,11 +357,11 @@
             var table=document.getElementById('procurement_table');
             var j=0;
             for ( var i = 1; i < table.rows.length;i++) {
-                if(table.rows[i].cells[13]){
+                if(table.rows[i].cells[12]){
                     if(j<productCodeOrTypeInputArr.length){
-                        console.log(table.rows[i].cells[13].firstElementChild);
-                        console.log(table.rows[i].cells[13].firstElementChild.value);
-                        remarkArr[j]=table.rows[i].cells[13].firstElementChild.value; //不要用“remarkArr[j]=table.rows[i].cells[12].firstElementChild.innerHTML;”
+                        console.log(table.rows[i].cells[12].firstElementChild);
+                        console.log(table.rows[i].cells[12].firstElementChild.value);
+                        remarkArr[j]=table.rows[i].cells[12].firstElementChild.value; //不要用“remarkArr[j]=table.rows[i].cells[12].firstElementChild.innerHTML;”
                         j += 1;
                     }
                     else break;
@@ -457,7 +457,7 @@
                 "<td>-</td>"+
                 "<td>"+result['products'][i][3][0][3]+"</td>\n"+
                 "<td>-</td>"+
-                "<td>-</td>"+
+                //"<td>-</td>"+
                 "<td>-</td>"+
                 "<td rowspan="+result['products'][i][3].length+"><textarea rows="+(result['products'][i][3].length*1.5)+" class='remark' placeholder='备注'></textarea></td></tr>";
             tableHtml += rowTemplate;
@@ -472,7 +472,7 @@
                     "<td>-</td>" +
                     "<td>" + result['products'][i][3][j][3] + "</td>\n" +
                     "<td>-</td>" +
-                    "<td>-</td>" +
+                    //"<td>-</td>" +
                     "<td>-</td></tr>";
                 tableHtml += rowTemplate;
             }
@@ -491,7 +491,7 @@
                     "<td>" + result['materials'][0][4] + "</td>\n" +
                     "<td>" + result['materials'][0][5] + "</td>\n" +
                     "<td>" + result['materials'][0][6] + "</td>\n" +
-                    "<td>" + (-result['materials'][0][6]) + "</td>\n" +
+                    //"<td>" + (-result['materials'][0][6]) + "</td>\n" +
                     "<td>" + result['materials'][0][7] + "</td>\n" +
                     "<td rowspan=" + result['materials'].length + "></td></tr>";
             }else {
@@ -506,7 +506,7 @@
                     "<td>" + result['materials'][0][4] + "</td>\n" +
                     "<td>" + result['materials'][0][5] + "</td>\n" +
                     "<td>" + result['materials'][0][6] + "</td>\n" +
-                    "<td>-</td>\n" +
+                    //"<td>-</td>\n" +
                     "<td>" + result['materials'][0][7] + "</td>\n" +
                     "<td rowspan=" + result['materials'].length + "></td></tr>";
             }
@@ -520,7 +520,7 @@
                         "<td>" + result['materials'][i][4] + "</td>\n" +
                         "<td>" + result['materials'][i][5] + "</td>\n" +
                         "<td>" + result['materials'][i][6] + "</td>\n" +
-                        "<td>" + (-result['materials'][i][6]) + "</td>\n" +
+                        //"<td>" + (-result['materials'][i][6]) + "</td>\n" +
                         "<td>" + result['materials'][i][7] + "</td></tr>";
                 }else {
                     rowTemplate = "<tr><td>" + result['materials'][i][0] + "</td>\n" +
@@ -530,7 +530,7 @@
                         "<td>" + result['materials'][i][4] + "</td>\n" +
                         "<td>" + result['materials'][i][5] + "</td>\n" +
                         "<td>" + result['materials'][i][6] + "</td>\n" +
-                        "<td>-</td>\n" +
+                        //"<td>-</td>\n" +
                         "<td>" + result['materials'][i][7] + "</td></tr>";
                 }
                 tableHtml += rowTemplate;
@@ -873,8 +873,8 @@
 
                     table.rows[i].cells[0].setAttribute("rowspan", rowIndexCountArr[index]);
 
-                    if(table.rows[i].cells[13].getElementsByTagName("textarea").length>0)
-                        table.rows[i].cells[13].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
+                    if(table.rows[i].cells[12].getElementsByTagName("textarea").length>0)
+                        table.rows[i].cells[12].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
                 }
                 else if(rowIndexCountArr[index]!==0&&rowIndexArr[i] === 0){
                     //console.log("rowIndexCountArr["+index+"]!==0&&rowIndexArr["+i+"] === 0");
@@ -900,8 +900,8 @@
                                     table.rows[j].cells[k].setAttribute("rowspan", rowIndexCountArr[index]);
                             //console.log(table.rows[j].cells[13].getElementsByTagName("textarea"));
                             //console.log(table.rows[j].cells[13].childNodes[0]);
-                            if(table.rows[j].cells[13].getElementsByTagName("textarea").length>0)
-                                table.rows[j].cells[13].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
+                            if(table.rows[j].cells[12].getElementsByTagName("textarea").length>0)
+                                table.rows[j].cells[12].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
                             //console.log(table.rows[j]);
 
                             for(var k = i+1; k < j;k++)
