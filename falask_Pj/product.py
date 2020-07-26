@@ -398,15 +398,33 @@ def search_materials_for_options():
     else: return jsonify({'ok': False})
 
 # # xijiawei
+# # 查询物料
+@product_app.route('/search_material', methods=['GET', 'POST'])
+def search_material():
+    if request.method == "POST":
+        data = request.get_json()
+        filterStr = data['filterStr']  # 不要写成productCode=request.data["productcode"]
+        if filterStr:
+            print(filterStr)
+            time.sleep(0.1)
+            # materials=select_materialInfoByFilter(filterStr)
+            thread = myThread(target=select_materialInfoByFilter,args=(filterStr,))
+            materials=thread.get_result()
+            return jsonify({'ok': True, 'materials': materials})
+        else:
+            return jsonify({'ok': True, 'materials': None})
+    else: return jsonify({'ok': False})
+
+# # xijiawei
 # # 物料编码校验
 @product_app.route('/test', methods=['GET', 'POST'])
 def test():
     form=UserForm()
     if request.method == "GET":
-        # users=select_all_users()
-        # sum=0
-        # for i in users:
-        #     sum+=int(i[3])
+        users=select_all_users()
+        sum=0
+        for i in users:
+            sum+=int(i[3])
         # choices=select_all_users_for_selector()
         # form.userid.choices = choices
         # return render_template('test.html',form=form,users=users,sum=sum)
@@ -434,7 +452,7 @@ def test():
             for material in materialsOfProduct:
                 materials.append([material[0],material[1],material[3]])
             product.append("无")
-        return render_template('test.html',form=form,products=products)
+        return render_template('test.html',form=form,users=users,sum=sum,products=products)
     elif request.method == "POST":
         re=request
         # data=request.form['personName']
@@ -442,21 +460,3 @@ def test():
         data=request.form['userid']
         data=form.data['userid']
         return data
-
-# # xijiawei
-# # 查询物料
-@product_app.route('/search_material', methods=['GET', 'POST'])
-def search_material():
-    if request.method == "POST":
-        data = request.get_json()
-        filterStr = data['filterStr']  # 不要写成productCode=request.data["productcode"]
-        if filterStr:
-            print(filterStr)
-            time.sleep(0.1)
-            # materials=select_materialInfoByFilter(filterStr)
-            thread = myThread(target=select_materialInfoByFilter,args=(filterStr,))
-            materials=thread.get_result()
-            return jsonify({'ok': True, 'materials': materials})
-        else:
-            return jsonify({'ok': True, 'materials': None})
-    else: return jsonify({'ok': False})

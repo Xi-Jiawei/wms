@@ -90,7 +90,8 @@ def material_inout():
             # inventoryMoneySum = select_sum_materials()
             thread = myThread(target=select_sum_materials, args=())
             inventoryMoneySum = thread.get_result()
-            return render_template('material_inout.html', authority=authority[0], materials=materials, inventoryMoneySum=inventoryMoneySum[0][0], username=username)
+            nowTime = datetime.now().strftime('%Y-%m-%d')
+            return render_template('material_inout.html', authority=authority[0], materials=materials, inventoryMoneySum=inventoryMoneySum[0][0], username=username, nowTime=nowTime)
         if request.method == "POST":
             data = request.get_json()
             materialCode = data['materialCode']

@@ -503,7 +503,7 @@
                                                 <button onclick="addRow()" type="button"><img src="http://jianzhong5137.blog.163.com/blog/button.gif" alt=""/>添加物料</button>
                                                 <button onclick="deleteRow()" type="button"><img src="http://jianzhong5137.blog.163.com/blog/button.gif" alt=""/>删除物料</button>
                                                 <br/>
-                                                <table id="materialsOfProduct" class="table table-striped table-bordered">
+                                                <table id="materialsOfProduct" class="table">
                                                     <!--<caption><h3>物料组成</h3></caption>-->                                    <!--h1标签控制一段文字的大小(从h1~h6)-->
                                                     <br/>
                                                     <thead>
@@ -523,9 +523,13 @@
                                                         {% for i in materialsOfProduct %}
                                                             <tr class='tr_i'>
                                                                 <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
-                                                                <td><input type='text' style='width:150px' class='materialCode' list="materialCodeList"
-                                                                           value='{{ i[0] }}'
-                                                                /></td>
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <input type='text' style='width:150px' class='materialCode' list="materialCodeList"
+                                                                           value='{{ i[0] }}'/>
+                                                                        <span class='fa fa-search' onclick="filter()"></span>
+                                                                    </div>
+                                                                </td>
                                                                 <td><input type='text' style='width:150px' class='materialName'
                                                                            value='{{ i[1] }}'
                                                                 /></td>
@@ -596,9 +600,13 @@
                                                         {% for i in materialsOfProduct %}
                                                             <tr class='tr_i'>
                                                                 <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
-                                                                <td><input type='text' style='width:150px' class='materialCode' list="materialCodeList"
-                                                                           value='{{ i[0] }}'
-                                                                /></td>
+                                                                <td>
+                                                                    <div class="input-group">
+                                                                        <input type='text' style='width:150px' class='materialCode' list="materialCodeList"
+                                                                           value='{{ i[0] }}'/>
+                                                                        <span class='fa fa-search' onclick="filter()"></span>
+                                                                    </div>
+                                                                </td>
                                                                 <td><input type='text' style='width:150px' class='materialName'
                                                                            value='{{ i[1] }}'
                                                                 /></td>
@@ -1217,7 +1225,7 @@
             rowNum++;
             var rowTemplate = "<tr class='tr_" + rowNum + "'>\n" +
                 "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
-                "<td><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/></td>" +
+                "<td><div class='input-group'><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/><span class='fa fa-search' onclick='filter()'></span></div></td>" +
                 "<td><input type='text' style='width:150px' class='materialName'/></td>" +
                 "<td><input type='text' style='width:150px' class='materialType'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
@@ -1233,7 +1241,7 @@
             rowNum++;
             var rowTemplate = "<tr class='tr_" + rowNum + "'>\n" +
                 "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
-                "<td><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/></td>" +
+                "<td><div class='input-group'><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/><span class='fa fa-search' onclick='filter()'></span></div></td>" +
                 "<td><input type='text' style='width:150px' class='materialName'/></td>" +
                 "<td><input type='text' style='width:150px' class='materialType'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
@@ -1572,7 +1580,7 @@
         $(this).attr("value",$(this).val());
     });
     /*物料编码过滤*/
-    $("#materialsOfProduct").on('input', '.materialCode', function () {
+    /*$("#materialsOfProduct").on('input', '.materialCode', function () {
         var filterStr=$(this).val();
 
         var data={'filterStr':filterStr};
@@ -1590,10 +1598,7 @@
                         console.log(materials);
 
                         $("#materialCodeList").empty();
-                        /*if(materials!=null) {
-                            for (var i = 0; i < materials.length; i++)
-                                $("#materialCodeList").append('<option value="' + materials[i][0] + '"/>');
-                        }*/
+
                         var list=document.getElementById("materialCodeList");
                         if(materials!=null) {
                             for (var i = 0; i < materials.length; i++) {
@@ -1612,10 +1617,10 @@
                     //alert('返回值错误');
                 }
             });
-    });
+    });*/
     /*物料编码校验*/
     /*'focus'获得焦点，'blur'失去焦点，'input'输入*/
-    $("#materialsOfProduct").on('blur', '.materialCode', function() {
+    /*$("#materialsOfProduct").on('blur', '.materialCode', function() {
         console.log($(this));
         console.log(document.activeElement);
         //document.activeElement.setAttribute("value", $(this).val());
@@ -1645,11 +1650,69 @@
                         console.log(material[0]);
                         console.log(material[0][3]);
                         console.log(tdArr);
+                        //tdArr.eq(2).find("input").val(material[0][0]);
+                        //tdArr.eq(3).find("input").val(material[0][1]);
+                        //tdArr.eq(5).find("input").val(material[0][4]);
+
+                        //输入框数据变成持久值
+                        //tdArr.eq(2).find("input").attr("value",material[0][0]);
+                        tdArr.eq(2).html('<div class="input-group"><input type="text" style="width:150px" class="materialCode" list="materialCodeList" value="'+material[0][0]+'"/><span class="fa fa-search" onclick="filter()"></span></div>');
+                        tdArr.eq(3).find("input").attr("value",material[0][1]);
+
+                        //console.log(tdElementsArr);
+                        //tdElementsArr[3].getElementsByTagName("input")[0].setAttribute("value", material[1]);
+                        tdArr.eq(5).html('<input type="text" style="width:100px" class="materialsOfProduct" value="'+material[0][4]+'">');
+                        console.log(tdArr.eq(3).html());
+                        console.log(tdArr);
+
+                        Calculate();
+                    }
+                    //else if(!callback['ok']){alert("不存在此物料，请再检查！");}
+                    //else {alert("出错了！");}
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    //alert('返回值错误');
+                }
+            });
+    });*/
+
+    $("#materialsOfProduct").on('change', '.materialCode', function() {
+        console.log($(this));
+
+        var materialCode=$(this).val();
+
+        console.log($(this).parent().parent().parent().html());
+        console.log($(this).parent().parent().parent().prevAll().length);//input -> td -> tr，$(this).parent().parent().prevAll().length获取当前行数，$(this).parent().prevAll().length获取当前列数
+
+        var tdArr=$(this).parent().parent().parent().find("td");
+        $(this).parent().parent().html('<div class="input-group"><input type="text" style="width:150px" class="materialCode" list="materialCodeList" value="' + $(this).val() + '"/><span class="fa fa-search" onclick="filter()"></span></div>');
+        console.log(tdArr);
+
+        if($(this).val()=="")return;
+
+        $.ajax({
+                url: "/check_uniqueness",
+                type: "POST",
+                dataType: "json",
+                data:JSON.stringify({'id':$(this).parent().parent().parent().prevAll().length,'materialCode':$(this).val()}),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    if(callback['ok']&&callback['material']!=null){
+                        var material=callback['material'];//materialName,materialType,unit,inventoryNum,price,inventoryMoney,remark,supplier
+
+                        console.log(material[0]);
+                        console.log(material[0][3]);
+                        console.log(tdArr);
+                        //tdArr.eq(2).find("input").val(material[0][0]);
                         tdArr.eq(2).find("input").val(material[0][0]);
                         tdArr.eq(3).find("input").val(material[0][1]);
                         tdArr.eq(5).find("input").val(material[0][4]);
 
-                        /*输入框数据变成持久值*/
+                        //输入框数据变成持久值
                         tdArr.eq(2).find("input").attr("value",material[0][0]);
                         tdArr.eq(3).find("input").attr("value",material[0][1]);
 
@@ -1672,6 +1735,61 @@
                 }
             });
     });
+    //输入框数据变成持久值
+    $("#materialsOfProduct").on('input', '.materialCode', function() {
+        //console.log($(this));
+        $(this).attr("value",$(this).val());
+        //console.log($(this));
+    });
+    function filter(){
+        var element=event.currentTarget;
+        console.log(element);
+        console.log(element.parentElement.childNodes[1]);
+        //console.log(element.parentElement.childNodes[1].value);
+        var inputElement;
+        if(element.parentElement.childNodes[0].value)
+            inputElement=element.parentElement.childNodes[0];
+        else if(element.parentElement.childNodes[1].value)
+            inputElement=element.parentElement.childNodes[1];
+        var filterStr=inputElement.value;
+        if(filterStr==="")return;
+
+        var data={'filterStr':filterStr};
+
+        $.ajax({
+                url: "/search_material",
+                type: "POST",
+                dataType: "json",
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    if(callback['ok']){
+                        var materials=callback['materials'];//materialCode,materialName,materialType
+                        console.log(materials);
+
+                        $("#materialCodeList").empty();
+
+                        var list=document.getElementById("materialCodeList");
+                        if(materials!=null) {
+                            for (var i = 0; i < materials.length; i++) {
+                                var option = document.createElement("option");
+                                option.value = materials[i][0];
+                                option.innerText = materials[i][1];
+                                list.appendChild(option);
+                            }
+                        }
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    //alert('返回值错误');
+                }
+            });
+    }
+
     function Calculate(){
         //统计materialCost表格数据
         var materialCost=0;

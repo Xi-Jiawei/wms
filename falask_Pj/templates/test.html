@@ -13,6 +13,30 @@
         .table th{border:1px solid #F00;}
         .table td{border:1px solid #F00;}
         .table > thead > tr > th {vertical-align: bottom;border-bottom: 1px solid #F00;}
+
+        .drag_main{ position: absolute;width: 870px; height: 660px; background-color: #f5f5f5; opacity:1; left:0; margin-left:10%; top:0; margin-top:0;  z-index: 1000; box-shadow: darkgrey 1px 1px 10px 1px; }
+        /* 已查验 */
+        .already_big{ position: absolute; background-image: url(../images/shuiyin.png);background-repeat: no-repeat; width: 249px;height: 270px; top:50%; margin-top: -135px; left: 50%; margin-left: -124.5px;}
+        .success_tip{ position: absolute; top:0px; color:#2883ff; font-size: 18px; width:135px; height:36px; background: #e9f2ff; text-align: center; line-height: 36px; left:50%; margin-left:-67.5px;}
+        .error_tip{ position: absolute; top:-50px; color:#ff2a2a; font-size: 26px;}
+
+        /* 发票填充 */
+        .invoice_box{ padding:35px 44px 20px 44px; color:#964300; line-height: 20px; font-weight: bold; background-color:#ffffff; font-size: 6px;}
+        .invoice_box span{ color:#808080; font-size: 8px; }
+        .drag_box td{ word-wrap:break-word; }
+        .un_line{ width:100%; height:5px; border-top:2px solid #964300; border-bottom:1px solid #b88787;}
+        .invoice_box div{ display: inline-block;}
+        .top_left{ width:23%;}
+        .top_middle{ width:50%; text-align: center; line-height: 30px; font-size: 12px;}
+        .top_right{ width:22%; }
+
+        .invoice_top{ width:100%;}
+        .invoice_center{ width:100%;}
+        .invoice_bottom{ width:100%;}
+        .itable{ border-left:2px solid #b88787; border-top:2px solid #b88787;}
+        .itable td,.ii_table td{ border-right:2px solid #b88787; }
+        .ii_table{ border-left:2px solid #b88787; }
+        .invoice_bottom p{ display:inline-block; width:168px; padding-left:14px;}
     </style>
 </head>
 <body>
@@ -29,7 +53,7 @@
 <!--DataTable-->
 <div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
     <div id="user_table_div" class="card-body">
-        <!--<table id="user_table" class="table table-striped">
+        <table id="user_table" class="table table-striped">
             <thead>
             <tr>
                 <th>用户ID</th>
@@ -59,8 +83,13 @@
                 <td>-</td>
             </tr>
             </tfoot>
-        </table>-->
+        </table>
+    </div>
+</div>
 
+<!--合并单元格-->
+<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+    <div id="product_table_div" class="card-body">
         <input type="text" id="query"/>
         <table id="product_table" class="table table-striped">
             <thead>
@@ -96,12 +125,12 @@
             </tbody>
         </table>
     </div>
-    <button type="button" onclick="printpage()">打印表格</button>
+    <button type="button" onclick="printTable()">打印表格</button>
     <button type="button" onclick="export2excel()">导出表格</button>
 </div>
 
 <!--表单-->
-<!--<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
     <div class="card-body">
         <form action="#" method="post" novalidate="novalidate">
             <div class="row">
@@ -118,8 +147,9 @@
             </div>
         </form>
     </div>
-</div>-->
+</div>
 
+<!--模态框测试-->
 <div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
     <div class="card-body">
         <label><a data-toggle="modal" data-target="#myModal" onclick="myFunction(1214)"> 模态框测试 </a></label>
@@ -151,6 +181,147 @@
     </div>
 </div>
 
+<!--div右上角设置关闭按钮-->
+<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+    <div id="product_table_div" class="card-body">
+        <div class="alert alert-success alert-dismissable" id="testDiv" >
+            <button type="button" class="close" onclick="divClose()">&times;</button>
+            Hello, world!
+        </div>
+    </div>
+</div>
+
+<!--发票-->
+<div class="card" style="position:relative;width: 100%;left: 0;top: 50px">
+    <div id="product_table_div" class="card-body">
+        <div class="drag_main">
+            <div class="img_large">
+                <div class="only">
+                    <!-- 发票 -->
+                    <div class="invoice_box">
+                        <div class="invoice_top">
+                            <div class="top_left">机器编号：<span class="machine_num" style="color:#2e2e2e"> </span></div>
+                            <div  class="top_middle">
+                                <h1 class="i_title">增值税电子普通发票</h1>
+                                <div>
+                                     <p class="un_line"></p>
+                                     <p style="opacity: 0;">———————————————————————————</p>
+                                </div>
+                            </div>
+                            <div  class="top_right">
+                                <p>发票代码：<span class="i_code" style="color:#2e2e2e"> </span></p>
+                                <p>发票号码：<span class="i_num" style="color:#2e2e2e"> </span></p>
+                                <p>开票日期：<span class="i_year"> </span>&nbsp;年&nbsp;<span class="i_month"> </span>&nbsp;月&nbsp;<span  class="i_date"> </span>&nbsp;日</p>
+                                <p>校&nbsp;验 &nbsp;码：<span class="i_checkout" style="color:#2e2e2e"> </span></p>
+                            </div>
+                        </div>
+                        <div class="invoice_center" >
+                             <table class="itable" cellspacing="0" cellpadding="0" width="787px" style="table-layout:fixed;">
+                                 <tr>
+                                     <td width="25px" style="padding-left:3px">购买方</td>
+                                     <td>
+                                         <p> &nbsp;名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<span class="i_buy_name"> </span></p>
+                                         <p> &nbsp;纳税人识别号：<span class="i_buy_distinguish" style="font-size:13px;letter-spacing:2px;"> </span></p>
+                                         <p> &nbsp;地&nbsp;址&nbsp;、电&nbsp;话：<span class="i_buy_contact"> </span></p>
+                                         <p> &nbsp;开户行及账号：<span class="i_buy_bank"> </span></p>
+                                     </td>
+                                 </tr>
+                             </table>
+                             <table class="itable itable_one" cellspacing="0" cellpadding="0" width="787px" height="157px" style="table-layout:fixed;">
+                                 <tr style="height:10px;" valign="top" align="center">
+                                     <td width="181px" height="10px">货物或应税劳务、服务名称</td>
+                                     <td width="60px" >规格型号</td>
+                                     <td width="50px" >单位</td>
+                                     <td width="80px" >数量</td>
+                                     <td width="90px" >单价</td>
+                                     <td width="90px" >金额</td>
+                                     <td width="40px" >税率</td>
+                                     <td width="80px" >税额</td>
+                                 </tr>
+                             </table>
+                             <table  class="ii_table" cellspacing="0" cellpadding="0" width="787px" style="table-layout:fixed;">
+                                 <tr align="center">
+                                     <td width="181px">合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;计</td>
+                                     <td width="60px"></td>
+                                     <td width="50px"></td>
+                                     <td width="80px"></td>
+                                     <td width="90px"></td>
+                                     <td width="90px" align="right"><span>￥</span><span class="i_mongey"> </span></td>
+                                     <td width="40px"></td>
+                                     <td width="80px" align="right"><span>￥</span><span class="i_paid"> </span></td>
+                                 </tr>
+                             </table>
+                             <table class="itable" cellspacing="0" cellpadding="0" width="787px" style="table-layout:fixed;">
+                                 <tr>
+                                     <td width="211px">&nbsp;价税合计（大写）</td>
+                                     <td id="billMoneyCapital" width="363px" style="border-right:none; padding-left:3px;"></td>
+                                     <td style="border-left:none;" width="72px">（小写）<span>￥</span></td>
+                                     <td id="billMoney" style="border-left:none;" contenteditable="true"></td>
+                                 </tr>
+                             </table>
+                             <table class="itable" cellspacing="0" cellpadding="0" width="787px" style="table-layout:fixed; border-bottom:2px solid #b88787;">
+                                 <tr>
+                                     <td width="25px" style="padding-left:3px">销售方</td>
+                                     <td width="450px">
+                                         <p>&nbsp;名&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;称：<span class="i_sell_name"> </span></p>
+                                         <p>&nbsp;纳税人识别号：<span class="i_sell_distinguish" style="font-size:13px; letter-spacing:2px;"> </span></p>
+                                         <p>&nbsp;地&nbsp;址&nbsp;、电&nbsp;话：<span class="i_sell_contact"> </span></p>
+                                         <p>&nbsp;开户行及账号：<span class="i_sell_bank"> </span></p>
+                                     </td>
+                                     <td width="20px" style="padding:0 3px">
+                                         备注
+                                     </td>
+                                     <td valign="top" style="padding-left:3px">
+                                         <span class="i_remarks" style="width:285px;word-break: break-all;"> </span>
+                                     </td>
+                                 </tr>
+                         </table>
+                        </div>
+                        <div class="invoice_bottom">
+                            <p>收款人：<span>张三</span></p>
+                            <p>复核：<span>张三</span></p>
+                            <p>开票人：<span>张三</span></p>
+                            <p>销售方：(章)<span></span></p>
+                        </div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--可编辑表格-->
+<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+    <div id="product_table_div" class="card-body">
+        <table width="698" border="0" cellpadding="0" cellspacing="0" id="tabProduct">
+            <tr>
+                <td width="32" align="center" bgcolor="#EFEFEF" Name="Num"><input type="checkbox" name="checkbox" value="checkbox" /></td>
+                <td width="186" bgcolor="#EFEFEF" Name="Num" EditType="TextBox">序号</td>
+                <td width="152" bgcolor="#EFEFEF" Name="ProductName" EditType="DropDownList" DataItems="{text:'A',value:'a'},{text:'B',value:'b'},{text:'C',value:'c'},{text:'D',value:'d'}">商品名称</td>
+                <td width="103" bgcolor="#EFEFEF" Name="Amount" EditType="TextBox">数量</td>
+                <td width="103" bgcolor="#EFEFEF" Name="Price" EditType="TextBox">单价</td>
+                <td width="120" bgcolor="#EFEFEF" Name="SumMoney" Expression="Amount*Price" Format="#,###.00">合计</td>
+            </tr>
+            <tr>
+                <td align="center" bgcolor="#FFFFFF"><input type="checkbox" name="checkbox2" value="checkbox" /></td>
+                <td bgcolor="#FFFFFF">1</td>
+                <td bgcolor="#FFFFFF" Value="c">C</td>
+                <td bgcolor="#FFFFFF">0</td>
+                <td bgcolor="#FFFFFF">0</td>
+                <td bgcolor="#FFFFFF">0</td>
+            </tr>
+            <tr>
+                <td align="center" bgcolor="#FFFFFF"><input type="checkbox" name="checkbox22" value="checkbox" /></td>
+                <td bgcolor="#FFFFFF">2</td>
+                <td bgcolor="#FFFFFF" Value="d">D</td>
+                <td bgcolor="#FFFFFF">0</td>
+                <td bgcolor="#FFFFFF">0</td>
+                <td bgcolor="#FFFFFF">0</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
 <script src="/static/jquery/jquery-2.1.4.min.js"></script>
 <script src="/static/jquery/bootstrap.min.js"></script>
 
@@ -168,44 +339,151 @@
 
 <!--<script type="text/javascript" charset="utf8" src="/static/jquery/jquery.dataTables.js"></script>-->
 <script type="text/javascript">
-    function myFunction(materialCode){
-        console.log("ok");
-        //$('#modalText').val(materialCode);
-        $('#modalText').html(materialCode);
+    /*输入框下拉提示*/
+    $("#search").on('input',function(e){
+        console.log($(this));
+        var filterStr=$(this).val();
+        console.log(filterStr);
+        var data={'filterStr':filterStr};
+
+        $.ajax({
+                url: "/search_material",
+                type: "POST",
+                dataType: "json",
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    if(callback['ok']){
+                        var materials=callback['materials'];//materialCode,materialName,materialType
+                        console.log(materials);
+
+                        /*var list=document.getElementById("list");
+                        console.log(list.childNodes);
+                        for(var i=0;i<list.childNodes.length;i++)
+                            list.removeChild(i);
+                        console.log(list.childNodes);
+                        for(var i=0;i<materials.length;i++) {
+                            var option=document.createElement("option");
+                            option.value=materials[i];
+                            list.appendChild(option);
+                        }
+                        console.log(list.childNodes);*/
+                        $("#list").empty();
+                        if(materials!=null)
+                            for(var i=0;i<materials.length;i++)
+                                $("#list").append('<option value="'+materials[i]+'"/>');
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    //alert('返回值错误');
+                }
+            });
+    });
+
+    <!--DataTable-->
+    $.fn.dataTable.ext.buttons.print = {
+        'text': '克隆',
+        'className': 'buttons-alert',
+        action: function ( e, dt, node, config ) {
+            alert(this.text());
+
+            // 深度拷贝
+            var table= document.getElementById("user_table").cloneNode(true);
+            console.log(table);
+            console.log(document.getElementById("user_table"));
+            table.rows[1].innerHTML="<tr>\n" +
+                                "                    <td>007</td>\n" +
+                                "                    <td>James</td>\n" +
+                                "                    <td>314159</td>\n" +
+                                "                    <td>888</td>\n" +
+                                "                    <td><a class='edit' onclick='deleteRow()'>删除</a></td>";
+            console.log(table);
+            console.log(document.getElementById("user_table"));
+        }
+    };
+    $(document).ready( function () {
+        var table = $('#user_table').DataTable({
+                'paging': false,
+                'dom': 'Bfrtip',
+                'buttons': [
+                    {
+                        'text': '新增一行',
+                        action: function ( e, dt, node, config ) {
+                            alert("this");
+
+                            var table=document.getElementById("user_table");
+                            var length=table.rows.length;
+                            table.insertRow(length).innerHTML="<tr>\n" +
+                                "                    <td>007</td>\n" +
+                                "                    <td>James</td>\n" +
+                                "                    <td>314159</td>\n" +
+                                "                    <td>888</td>\n" +
+                                "                    <td><a class='edit' onclick='deleteRow()'>删除</a></td>";
+                        }
+                    },
+                    {
+                        'extend': 'print',
+                        'text': '克隆测试'
+                    }
+                ]
+            }
+        );
+
+        table.on('search.dt', function () {
+            console.log("mark");
+            console.log(table.rows({filter: 'applied'}).nodes());
+            console.log(table.rows({filter: 'applied'}).nodes().length);
+            console.log(table.rows({filter: 'applied'}).data());
+            console.log(table.rows({filter: 'applied'}).data().length);
+
+            var data = table.rows({filter: 'applied'}).data();
+            var length = table.rows({filter: 'applied'}).nodes().length;
+            var sum = 0;
+            for (var i = 0; i < length; i++) {
+                sum += parseInt(data[i][3]);
+            }
+            console.log(sum);
+
+            /*var trArr = $("#user_table tfoot").children("tr");
+            var tdArr = trArr.eq(0).find("td");
+            //tdArr.eq(3).val(sum);
+            //console.log(tdArr.eq(3).val());
+            tdArr.eq(3).text(sum);
+            console.log(tdArr.eq(3).text());*/
+            console.log($("#user_table tfoot tr td"));
+            $("#user_table tfoot tr td").eq(3).text(sum);
+        });
+    });
+    /*删除行*/
+    function deleteRow(){
+        /*console.log(event);
+        console.log(event.parentElement);*/
+
+        /*获取当前元素*/
+        //方式一：弃用，无效
+        /*var activeElement=document.activeElement;
+        console.log(activeElement);*/
+        //方式二：
+        var element=event.currentTarget;
+        console.log(element);
+        console.log(element.parentElement.parentElement);
+        //var table=document.getElementById("user_table");
+        var table=$('#user_table').DataTable();
+        var index = table.row(element.parentElement.parentElement).index();
+        console.log(index);
+
+        //table.rows(element.parentElement.parentElement).remove().draw();
+        table.rows(element.parentElement.parentElement).remove();
+        var currentPage = table.page();
+        table.page(currentPage).draw(false);
     }
 
-    {#$(document).ready( function () {#}
-    {#    var table=$('#user_table').DataTable({#}
-    {#            'paging': false#}
-    {#        }#}
-    {#    );#}
-    {##}
-    {#    table.on('search.dt', function() {#}
-    {#        console.log("mark");#}
-    {#        console.log(table.rows({ filter: 'applied'}).nodes());#}
-    {#        console.log(table.rows({ filter: 'applied'}).nodes().length);#}
-    {#        console.log(table.rows({ filter: 'applied'}).data());#}
-    {#        console.log(table.rows({ filter: 'applied'}).data().length);#}
-    {##}
-    {#        var data=table.rows({ filter: 'applied'}).data();#}
-    {#        var length=table.rows({ filter: 'applied'}).nodes().length;#}
-    {#        var sum=0;#}
-    {#        for(var i=0;i<length;i++){#}
-    {#            sum+=parseInt(data[i][3]);#}
-    {#        }#}
-    {#        console.log(sum);#}
-    {##}
-    {#        /*var trArr = $("#user_table tfoot").children("tr");#}
-    {#        var tdArr = trArr.eq(0).find("td");#}
-    {#        //tdArr.eq(3).val(sum);#}
-    {#        //console.log(tdArr.eq(3).val());#}
-    {#        tdArr.eq(3).text(sum);#}
-    {#        console.log(tdArr.eq(3).text());*/#}
-    {#        console.log($("#user_table tfoot tr td"));#}
-    {#        $("#user_table tfoot tr td").eq(3).text(sum);#}
-    {#    });#}
-    //);
-
+    <!--合并单元格-->
+    /*表格过滤*/
     function deepClone(obj, newObj) {
         var newObj = newObj || {};
         for (key in obj) {
@@ -340,76 +618,9 @@
         console.log(table);
         document.getElementById('product_table').outerHTML=table.outerHTML;
     });
-
-    $("#search").on('input',function(e){
-        console.log($(this));
-        var filterStr=$(this).val();
-        console.log(filterStr);
-        var data={'filterStr':filterStr};
-
-        $.ajax({
-                url: "/search_material",
-                type: "POST",
-                dataType: "json",
-                data:JSON.stringify(data),
-                contentType: 'application/json; charset=UTF-8',
-                success: function (callback) {
-                    console.log(callback);
-                    if(callback['ok']){
-                        var materials=callback['materials'];//materialCode,materialName,materialType
-                        console.log(materials);
-
-                        /*var list=document.getElementById("list");
-                        console.log(list.childNodes);
-                        for(var i=0;i<list.childNodes.length;i++)
-                            list.removeChild(i);
-                        console.log(list.childNodes);
-                        for(var i=0;i<materials.length;i++) {
-                            var option=document.createElement("option");
-                            option.value=materials[i];
-                            list.appendChild(option);
-                        }
-                        console.log(list.childNodes);*/
-                        $("#list").empty();
-                        if(materials!=null)
-                            for(var i=0;i<materials.length;i++)
-                                $("#list").append('<option value="'+materials[i]+'"/>');
-                    }
-                },
-                error: function(xhr, textStatus, errorThrown) {
-                    console.log(xhr.status);// 状态码
-                    console.log(xhr.readyState);// 状态
-                    console.log(textStatus);// 错误信息
-                    //alert('返回值错误');
-                }
-            });
-    });
-
-    function deleteRow(){
-        /*console.log(event);
-        console.log(event.parentElement);*/
-
-        /*获取当前元素*/
-        //方式一：弃用，无效
-        /*var activeElement=document.activeElement;
-        console.log(activeElement);*/
-        //方式二：
-        var element=event.currentTarget;
-        console.log(element);
-        console.log(element.parentElement.parentElement);
-        //var table=document.getElementById("user_table");
-        var table=$('#user_table').DataTable();
-        var index = table.row(element.parentElement.parentElement).index();
-        console.log(index);
-
-        //table.rows(element.parentElement.parentElement).remove().draw();
-        table.rows(element.parentElement.parentElement).remove();
-        var currentPage = table.page();
-        table.page(currentPage).draw(false);
-    }
-
-    function printpage(){
-        var newstr = document.getElementById("user_table_div").innerHTML;
+    /*打印表格*/
+    function printTable(){
+        var newstr = document.getElementById("product_table_div").innerHTML;
         var oldstr = document.body.innerHTML;
         document.body.innerHTML = newstr;
         window.print();
@@ -421,7 +632,7 @@
         wind.document.body.innerHTML = printHtml;
         wind.print();*/
     }
-
+    /*表格以excel格式导出*/
     function export2excel() {
         var table = document.getElementById("procurement_table");
 
@@ -533,6 +744,212 @@
             //是否排除导出输入框中的内容
             exclude_inputs: false
         });*/
+    }
+
+    <!--模态框测试-->
+    function myFunction(materialCode){
+        console.log("ok");
+        //$('#modalText').val(materialCode);
+        $('#modalText').html(materialCode);
+    }
+
+    <!--div右上角设置关闭按钮-->
+    function divClose(){
+        $("#testDiv").remove();
+    }
+
+    <!--金额大写转化-->
+    /*参考中国人民银行于1997年颁布的《支付结算办法》。
+    例：￥106070.00写作壹拾万陆仟零柒拾元整，或壹拾万零陆仟零柒拾元整。
+    详见中国人民银行于1997年颁布的《支付结算办法》附一·五（三）：
+    “阿拉伯金额数字万位或元位是“0”，或者数字中间连续有几个“0”，万位、元位也是“0”，但千位、角位不是“0”时，中文大写金额中可以只写一个零字，也可以不写“零”字。如￥1,680.32，应写成人民币壹仟陆佰捌拾元零叁角贰分，或者写成人民币壹仟陆佰捌拾元叁角贰分;又如￥107,000.53，应写成人民币壹拾万柒仟元零伍角叁分，或者写成人民币壹拾万零柒仟元伍角叁分。”
+    */
+    $("#billMoney").on("input",function (){
+        console.log("输入");
+        amount=parseFloat(this.innerHTML);
+        //amount=1234500607.89;
+        var amountInteger=Math.floor(amount);
+        var amountDecimal=Math.floor((amount-amountInteger)*100); // 精确到分
+        console.log(amountInteger);
+        console.log(amountDecimal);
+        var billMondeySumCapital="",amountIntegerArr=new Array(),j=0,numberMap=['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'],integerUnitMap=['元','拾','佰','仟','万','拾','佰','仟','亿','拾','佰','仟','万亿','拾','佰','仟'],decimalUnitMap=['整','角','分','厘'];
+        //整数部分
+        amountIntegerArr[0]=amountInteger%10;
+        amountInteger=Math.floor(amountInteger/10);
+        while(amountInteger) {
+            amountIntegerArr[++j] = amountInteger % 10;
+            amountInteger=Math.floor(amountInteger/10);
+        }
+        console.log(amountIntegerArr);
+        for(j=amountIntegerArr.length-1;j>=0;j--) {
+            if (!amountIntegerArr[j]) {
+                if (j==8||j==4||j==0)
+                    billMondeySumCapital += integerUnitMap[j];
+                /*else if(amountIntegerArr[j-1])
+                    billMondeySumCapital += numberMap[0];*/
+                if(j&&amountIntegerArr[j-1])
+                    billMondeySumCapital += numberMap[0];
+            }
+            else
+                billMondeySumCapital += numberMap[amountIntegerArr[j]]+integerUnitMap[j];
+        }
+        //小数部分
+        if(amountDecimal) {
+            var jiao=Math.floor(amountDecimal / 10);
+            var fen=amountDecimal % 10;
+            if (fen) {
+                if (jiao) billMondeySumCapital += numberMap[jiao]+decimalUnitMap[1]+numberMap[fen]+decimalUnitMap[2];
+                else billMondeySumCapital += numberMap[0]+numberMap[fen]+decimalUnitMap[2];
+            }else billMondeySumCapital += numberMap[jiao]+decimalUnitMap[1];
+        }else billMondeySumCapital += decimalUnitMap[amountDecimal];
+        console.log(billMondeySumCapital);
+
+        $("#billMoneyCapital").text(billMondeySumCapital);
+    });
+
+    /**
+     * JS实现可编辑的表格
+     * 用法:EditTables(tb1,tb2,tb2,......);
+     * Create by Senty at 2008-04-12
+     **/
+    var tabProduct = document.getElementById("tabProduct");
+    // 设置表格可编辑
+    // 可一次设置多个，例如：EditTables(tb1,tb2,tb2,......)
+    EditTables(tabProduct);
+    //设置多个表格可编辑
+    function EditTables(){
+        for(var i=0;i<arguments.length;i++){
+            SetTableCanEdit(arguments[i]);
+        }
+    }
+    //设置表格是可编辑的
+    function SetTableCanEdit(table){
+        for(var i=1; i<table.rows.length;i++){
+            SetRowCanEdit(table.rows[i]);
+        }
+    }
+    function SetRowCanEdit(row){
+        for(var j=0;j<row.cells.length; j++){
+
+            //如果当前单元格指定了编辑类型，则表示允许编辑
+            var editType = row.cells[j].getAttribute("EditType");
+            if(!editType){
+                //如果当前单元格没有指定，则查看当前列是否指定
+                editType = row.parentNode.rows[0].cells[j].getAttribute("EditType");
+            }
+            if(editType){
+                row.cells[j].onclick = function (){
+                    EditCell(this);
+                }
+            }
+        }
+    }
+    //设置指定单元格可编辑
+    function EditCell(element, editType){
+
+        var editType = element.getAttribute("EditType");
+        if(!editType){
+            //如果当前单元格没有指定，则查看当前列是否指定
+            editType = element.parentNode.parentNode.rows[0].cells[element.cellIndex].getAttribute("EditType");
+        }
+
+        switch(editType){
+            case "TextBox":
+                CreateTextBox(element, element.innerHTML);
+                break;
+            case "DropDownList":
+                CreateDropDownList(element);
+                break;
+            default:
+                break;
+        }
+    }
+    //为单元格创建可编辑输入框
+    function CreateTextBox(element, value){
+        //检查编辑状态，如果已经是编辑状态，跳过
+        var editState = element.getAttribute("EditState");
+        if(editState != "true"){
+            //创建文本框
+            var textBox = document.createElement("INPUT");
+            textBox.type = "text";
+            textBox.className="EditCell_TextBox";
+
+            //设置文本框当前值
+            if(!value){
+                value = element.getAttribute("Value");
+            }
+            textBox.value = value;
+
+            //设置文本框的失去焦点事件
+            textBox.onblur = function (){
+                CancelEditCell(this.parentNode, this.value);
+            };
+            //向当前单元格添加文本框
+            element.innerHTML = "";//清空指定对象的所有字节点
+            element.appendChild(textBox);
+            textBox.focus();
+            textBox.select();
+
+            //改变状态变量
+            element.setAttribute("EditState", "true");
+            element.parentNode.parentNode.setAttribute("CurrentRow", element.parentNode.rowIndex);
+        }
+
+    }
+    //为单元格创建选择框
+    function CreateDropDownList(element, value){
+        //检查编辑状态，如果已经是编辑状态，跳过
+        var editState = element.getAttribute("EditState");
+        if(editState != "true"){
+            //创建下接框
+            var downList = document.createElement("Select");
+            downList.className="EditCell_DropDownList";
+
+            //添加列表项
+            var items = element.getAttribute("DataItems");
+            if(!items){
+                items = element.parentNode.parentNode.rows[0].cells[element.cellIndex].getAttribute("DataItems");
+            }
+            if(items){
+                items = eval("[" + items + "]");
+                for(var i=0; i<items.length; i++){
+                    var oOption = document.createElement("OPTION");
+                    oOption.text = items[i].text;
+                    oOption.value = items[i].value;
+                    downList.options.add(oOption);
+                }
+            }
+
+            //设置列表当前值
+            if(!value){
+                value = element.getAttribute("Value");
+            }
+            downList.value = value;
+
+            //设置创建下接框的失去焦点事件
+            downList.onblur = function (){
+                CancelEditCell(this.parentNode, this.value, this.options[this.selectedIndex].text);
+            };
+
+            //向当前单元格添加创建下接框
+            element.innerHTML = "";//清空指定对象的所有字节点
+            element.appendChild(downList);
+            downList.focus();
+
+            //记录状态的改变
+            element.setAttribute("EditState", "true");
+            element.parentNode.parentNode.setAttribute("LastEditRow", element.parentNode.rowIndex);
+        }
+    }
+    //取消单元格编辑状态
+    function CancelEditCell(element, value, text){
+        element.setAttribute("Value", value);
+        if(text){
+            element.innerHTML = text;
+        }else{
+            element.innerHTML = value;
+        }
+        element.setAttribute("EditState", "false");
     }
 </script>
 </body>

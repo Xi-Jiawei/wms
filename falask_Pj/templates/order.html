@@ -1,0 +1,1365 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>永琪智控仓库管理系统</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
+    <link rel="stylesheet" href="/static/bootstrap/pe-icon-7-filled.css">
+    <link rel="stylesheet" href="/static/bootstrap/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/bootstrap/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+    <style>
+        /* 发票填充 */
+        .bill_box{ padding:20px 40px 20px 40px; color:#964300; line-height: 20px; font-weight: bold; background-color:#ffffff; font-size: 6px;}
+        .bill_box span{ color:#808080; font-size: 8px; }
+        .bill_box div{ display: inline-block;}
+
+        .bill_table{ border-left:2px solid #b88787; border-top:2px solid #b88787;}
+        .bill_table td{ border-right:2px solid #b88787; }
+    </style>
+</head>
+<body>
+<!-- Left Panel -->
+
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="{{url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
+                </li>
+                <li class="menu-title">菜单</li><!-- /.menu-title -->
+
+                <li class="active">
+                    <a href="{{ url_for('order.order') }}"> <i class="menu-icon fa fa-th"></i>订单出货</a>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
+
+<!-- Left Panel -->
+
+<!-- Right Panel -->
+
+<div id="right-panel" class="right-panel">
+
+    <!-- Header-->
+    <header id="header" class="header">
+        <div class="top-left">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for("user_login")}}"><img src="/static/images/logo.png" alt="Logo"></a>
+                <a class="navbar-brand hidden" href="{{ url_for("user_login")}}"><img src="/static/images/logo2.png" alt="Logo"></a>
+                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="header-menu">
+                <div class="user-area dropdown float-right">
+                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <img class="user-avatar rounded-circle" src="/static/images/admin.jpg" alt="{{ personName }}">
+                    </a>
+
+                    <div class="user-menu dropdown-menu">
+                        <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+
+                        <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power -off"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header><!-- /header -->
+    <!-- Header-->
+
+
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+
+                    <div id="orderEditDialog" class="card" style="overflow: hidden;display: none">
+                        <input style="display: none" id="editflag"/>
+                        <input style="display: none" id="rowindex"/>
+
+                        <button type="button" class="close" onclick="dlgClose()">&times;</button>
+                        <form id="order_form" action="#" method="post" novalidate="novalidate">
+                            <div class="card-body">
+                                <div class="row" style="position:relative;width:1000px;height: 60px">
+                                    <div class="col-xs-12" style="position:absolute;bottom:30px;left: 20px;width: 320px;">
+                                        {{ form.orderCode }}
+                                    </div>
+                                    <div class="col-xs-12" style="position:absolute;bottom:30px;left: 350px;width: 320px;">
+                                        {{ form.client }}
+                                    </div>
+                                    <div class="col-xs-12" style="position:absolute;bottom:30px;left: 680px;width: 320px;">
+                                        {{ form.orderDate }}
+                                    </div>
+                                </div>
+                                <table id="orderItem" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <td width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></td>
+                                        <td>成品型号</td>
+                                        <td>订单数量</td>
+                                        <td>当前库存</td>
+                                        <td>余库存</td>
+                                        <td>交货日期</td>
+                                        <td>备注</td>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for i in materials %}
+                                        <tr>
+                                            <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                            <td contenteditable="true">{{ i[0] }}</td>
+                                            <td contenteditable="true">{{ i[1] }}</td>
+                                            <td>{{ i[2] }}</td>
+                                            <td>{{ i[3] }}</td>
+                                            <td contenteditable="true">{{ i[4] }}</td>
+                                            <td contenteditable="true">{{ i[5] }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row" style="position:absolute;bottom: 10px;width:1000px;height: 42px">
+                                <div class="col-xs-12" style="position:absolute;bottom:30px;right: 120px;width: 100px">
+                                    <button type="submit" class="btn btn-default" style="width: 100px">保存</button>
+                                </div>
+                                <div class="col-xs-12" style="position:absolute;bottom:30px;right: 0;width: 100px;">
+                                    <button type="button" class="btn btn-default" style="width: 100px" onclick="dlgClose()">取消</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="deliverDialog" class="card" style="overflow: hidden;display: none">
+                        <button type="button" class="close" onclick="dlgClose()">&times;</button>
+                        <div class="card-body">
+                            <table id="deliverRecord" class="table table-striped table-bordered">
+                                <caption><h3 id="deliverRecordHeader">订单<span style="color: #8a6d3b"></span>出货记录</h3></caption>
+                                <thead>
+                                <tr>
+                                    <td width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAllProduct()"/></td>
+                                    <td>成品型号</td>
+                                    <td>订单数量</td>
+                                    <td>交货日期</td>
+                                    <td>出货日期</td>
+                                    <td>出货量</td>
+                                    <td>出货前剩余订单量</td>
+                                    <td>剩余订单量</td>
+                                    <td>当前库存</td>
+                                    <td>余库存</td>
+                                    <td>备注</td>
+                                    <td>打印</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+
+                            <form id="deliverForm" action="#" method="post" novalidate="novalidate">
+
+                                <div class="col-xs-12" style="position:relative;width: 200px;float:right;right:16px;top:10px;">
+                                    <div class="col-xs-12" style="position:absolute;width: 100px;right: 166px;">
+                                        <button type="button" class="btn btn-default" style="width: 100px" onclick="deliverPost()">确认出货</button>
+                                    </div>
+                                    <div class="col-xs-12" style="position:absolute;width: 100px;right: 46px;">
+                                        <button type="button" class="btn btn-default" style="width: 100px" onclick="deliverPrint()">打印出货单</button>
+                                    </div>
+                                </div>
+
+                                <!-- 发票 -->
+                                <div id="bill_frame" style="position: relative;width: 870px; height: 670px; background-color: #f5f5f5; opacity:1; left:26px; margin-left:26px; top:60px; margin-top:0; bottom: 10px;margin-bottom: 10px;box-shadow: darkgrey 1px 1px 10px 1px;">
+                                    <div class="bill_box">
+                                        <div style="width:320px; text-align: center; left:230px;margin-left:230px;top:0;margin-top: 0;">
+                                            <h3 id="billHeader" contenteditable="true" style="font-size: 24px;">嘉兴市永琪电子科技有限公司</h3>
+                                        </div>
+                                        <div  style="width:139px; text-align: center; left:312px;margin-left:312px;top:10px;margin-top: 10px;">
+                                            <h1 id="billTitle" style="font-size: 36px;">出货单</h1>
+                                            <p style="width:100%; height:5px; border-top:2px solid #964300; border-bottom:1px solid #b88787;"></p>
+                                            <p style="opacity: 0;height:1px;">——————</p>
+                                        </div>
+                                        <div style="width:100%">
+                                            <div style="width:670px; font-size: 8px;">订单号：<span id="billOrderCode" style="color:#2e2e2e"></span></div>
+                                            <div style="width:110px;">时间：<span id="billDate" style="color:#2e2e2e;"></span></div>
+                                        </div>
+                                        <div style="width:100%;">
+                                            <table class="bill_table" cellspacing="0" cellpadding="0" width="787px" style="table-layout:fixed;">
+                                                <tr>
+                                                    <td width="25px" style="padding-left:3px;">交易客户</td>
+                                                    <td>
+                                                        <p> &nbsp;名&nbsp;&nbsp;&nbsp;&nbsp;称：<input id="billClient" style= "background-color:transparent;border:0;color:#2e2e2e;" placeholder=""/></p>
+                                                        <p> &nbsp;地&nbsp;&nbsp;&nbsp;&nbsp;址：<input id="billAddress" style= "background-color:transparent;border:0;color:#2e2e2e;" placeholder=""/></p>
+                                                        <p> &nbsp;电&nbsp;&nbsp;&nbsp;&nbsp;话：<input id="billTelephone" style= "background-color:transparent;border:0;color:#2e2e2e;" placeholder=""/></p>
+                                                        <p> &nbsp;账&nbsp;&nbsp;&nbsp;&nbsp;号：<input id="billAccount" style= "background-color:transparent;border:0;color:#2e2e2e;" placeholder=""/></p>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                            <table id="deliver" class="bill_table" cellspacing="0" cellpadding="0" style="table-layout:fixed;width: 787px;height: 180px">
+                                                <thead>
+                                                <tr style="height:10px;" valign="top" align="center">
+                                                    <td width="90px">成品型号</td>
+                                                    <td width="50px">单位</td>
+                                                    <td width="90px">数量</td>
+                                                    <td width="90px">单价</td>
+                                                    <td width="90px">金额</td>
+                                                    <td width="90px">备注</td>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                                <tfoot>
+                                                <tr align="center">
+                                                    <td width="90px">合&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;计</td>
+                                                    <td width="50px"></td>
+                                                    <td width="90px"></td>
+                                                    <td width="90px"></td>
+                                                    <td width="90px" align="right"><span>￥</span><span class="billMoney"> </span></td>
+                                                    <td width="90px"></td>
+                                                </tr>
+                                                </tfoot>
+                                            </table>
+                                            <table class="bill_table" cellspacing="0" cellpadding="0" width="787px" style="table-layout:fixed;">
+                                                <tr>
+                                                    <td width="142px">&nbsp;合计金额</td>
+                                                    <td width="363px" style="border-right:none; padding-left:3px;">（大写）<span id="billMondeySumCapital"> </span></td>
+                                                    <td style="border-left:none;">（小写）<span>￥</span> <span id="billMondeySum"> </span></td>
+                                                </tr>
+                                            </table>
+                                            <table class="bill_table" cellspacing="0" cellpadding="0" width="787px" style="table-layout:fixed; border-bottom:2px solid #b88787;">
+                                                <tr>
+                                                    <td width="20px" style="padding:0 3px">备注</td>
+                                                    <td valign="top" style="padding-left:3px">
+                                                        <span class="i_remarks" style="width:285px;word-break: break-all;"></span>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div style="width:100%;">
+                                            <p style="display:inline-block; width:240px; padding-left:20px;">开票人：<span id="billEntryClerk" style="color:#2e2e2e;"></span></p>
+                                            <p style="display:inline-block; width:240px; padding-left:20px;">复核：<span></span></p>
+                                            <p style="display:inline-block; width:240px; padding-left:14px;">销售方：(章)<span></span></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <br/>
+                            <br/>
+                        </div>
+                    </div>
+
+                    <div id="mainDialog" class="card" style="overflow: hidden">
+                        <div class="card-body">
+                            <div class="row" style="position:relative;width:1000px;height: 42px">
+                                <div class="col-xs-12" style="position:absolute;top:10px;bottom:30px;left: 15px;width: 200px;">
+                                    <button type="button" class="btn btn-primary" style="width: 200px" onclick="orderAdd()">添加订单</button>
+                                </div>
+                                <div class="col-xs-12" style="position:absolute;top:10px;bottom:30px;left: 230px;width: 200px;">
+                                    <button type="button" class="btn btn-primary" style="width: 200px" onclick="orderArrDelete()">删除订单</button>
+                                </div>
+                            </div>
+                            <br/>
+                            <table id="order" class="table table-striped table-bordered">
+                                <thead>
+                                <tr>
+                                    <th width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                    <th>订单号</th>
+                                    <th>交易客户</th>
+                                    <th>订单日期</th>
+                                    <th>订单成品</th>
+                                    <th>交货日期</th>
+                                    <th>订单状态</th>
+                                    <th>备注</th>
+                                    <th>出货</th>
+                                    <th style="width: 60px">编辑</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for i in orders %}
+                                    <tr>
+                                        <td><input type='checkbox' name='checkbox' value='checkbox' /></td>
+                                        <td>{{ i[0] }}</td>
+                                        <td>{{ i[1] }}</td>
+                                        <td>{{ i[2] }}</td>
+                                        <td>{{ i[3] }}</td>
+                                        <td>{{ i[4] }}</td>
+                                        <td>{{ i[5] }}</td>
+                                        <td>{{ i[6] }}</td>
+                                        <td><a onclick="deliverGet('{{ i[0] }}')"> 出货 </a></td>
+                                        <td><a onclick="orderEdit('{{ i[0] }}','{{ i[1] }}','{{ i[2] }}')"> 修改 </a><a onclick="orderDelete('{{ i[0] }}')"> 删除 </a></td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div><!-- .content -->
+    <!-- Right Panel -->
+</div>
+<!-- Scripts -->
+<script src="/static/jquery/jquery-2.1.4.min.js"></script>
+<script src="/static/jquery/popper.min.js"></script>
+<script src="/static/jquery/bootstrap.min.js"></script>
+<script src="/static/jquery/jquery.matchHeight.min.js"></script>
+<script src="/static/jquery/main.js"></script>
+<script src="/static/jquery/datatables.min.js"></script>
+<script src="/static/jquery/dataTables.bootstrap.min.js"></script>
+<script src="/static/jquery/dataTables.buttons.min.js"></script>
+<script src="/static/jquery/buttons.bootstrap.min.js"></script>
+<script src="/static/jquery/jszip.min.js"></script>
+<script src="/static/jquery/vfs_fonts.js"></script>
+<script src="/static/jquery/buttons.html5.min.js"></script>
+<script src="/static/jquery/buttons.print.min.js"></script>
+<script src="/static/jquery/buttons.colVis.min.js"></script>
+<script src="/static/jquery/datatables-init.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#order').DataTable();
+
+        $('#orderItem').DataTable({
+            'paging': false,
+            //"info" : false,
+            'filter':false,
+            'dom': 'Bfrtip',
+            'buttons': [
+                {
+                    'text': '添加',
+                    action: function ( e, dt, node, config ) {
+                        console.log(this);
+                        this.row.add([
+                            '<input type=\'checkbox\' name=\'checkbox\' value=\'checkbox\' />',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            ''
+                        ]).draw();
+                        console.log(document.getElementById("orderItem"));
+
+                        /*设置单元格可编辑*/
+                        var data=this.rows().data();
+                        var length=this.rows().nodes().length;
+                        console.log(data);
+                        console.log(length);
+                        console.log(this.cell(length-1, 0).node()); //最后一行第一个单元格
+                        console.log(this.rows().nodes()[0]); //最后一行
+                        console.log(this.row(length-1).node());  //最后一行
+                        console.log(this.row(length-1).nodes()[0]);  //最后一行
+                        for(var i=1;i<=6;i++)
+                            this.cell(length-1, i).node().setAttribute("contenteditable",true);
+                        /*document.getElementById("orderItem").rows[length].innerHTML='<tr role="row" class="odd">' +
+                            '<td class="sorting_1"><input type="checkbox" name="checkbox" value="checkbox"></td>' +
+                            '<td contenteditable="true"></td>' +
+                            '<td contenteditable="true"></td>' +
+                            '<td contenteditable="true"></td>' +
+                            '<td contenteditable="true"></td>' +
+                            '<td contenteditable="true"></td>' +
+                            '<td contenteditable="true"></td>' +
+                            '</tr>';*/
+                        console.log(document.getElementById("orderItem"));
+                    }
+                },
+                {
+                    'text': '删除',
+                    action: function ( e, dt, node, config ) {
+                        /*dom删除方式，不适用*/
+                        /*$("#orderItem").find('tr > td:first-child input:checkbox').each(function(){
+                            console.log(this);
+                            console.log(this.parentElement.parentElement);
+                            console.log(this.parentElement.parentElement.rowIndex);
+                            if(this.parentElement.parentElement.rowIndex&&this.checked)
+                                this.parentElement.parentElement.remove();
+                        });*/
+                        /*datatable方式*/
+                        console.log(this);
+                        console.log(document.getElementById("orderItem"));
+                        var length=this.rows().nodes().length;
+                        for(var i=length-1;i>=0;i--){
+                            console.log(this.row(i).data());
+                            console.log(this.row(i).node());
+                            console.log(this.cell(i, 0).node());
+                            console.log(this.cell(i, 0).node().firstChild);
+                            var checktd=this.cell(i, 0).node().firstChild;
+                            if(checktd.checked) {
+                                this.row(i).node().remove();
+                                this.row(i).remove();
+                            }
+                        }
+                        console.log(this.rows().data());
+                        console.log(document.getElementById("orderItem"));
+                    }
+                },
+            ]
+        });
+
+        /*初始加载页面时给delever表格留空*/
+        var tableTbodyHtml='';
+        for(var i=0;i<10;i++){
+            tableTbodyHtml+='<tr valign="top" align="center">\n' +
+                '                                                        <td width="90px" class="billProductType" style="color:#2e2e2e;">&nbsp;</td>\n' +
+                '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;"></td>\n' +
+                '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;"></td>\n' +
+                '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;"></td>\n' +
+                '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
+                '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;"></td>\n' +
+                '                                                    </tr>';
+        }
+        $('#deliver tbody').html(tableTbodyHtml);
+    });
+    $("#order_form").submit(function(e) {
+        e.preventDefault();
+
+        console.log("保存");
+
+        /*正则表达式判断日期格式*/
+        var reg=/^(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29)$/;
+
+        /*表格数据*/
+        var productTypeStr="", deliveryDate="0000-00-00", remarkStr="";
+        var productOfOrderArr = new Array();
+        var trList = $("#orderItem tbody").children("tr");
+        for (var i = 0; i < trList.length; i++) {
+            productOfOrderArr[i] = new Array();
+            var tdArr = trList.eq(i).find("td");
+            if (tdArr.eq(1).text() === "" || tdArr.eq(2).text() === "") {
+                alert("请输入成品型号、订单数量！");
+                return;
+            }
+            if (!reg.exec(tdArr.eq(5).text())) {
+                alert("交货日期格式不正确！");
+                return;
+            }
+            productOfOrderArr[i][0] = tdArr.eq(1).text();//成品型号
+            productOfOrderArr[i][1] = parseInt(tdArr.eq(2).text());//订单数量
+            productOfOrderArr[i][2] = tdArr.eq(5).text();//交货日期
+            productOfOrderArr[i][3] = tdArr.eq(6).text();//备注
+
+            productTypeStr+=tdArr.eq(1).text()+", ";
+            if(deliveryDate<tdArr.eq(5).text())
+                deliveryDate = tdArr.eq(5).text();
+            remarkStr+=tdArr.eq(6).text()+", ";
+        }
+        console.log(productOfOrderArr);
+
+        console.log($(this));
+        console.log($(this).serialize());
+        console.log($(this).serializeArray());
+        var formData = $(this).serializeArray();
+        if (formData[0]['value'] === "") {
+            alert("请输入订单号！");
+            return;
+        }
+        if (formData[1]['value'] === "") {
+            alert("请输入交易客户！");
+            return;
+        }
+        if (!reg.exec(formData[2]['value'])) {
+            alert("订单日期格式不正确！");
+            return;
+        }
+        var data = {
+            'orderCode': formData[0]['value'],
+            'client': formData[1]['value'],
+            'orderDate': formData[2]['value'],
+            'productOfOrderArr': productOfOrderArr,
+        };
+        console.log(data);
+
+        var editflag = $("#editflag").val();
+        if (editflag==0) {
+            console.log("新加");
+            $.ajax({
+                url: "/add_order",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if(callback['ok']) {
+                        var table = $('#order').DataTable();
+                        table.row.add([
+                            '<input type=\'checkbox\' name=\'checkbox\' value=\'checkbox\' />',
+                            formData[0]['value'],
+                            formData[1]['value'],
+                            formData[2]['value'],
+                            productTypeStr,
+                            deliveryDate,
+                            0,
+                            remarkStr,
+                            '<a onclick="deliverGet(\'' + formData[0]['value'] + '\')"> 出货 </a>',
+                            '<a onclick="orderEdit(\'' + formData[0]['value'] + '\',\'' + formData[1]['value'] + '\',\'' + formData[2]['value'] + '\')"> 修改 </a><a onclick="orderDelete(\'' + formData[0]['value'] + '\')"> 删除 </a>'
+                        ]).draw();
+                        alert("成功生成订单");
+                    }else if (!callback['ok']) {
+                        alert("出错了！");
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        } else if (editflag==1) {
+            console.log("编辑");
+            $.ajax({
+                url: "/edit_order/"+formData[0]['value'],
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    if (callback['ok']) {
+                        var table = $('#order').DataTable();
+                        table.row($('#rowindex').val()).data([
+                            '<input type=\'checkbox\' name=\'checkbox\' value=\'checkbox\' />',
+                            formData[0]['value'],
+                            formData[1]['value'],
+                            formData[2]['value'],
+                            productTypeStr,
+                            deliveryDate,
+                            0,
+                            remarkStr,
+                            '<a onclick="deliverGet(\'' + formData[0]['value'] + '\')"> 出货 </a>',
+                            '<a onclick="orderEdit(\'' + formData[0]['value'] + '\',\'' + formData[1]['value'] + '\',\'' + formData[2]['value'] + '\')"> 修改 </a><a onclick="orderDelete(\'' + formData[0]['value'] + '\')"> 删除 </a>'
+                        ]);
+                        console.log(table.row($('#rowindex').val()).node());
+                        alert("成功修改订单");
+                    } else if (!callback['ok']) {
+                        alert("出错了！");
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
+
+        $('#orderEditDialog').hide();
+        $('#mainDialog').show();
+    });
+
+    function orderAdd(){
+        $('#orderCode').val("");
+        $('#client').val("");
+        $('#orderDate').val("");
+        $('#orderCode').attr('readonly',false);
+        //$('#orderItem').DataTable().fnClearTable(); // 无效，提示“fnClearTable非成员函数”
+        $('#orderItem').DataTable().clear().draw();
+
+        $('#mainDialog').hide();
+        $('#orderEditDialog').show();
+        $("#editflag").val(0);
+    }
+    function orderEdit(orderCode,client,orderDate){
+        $('#orderCode').val(orderCode);
+        $('#client').val(client);
+        $('#orderDate').val(orderDate);
+        $('#orderCode').attr('readonly',true);
+        $('#orderItem').DataTable().clear().draw();
+
+        console.log(document.getElementById('order').rows);
+        console.log(event.currentTarget);
+        console.log(event.currentTarget.parentElement.parentElement);
+        console.log(event.currentTarget.parentElement.parentElement.rowIndex);
+        $('#rowindex').val(event.currentTarget.parentElement.parentElement.rowIndex-1);
+
+        $.ajax({
+            url: "/edit_order/"+orderCode,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var productOfOrderArr=callback['productOfOrderArr'];
+                    var table = $('#orderItem').DataTable();
+                    for(var i=0;i<productOfOrderArr.length;i++) {
+                        table.row.add([
+                            '<input type=\'checkbox\' name=\'checkbox\' value=\'checkbox\' />',
+                            productOfOrderArr[i][0],
+                            productOfOrderArr[i][1],
+                            '',
+                            '',
+                            productOfOrderArr[i][2],
+                            productOfOrderArr[i][6],
+                        ]).draw();
+
+                        for(var j=1;j<=6;j++)
+                            table.cell(i, j).node().setAttribute("contenteditable",true);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+
+        $('#mainDialog').hide();
+        $('#orderEditDialog').show();
+        $("#editflag").val(1);
+    }
+    function orderDelete(orderCode){
+        var rowindex=event.currentTarget.parentElement.parentElement.rowIndex-1;
+        $('#rowindex').val(rowindex);
+
+        if(confirm("确定删除该订单?")){
+            var orderCodeArr=new Array();
+            orderCodeArr[0]=orderCode;
+            var data={"orderCodeArr":orderCodeArr}
+
+            $.ajax({
+                url: "/delete_orders",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if(callback['ok']){
+                        var table = $('#order').DataTable();
+                        table.row(rowindex).remove().draw(false);
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
+    };
+    function orderArrDelete(){
+        if(confirm("确定删除选中订单?")){
+            var orderCodeArr=new Array();
+            var table = $('#order').DataTable();
+            var length=table.rows().nodes().length,j=0;
+            for(var i=length-1;i>=0;i--){
+                var checktd=table.cell(i, 0).node().firstChild;
+                if(checktd.checked) {
+                    orderCodeArr[j]=table.cell(i, 1).data();
+                    j+=1;
+                }
+            }
+            var data={"orderCodeArr":orderCodeArr};
+
+            $.ajax({
+                url: "/delete_orders",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if(callback['ok']){
+                        for(var i=length-1;i>=0;i--){
+                            var checktd=table.cell(i, 0).node().firstChild;
+                            if(checktd.checked) {
+                                table.row(i).remove();
+                            }
+                        }
+                        table.rows().draw(false);
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
+    };
+    var deliverTableRowsLength;
+    function deliverGet(orderCode){
+        $('#deliverRecordHeader').text("订单\""+orderCode+"\"出货记录");
+        deliverTableRowsLength=0;
+
+        $.ajax({
+            url: "/deliver/"+orderCode,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var productOfOrderArr=callback['productOfOrderArr']; // productType, deliveryNum, deliveryDate, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark], client, address, telephone, account, orderDate, uint, price
+                    var tableHtml = "";
+                    for(var i=0;i<productOfOrderArr.length;i++){
+                        var rowTemplate;
+                        if(productOfOrderArr[i][3].length) {
+                            rowTemplate = "<tr><td rowspan=" + productOfOrderArr[i][3].length + "><input class='deliverRecordCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][3].length + ">" + productOfOrderArr[i][0] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][3].length + ">" + productOfOrderArr[i][1] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][3].length + ">" + productOfOrderArr[i][2] + "</td>\n" +
+                                "<td style='display: none'>" + productOfOrderArr[i][3][0][0] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][3][0][1] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][3][0][2] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][3][0][3] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][3][0][4] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][3][0][5] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][3][0][6] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][3][0][7] + "</td>\n" +
+                                "<td><a onclick='deliverBillPrint(\"" + orderCode + "\",\"" + productOfOrderArr[i][0] + "\",\"" + productOfOrderArr[i][3][0][0] + "\")'> 打印 </a></td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][3].length + " style='display: none'>" + productOfOrderArr[i][9] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][3].length + " style='display: none'>" + productOfOrderArr[i][10] + "</td></tr>";
+                            tableHtml += rowTemplate;
+                            for(var j=1;j<productOfOrderArr[i][3].length;j++) {
+                                rowTemplate = "<tr><td style='display: none'>" + productOfOrderArr[i][3][j][0] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][3][j][1] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][3][j][2] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][3][j][3] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][3][j][4] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][3][j][5] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][3][j][6] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][3][j][7] + "</td>\n" +
+                                    "<td><a onclick='deliverBillPrint(\""+ orderCode +"\",\""+productOfOrderArr[i][0]+"\",\""+ productOfOrderArr[i][3][j][0] +"\")'> 打印 </a></td></tr>";
+                                tableHtml += rowTemplate;
+                            }
+                        } else {
+                            rowTemplate = "<tr><td rowspan=1><input class='deliverRecordCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][0] + "</td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][1] + "</td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][2] + "</td>\n" +
+                                "<td style='display: none'>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td rowspan=1 style='display: none'>" + productOfOrderArr[i][9] + "</td>\n" +
+                                "<td rowspan=1 style='display: none'>" + productOfOrderArr[i][10] + "</td></tr>";
+                            tableHtml += rowTemplate;
+                        }
+                    }
+                    $("#deliverRecord tbody").html(tableHtml);
+
+                    $("#billOrderCode").text(orderCode);
+                    $("#billClient").val(productOfOrderArr[0][4]);
+                    $("#billAddress").val(productOfOrderArr[0][5]);
+                    $("#billTelephone").val(productOfOrderArr[0][6]);
+                    $("#billAccount").val(productOfOrderArr[0][7]);
+                    $("#billDate").text(callback['nowTime']);
+                    $("#billEntryClerk").text(callback['entryClerk']);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+
+        $('#mainDialog').hide();
+        $('#deliverDialog').show();
+    }
+    function dlgClose(){
+        $('#orderEditDialog').hide();
+        $('#deliverDialog').hide();
+        $('#mainDialog').show();
+    }
+    /*全部勾选*/
+    function checkAll() {
+        var mckeckbox=document.activeElement;
+        var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
+        console.log(mckeckbox);
+        console.log(table);
+        console.log(table.rows);
+        console.log(table.label);
+        console.log(table.tagName);
+        console.log(mckeckbox.checked);
+        if(table.tagName=="TABLE"){
+            if(mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type = "CHECKBOX"){
+                            chkOrder.checked=true;
+                            //chkOrder.setAttribute("checked", true);
+                        }
+                    }
+                }
+            }else if(!mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type = "CHECKBOX"){
+                            chkOrder.checked=false;
+                            //chkOrder.setAttribute("checked", false);
+                        }
+                    }
+                }
+            }
+        }
+
+        /*var table=$(this).closest('table');
+        console.log($(this));
+        console.log(table);
+        console.log(table.eq(0));
+        //console.log(trArr);
+        var trArr = table.children("tbody")[0].children("tr");
+        if($(this).checked)
+        for (var i=0;i<trArr.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+            if(tdArr.eq(0).find("input").type=="checkbox"){
+                tdArr.eq(0).find("input").checked=true;
+            }
+        }
+        else {
+        if($(this).checked)
+        for (var i=0;i<trArr.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+            if(tdArr.eq(0).find("input").type=="checkbox"){
+                tdArr.eq(0).find("input").checked=false;
+            }
+        }}*/
+    }
+    /*勾选触发事件，并更新delever表格*/
+    $("#deliverRecord").on("change",".deliverRecordCheckbox", function () {
+        console.log("勾选");
+        console.log(this);
+        console.log(this.parentElement.parentElement);
+        console.log(this.parentElement.parentElement.children);
+        console.log(this.parentElement.parentElement.children[1].textContent);
+        var productType=this.parentElement.parentElement.children[1].textContent;
+
+        console.log(document.getElementById("deliver"));
+        var table=document.getElementById("deliver");
+        if(this.checked){
+            if(deliverTableRowsLength<10){
+                console.log(table.rows[deliverTableRowsLength+1]);
+                table.rows[deliverTableRowsLength+1].cells[0].textContent=this.parentElement.parentElement.children[1].textContent;
+                table.rows[deliverTableRowsLength+1].cells[1].textContent=this.parentElement.parentElement.children[13].textContent;
+                table.rows[deliverTableRowsLength+1].cells[3].textContent=this.parentElement.parentElement.children[14].textContent;
+
+                table.rows[deliverTableRowsLength+1].cells[2].setAttribute("contenteditable","true");
+                table.rows[deliverTableRowsLength+1].cells[5].setAttribute("contenteditable","true");
+            }else {
+                var rowHtml='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[1].textContent+'</td>\n' +
+                    '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[13].textContent+'</td>\n' +
+                    '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true"></td>\n' +
+                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[14].textContent+'</td>\n' +
+                    '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
+                    '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true"></td></tr>';
+                //方式一：此方式添加行会出问题，行会添加到tfoot
+                /*var row=table.insertRow(deliverTableRowsLength+1);
+                row.outerHTML=rowHtml;*/
+                //方式二：行添加到tbody
+                /*$('#deliver tbody').append(rowHtml);*/
+                //方式三：行添加到tbody
+                console.log(table.tbody);
+                console.log(table.childNodes);
+                console.log(table.children);
+                var tbody=table.children[1];
+                var row=table.children[1].insertRow(deliverTableRowsLength);
+                row.outerHTML=rowHtml;
+            }
+            deliverTableRowsLength++;
+            console.log(document.getElementById("deliver"));
+        }else{
+            var i,j;
+            if(deliverTableRowsLength<=10){
+                for (i = 1; i <= deliverTableRowsLength; i++) {
+                    if (table.rows[i].cells[0].innerHTML == productType)
+                        break;
+                }
+                for (j = i; j < deliverTableRowsLength; j++) {
+                    //上移一行
+                    table.rows[j].cells[0].textContent = table.rows[j + 1].cells[0].textContent;
+                    table.rows[j].cells[1].textContent = table.rows[j + 1].cells[1].textContent;
+                    table.rows[j].cells[2].textContent = table.rows[j + 1].cells[2].textContent;
+                    table.rows[j].cells[3].textContent = table.rows[j + 1].cells[3].textContent;
+                    table.rows[j].cells[4].textContent = table.rows[j + 1].cells[4].textContent;
+                    table.rows[j].cells[5].textContent = table.rows[j + 1].cells[5].textContent;
+                }
+                table.rows[deliverTableRowsLength].outerHTML='<tr valign="top" align="center">\n' +
+                    '                                                        <td width="90px" class="billProductType" style="color:#2e2e2e;">&nbsp;</td>\n' +
+                    '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;"></td>\n' +
+                    '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;"></td>\n' +
+                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;"></td>\n' +
+                    '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
+                    '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;"></td>\n' +
+                    '                                                    </tr>';
+            }else{
+                for (i = 1; i <= deliverTableRowsLength; i++) {
+                    if (table.rows[i].cells[0].innerHTML == productType) {
+                        table.deleteRow(i);
+                        break;
+                    }
+                }
+            }
+            deliverTableRowsLength--;
+            console.log(document.getElementById("deliver"));
+        }
+    });
+    /*全部勾选，并更新delever表格*/
+    function checkAllProduct(){
+        var mckeckbox=document.activeElement;
+        var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
+        var deliverTable=document.getElementById("deliver");
+        if(table.tagName=="TABLE"){
+            if(mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder.type = "CHECKBOX"){
+                        if(!chkOrder.checked) {
+                            chkOrder.checked = true;
+
+                            //更新delever表格
+                            if(deliverTableRowsLength<10){
+                                deliverTable.rows[deliverTableRowsLength+1].cells[0].textContent=table.rows[i].cells[1].textContent;
+                                deliverTable.rows[deliverTableRowsLength+1].cells[1].textContent=table.rows[i].cells[13].textContent;
+                                deliverTable.rows[deliverTableRowsLength+1].cells[3].textContent=table.rows[i].cells[14].textContent;
+
+                                deliverTable.rows[deliverTableRowsLength+1].cells[2].setAttribute("contenteditable","true");
+                                deliverTable.rows[deliverTableRowsLength+1].cells[5].setAttribute("contenteditable","true");
+                            }else {
+                                var row=deliverTable.insertRow(deliverTableRowsLength+1);
+                                row.outerHTML='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+table.rows[i].cells[1].textContent+'</td>\n' +
+                                    '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+table.rows[i].cells[13].textContent+'</td>\n' +
+                                    '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true"></td>\n' +
+                                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+table.rows[i].cells[14].textContent+'</td>\n' +
+                                    '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
+                                    '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true"></td></tr>';
+                            }
+                            deliverTableRowsLength++;
+                        }
+                    }
+                }
+            }else{
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder.type = "CHECKBOX"){
+                        chkOrder.checked=false;
+                    }
+                }
+
+                //更新delever表格
+                var tableTbodyHtml='';
+                for(var i=0;i<10;i++){
+                    tableTbodyHtml+='<tr valign="top" align="center">\n' +
+                        '                                                        <td width="90px" class="billProductType" style="color:#2e2e2e;">&nbsp;</td>\n' +
+                        '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;"></td>\n' +
+                        '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;"></td>\n' +
+                        '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;"></td>\n' +
+                        '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
+                        '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;"></td>\n' +
+                        '                                                    </tr>';
+                }
+                $('#deliver tbody').html(tableTbodyHtml);
+                console.log(document.getElementById("deliver"));
+            }
+        }
+    }
+    /*输入触发事件，并计算金额*/
+    $("#deliver").on("input",".billSendNum", function (){
+        console.log("输入");
+        console.log(this);
+        var tbody=this.parentElement.parentElement;
+        var table=this.parentElement.parentElement.parentElement;
+        var amount=0;
+
+        console.log(this.parentNode);
+        console.log(this.parentNode.childNodes);
+        console.log(this.parentNode.children);
+        console.log(this.parentNode.cells);
+        if($.isNumeric(this.innerHTML)&&$.isNumeric(this.parentNode.children[3].innerHTML))
+            this.parentNode.children[4].innerHTML=parseInt(this.innerHTML)*parseFloat(this.parentNode.children[3].innerHTML);
+        else this.parentNode.children[4].innerHTML=0;
+        for(var i=0;i<deliverTableRowsLength;i++)
+            if($.isNumeric(tbody.rows[i].cells[2].innerHTML)&&$.isNumeric(tbody.rows[i].cells[3].innerHTML))
+                amount += parseInt(tbody.rows[i].cells[2].innerHTML) * parseFloat(tbody.rows[i].cells[3].innerHTML);
+        table.children[2].rows[0].cells[4].innerHTML=amount;
+
+        /*合计金额，转为大写数字*/
+        //amount=123045607.89;
+        var amountInteger=Math.floor(amount);
+        var amountDecimal=Math.floor((amount-amountInteger)*100); // 精确到分
+        console.log(amountInteger);
+        console.log(amountDecimal);
+        var billMondeySumCapital="",amountIntegerArr=new Array(),j=0,numberMap=['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'],integerUnitMap=['元','拾','佰','仟','万','拾','佰','仟','亿','拾','佰','仟','万亿','拾','佰','仟'],decimalUnitMap=['整','角','分','厘'];
+        //整数部分
+        amountIntegerArr[0]=amountInteger%10;
+        amountInteger=Math.floor(amountInteger/10);
+        while(amountInteger) {
+            amountIntegerArr[++j] = amountInteger % 10;
+            amountInteger=Math.floor(amountInteger/10);
+        }
+        console.log(amountIntegerArr);
+        for(j=amountIntegerArr.length-1;j>=0;j--) {
+            if (!amountIntegerArr[j]) {
+                if (j==8||j==4||j==0)
+                    billMondeySumCapital += integerUnitMap[j];
+                /*else if(amountIntegerArr[j-1])
+                    billMondeySumCapital += numberMap[0];*/
+                if(j&&amountIntegerArr[j-1])
+                    billMondeySumCapital += numberMap[0];
+            }
+            else
+                billMondeySumCapital += numberMap[amountIntegerArr[j]]+integerUnitMap[j];
+        }
+        //小数部分
+        if(amountDecimal) {
+            var jiao=Math.floor(amountDecimal / 10);
+            var fen=amountDecimal % 10;
+            if (fen) {
+                if (jiao) billMondeySumCapital += numberMap[jiao]+decimalUnitMap[1]+numberMap[fen]+decimalUnitMap[2];
+                else billMondeySumCapital += numberMap[0]+numberMap[fen]+decimalUnitMap[2];
+            }else billMondeySumCapital += numberMap[jiao]+decimalUnitMap[1];
+        }else billMondeySumCapital += decimalUnitMap[amountDecimal];
+        console.log(billMondeySumCapital);
+        $("#billMondeySumCapital").text(billMondeySumCapital);
+        $("#billMondeySum").text(amount);
+        console.log(table);
+    });
+    /*确认出货*/
+    function deliverPost(){
+        var orderCode=$('#billOrderCode').text();
+        console.log(document.getElementById("deliver"));
+        var deliverProductArr=new Array(),i;
+        var tbody=document.getElementById("deliver").children[1];
+        for (i = 0; i < deliverTableRowsLength; i++) {
+            deliverProductArr[i]=new Array();
+            deliverProductArr[i][0]=tbody.rows[i].cells[0].innerHTML;
+            deliverProductArr[i][1]=tbody.rows[i].cells[1].innerHTML;
+            deliverProductArr[i][2]=parseInt(tbody.rows[i].cells[2].innerHTML);
+            deliverProductArr[i][3]=parseFloat(tbody.rows[i].cells[3].innerHTML);
+            //deliverProductArr[i][4]=parseFloat(tbody.rows[i].cells[4].innerHTML);
+            deliverProductArr[i][4]=tbody.rows[i].cells[5].innerHTML;
+        }
+        var data = {
+            'orderCode': $('#billOrderCode').text(),
+            'sendDate': $('#billDate').text(),
+            'client': $('#billClient').text(),
+            'address': $('#billAddress').text(),
+            'telephone': $('#billTelephone').text(),
+            'account': $('#billAccount').text(),
+            'deliverProductArr': deliverProductArr,
+        };
+
+        $.ajax({
+            url: "/deliver/"+orderCode,
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var productOfOrderArr=callback['productOfOrderArr']; // productType, deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, inventoryNum, inventoryNum-sendNum, remark
+                    var table=document.getElementById("deliverRecord"); // row.cells: checkbox, productType, deliveryNum, deliveryDate, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark], uint, price
+                    for(i=1;i<table.rows.length;i++) {
+                        var checkbox = table.rows[i].cells[0].firstChild;
+                        if (checkbox.type = "CHECKBOX") {
+                            if (checkbox.checked) {
+                                var rowspan=table.rows[i].cells[0].getAttribute("rowspan");
+                                console.log(rowspan==1);
+                                rowspan=parseInt(rowspan); // 注意虽然js中变量是弱类型，但是这里rowspan实际上是字符串变量，要转化为整型，否则与数字相加时会直接作字符串拼接，而不是数字相加
+
+                                var productType=table.rows[i].cells[1].innerHTML;
+                                console.log("productType: "+productType);
+                                for(var j=0;j<productOfOrderArr.length;j++) {
+                                    console.log("productOfOrderArr["+j+"][0]: "+productOfOrderArr[j][0]);
+                                    console.log(productType == productOfOrderArr[j][0]);
+                                    if (productType == productOfOrderArr[j][0]) {
+                                        var deliveryCode = table.rows[i].cells[4].innerHTML;
+                                        console.log("deliveryCode: "+deliveryCode);
+                                        console.log(deliveryCode == "-");
+                                        if (deliveryCode == "-") {
+                                            table.rows[i].cells[4].innerHTML = productOfOrderArr[j][1];
+                                            table.rows[i].cells[5].innerHTML = productOfOrderArr[j][2];
+                                            table.rows[i].cells[6].innerHTML = productOfOrderArr[j][3];
+                                            table.rows[i].cells[7].innerHTML = productOfOrderArr[j][4];
+                                            table.rows[i].cells[8].innerHTML = productOfOrderArr[j][5];
+                                            table.rows[i].cells[9].innerHTML = productOfOrderArr[j][6];
+                                            table.rows[i].cells[10].innerHTML = productOfOrderArr[j][7];
+                                            table.rows[i].cells[11].innerHTML = productOfOrderArr[j][8];
+                                            table.rows[i].cells[12].innerHTML = "<td><a onclick='deliverBillPrint(\""+ orderCode +"\",\""+productType+"\",\""+ productOfOrderArr[j][1] +"\")'> 打印 </a></td>";
+                                        } else {
+                                            console.log("rows.length: " + table.rows.length);
+                                            console.log("i: " + i + "; rowspan: " + rowspan);
+                                            console.log("i + rowspan: " + (i + rowspan));
+                                            table.insertRow(i + rowspan).innerHTML = "<tr><td style='display: none'>" + productOfOrderArr[j][1] + "</td>\n" +
+                                                "<td>" + productOfOrderArr[j][2] + "</td>\n" +
+                                                "<td>" + productOfOrderArr[j][3] + "</td>\n" +
+                                                "<td>" + productOfOrderArr[j][4] + "</td>\n" +
+                                                "<td>" + productOfOrderArr[j][5] + "</td>\n" +
+                                                "<td>" + productOfOrderArr[j][6] + "</td>\n" +
+                                                "<td>" + productOfOrderArr[j][7] + "</td>\n" +
+                                                "<td>" + productOfOrderArr[j][8] + "</td>\n" +
+                                                "<td><a onclick='deliverBillPrint(\"" + orderCode + "\",\"" + productType + "\",\"" + productOfOrderArr[j][1] + "\")'> 打印 </a></td></tr>";
+
+                                            console.log("rowspan + 1: " + (rowspan + 1));
+                                            table.rows[i].cells[0].setAttribute("rowspan", rowspan + 1);
+                                            table.rows[i].cells[1].setAttribute("rowspan", rowspan + 1);
+                                            table.rows[i].cells[2].setAttribute("rowspan", rowspan + 1);
+                                            table.rows[i].cells[3].setAttribute("rowspan", rowspan + 1);
+                                            table.rows[i].cells[13].setAttribute("rowspan", rowspan + 1);
+                                            table.rows[i].cells[14].setAttribute("rowspan", rowspan + 1);
+                                        }
+                                        console.log(table);
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    /*打印出货单*/
+    function deliverPrint() {
+        var newstr = document.getElementById("bill_frame").innerHTML;
+
+        var wind = window.open();
+        wind.document.body.innerHTML = "<!DOCTYPE html>\n" +
+            "<html lang=\"en\">\n" +
+            "<head>\n" +
+            "    <meta charset=\"UTF-8\">\n" +
+            "    <title>Title</title>\n" +
+            "\n" +
+            "    <link rel=\"stylesheet\" href=\"/static/bootstrap/bootstrap.min.css\">\n" +
+            "\n" +
+            "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/jquery/jquery.dataTables.css\">\n" +
+            "\n" +
+            "    <style>\n" +
+            "        .bill_box{ padding:20px 40px 20px 40px; color:#964300; line-height: 20px; font-weight: bold; background-color:#ffffff; font-size: 6px;}\n" +
+            "        .bill_box span{ color:#808080; font-size: 8px; }\n" +
+            "        .bill_box div{ display: inline-block;}\n" +
+            "        .bill_table{ border-left:2px solid #b88787; border-top:2px solid #b88787;}\n" +
+            "        .bill_table td{ border-right:2px solid #b88787; }\n" +
+            "    </style>" +
+            "</head>\n" +
+            "<body>"+
+            newstr+
+            "</body>";
+        wind.print();
+        return false;
+    }
+    function deliverBillPrint(orderCode,productType,deliveryCode) {
+        console.log("打印");
+        var printHtml = document.getElementById("bill_frame").innerHTML;
+        /*正则替换
+        * \w等价于[0-9a-zA-Z_]。注：包括下划线，不包括横杠，也就是说可以用于变量命名的符号都可以匹配*/
+        /*printHtml=printHtml.replace(/<span[^>]id=['"]billDate['"][^>]style=['"]color:#2e2e2e;['"]>[0-9]{4}-[0-9]{2}-[0-9]{2}<\/span>/g,"<span id=\"billDate\" style=\"color:#2e2e2e;\">2020-02-30</span>");
+        console.log(printHtml);*/
+
+        var printObject= document.getElementById("bill_frame").cloneNode(true),i;
+
+        $.ajax({
+            url: "/print_deliver/"+deliveryCode,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var productOfDeliverArr=callback['productOfDeliverArr']; // productType, deliveryNum, deliveryDate, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark, client, address, telephone, account, orderDate, uint, price, delivery.entryClerk
+
+                    console.log(printObject.children[0].children[2].children[1].children[0]);
+                    console.log(printObject.children[0].children[3].children[0].rows[0].cells[1].children[0].children[0]);
+                    printObject.children[0].children[2].children[1].children[0].textContent=productOfDeliverArr[0][3]; // sendDate
+                    printObject.children[0].children[3].children[0].rows[0].cells[1].children[0].children[0].textContent=productOfDeliverArr[0][10]; // client
+                    printObject.children[0].children[3].children[0].rows[0].cells[1].children[1].children[0].textContent=productOfDeliverArr[0][11]; // address
+                    printObject.children[0].children[3].children[0].rows[0].cells[1].children[2].children[0].textContent=productOfDeliverArr[0][12]; // telephone
+                    printObject.children[0].children[3].children[0].rows[0].cells[1].children[3].children[0].textContent=productOfDeliverArr[0][13]; // account
+
+                    console.log(printObject.children[0].children[3].children[1]);
+                    var deliverTable=printObject.children[0].children[3].children[1];
+                    var amount=0,money;
+                    if(productOfDeliverArr.length<=10) {
+                        for (i = 0; i < productOfDeliverArr.length; i++) {
+                            money=productOfDeliverArr[i][4]*productOfDeliverArr[i][16];
+                            amount+=money;
+
+                            deliverTable.children[1].rows[i].cells[0].innerHTML = productOfDeliverArr[i][0]; // productType
+                            deliverTable.children[1].rows[i].cells[1].innerHTML = productOfDeliverArr[0][15]; // uint
+                            deliverTable.children[1].rows[i].cells[2].innerHTML = productOfDeliverArr[i][4]; // sendNum
+                            deliverTable.children[1].rows[i].cells[3].innerHTML = productOfDeliverArr[0][16]; // price
+                            deliverTable.children[1].rows[i].cells[4].innerHTML = money; // money
+                            deliverTable.children[1].rows[i].cells[5].innerHTML = productOfDeliverArr[i][9]; // remark
+                        }
+                    }else {
+                        for (i = 0; i < 10; i++) {
+                            money=productOfDeliverArr[i][4]*productOfDeliverArr[i][16];
+                            amount+=money;
+
+                            deliverTable.children[1].rows[i].cells[0].innerHTML = productOfDeliverArr[i][0]; // productType
+                            deliverTable.children[1].rows[i].cells[1].innerHTML = productOfDeliverArr[0][15]; // uint
+                            deliverTable.children[1].rows[i].cells[2].innerHTML = productOfDeliverArr[i][4]; // sendNum
+                            deliverTable.children[1].rows[i].cells[3].innerHTML = productOfDeliverArr[0][16]; // price
+                            deliverTable.children[1].rows[i].cells[4].innerHTML = money; // money
+                            deliverTable.children[1].rows[i].cells[5].innerHTML = productOfDeliverArr[i][9]; // remark
+                        }
+                        for(i=10;i<productOfDeliverArr.length;i++){
+                            money=productOfDeliverArr[i][4]*productOfDeliverArr[i][16];
+                            amount+=money;
+
+                            deliverTable.children[1].insertRow(i).innerHTML='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+productOfDeliverArr[i][0]+'</td>\n' +
+                                '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+productOfDeliverArr[i][15]+'</td>\n' +
+                                '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true">'+productOfDeliverArr[i][4]+'</td>\n' +
+                                '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+productOfDeliverArr[i][16]+'</td>\n' +
+                                '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;">'+money+'</td>\n' +
+                                '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true">'+productOfDeliverArr[i][9]+'</td></tr>';
+                        }
+                    }
+                    deliverTable.children[2].rows[0].cells[4].children[1].textContent=amount;
+
+                    /*合计金额，转为大写数字*/
+                    var amountInteger=Math.floor(amount);
+                    var amountDecimal=Math.floor((amount-amountInteger)*100); // 精确到分
+                    console.log(amountInteger);
+                    console.log(amountDecimal);
+                    var billMondeySumCapital="",amountIntegerArr=new Array(),j=0,numberMap=['零','壹','贰','叁','肆','伍','陆','柒','捌','玖'],integerUnitMap=['元','拾','佰','仟','万','拾','佰','仟','亿','拾','佰','仟','万亿','拾','佰','仟'],decimalUnitMap=['整','角','分','厘'];
+                    //整数部分
+                    amountIntegerArr[0]=amountInteger%10;
+                    amountInteger=Math.floor(amountInteger/10);
+                    while(amountInteger) {
+                        amountIntegerArr[++j] = amountInteger % 10;
+                        amountInteger=Math.floor(amountInteger/10);
+                    }
+                    console.log(amountIntegerArr);
+                    for(j=amountIntegerArr.length-1;j>=0;j--) {
+                        if (!amountIntegerArr[j]) {
+                            if (j==8||j==4||j==0)
+                                billMondeySumCapital += integerUnitMap[j];
+                            /*else if(amountIntegerArr[j-1])
+                                billMondeySumCapital += numberMap[0];*/
+                            if(j&&amountIntegerArr[j-1])
+                                billMondeySumCapital += numberMap[0];
+                        }
+                        else
+                            billMondeySumCapital += numberMap[amountIntegerArr[j]]+integerUnitMap[j];
+                    }
+                    //小数部分
+                    if(amountDecimal) {
+                        var jiao=Math.floor(amountDecimal / 10);
+                        var fen=amountDecimal % 10;
+                        if (fen) {
+                            if (jiao) billMondeySumCapital += numberMap[jiao]+decimalUnitMap[1]+numberMap[fen]+decimalUnitMap[2];
+                            else billMondeySumCapital += numberMap[0]+numberMap[fen]+decimalUnitMap[2];
+                        }else billMondeySumCapital += numberMap[jiao]+decimalUnitMap[1];
+                    }else billMondeySumCapital += decimalUnitMap[amountDecimal];
+                    console.log(printObject.children[0].children[3].children[2].rows[0].cells[1]);
+                    printObject.children[0].children[3].children[2].rows[0].cells[1].textContent=billMondeySumCapital;
+                    printObject.children[0].children[3].children[2].rows[0].cells[2].children[0].textContent=amount;
+
+                    console.log(printObject.children[0].children[4].children[0].children[0]);
+                    printObject.children[0].children[4].children[0].children[0].textContent=productOfDeliverArr[0][17]; // entryClerk
+
+                    /*打印*/
+                    console.log(printObject);
+                    printHtml = printObject.innerHTML;
+                    var wind = window.open();
+                    wind.document.body.innerHTML = "<!DOCTYPE html>\n" +
+                        "<html lang=\"en\">\n" +
+                        "<head>\n" +
+                        "    <meta charset=\"UTF-8\">\n" +
+                        "    <title>Title</title>\n" +
+                        "\n" +
+                        "    <link rel=\"stylesheet\" href=\"/static/bootstrap/bootstrap.min.css\">\n" +
+                        "\n" +
+                        "    <link rel=\"stylesheet\" type=\"text/css\" href=\"/static/jquery/jquery.dataTables.css\">\n" +
+                        "\n" +
+                        "    <style>\n" +
+                        "        .bill_box{ padding:20px 40px 20px 40px; color:#964300; line-height: 20px; font-weight: bold; background-color:#ffffff; font-size: 6px;}\n" +
+                        "        .bill_box span{ color:#808080; font-size: 8px; }\n" +
+                        "        .bill_box div{ display: inline-block;}\n" +
+                        "        .bill_table{ border-left:2px solid #b88787; border-top:2px solid #b88787;}\n" +
+                        "        .bill_table td{ border-right:2px solid #b88787; }\n" +
+                        "    </style>" +
+                        "</head>\n" +
+                        "<body>"+
+                        printHtml+
+                        "</body>";
+                    wind.print();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+
+    /*td内容更新到datatable*/
+    /*$("#orderItem").on('input','td',function(){
+        console.log("change");
+        console.log(this);
+        console.log(document.activeElement);
+        var table=$('#orderItem').DataTable();
+        console.log(table.rows(document.activeElement.parentElement)); //查询多行，行筛选器必须是tr
+        console.log(table.rows(document.activeElement.parentElement).data()); //查询多行
+        console.log(table.rows(document.activeElement.parentElement).nodes()); //查询多行
+        console.log(table.row(document.activeElement.parentElement)); //查询单行
+        console.log(table.row(document.activeElement.parentElement).nodes()[0]); //查询单行
+        console.log(table.row(document.activeElement.parentElement).node()); //查询单行
+        console.log(table.row(document.activeElement.parentElement).data()); //查询单行
+        console.log(table.cell(document.activeElement).node()); //查询单元格，行筛选器必须是td
+        //table.cell(document.activeElement).data(document.activeElement.innerHTML);
+        //console.log(table.cell(document.activeElement).data()); //查询单元格
+        table.cell(this).data(this.innerHTML);
+        console.log(table.cell(this).data()); //查询单元格
+    });*/
+</script>
+
+
+</body>
+</html>

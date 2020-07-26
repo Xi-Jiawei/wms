@@ -86,7 +86,7 @@
                             <a href="{{ url_for("procurement.procurement") }}"><i class="menu-icon fa fa-cogs"></i>添加采购</a>
                         </li>
                         <li class="active">
-                            <a href="#"><i class="menu-icon fa fa-cogs"></i>修改采购</a>
+                            <a href="#"><i class="menu-icon fa fa-cogs"></i>查看采购</a>
                         </li>
                     {% endif %}
                 {% endif %}
@@ -293,6 +293,7 @@
             <br>
 
             {% if authority=="3" or authority=="8"%}
+                {% if setting==0 %}
                 <div>
                     <div class="row">
                         <div class="col-xs-12">
@@ -301,6 +302,7 @@
                         </div>
                     </div>
                 </div>
+                {% endif %}
             {% endif %}
         </form>
     </div><!-- .content -->

@@ -177,6 +177,8 @@
                         </div>
                     </div>
 
+                    <label style="display: none" id="nowTime">{{ nowTime }}</label>
+
                     {% if authority=='3' or authority=="8"%}
                         <div class="card">
                             <div class="card-body">
@@ -370,6 +372,7 @@
         $('#unit').val(unit);
         $('#price').val(price);
         $('#supplier').val(supplier);
+        $('#documentTime').val(document.getElementById("nowTime").innerHTML);
     };
 
     $("#materialInOutForm").submit(function(e)

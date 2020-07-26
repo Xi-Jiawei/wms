@@ -340,6 +340,7 @@ def edit_procurement(procurementCode):
             productTypeInput = ''
             productNumInput = ''
             for i in all_products:
+                # print("productCode: " + i[0] + "; materialCode: " + i[5])
                 if not i[0] == productCode:
                     productCode = i[0]
                     product = []
@@ -370,6 +371,8 @@ def edit_procurement(procurementCode):
             # materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
             thread = myThread(target=select_materialsOfProcurementByCode, args=(procurementCode,))
             materials = thread.get_result()
+            # for i in materials:
+            #     print("materialCode: " + i[0])
             # form data
             form.productCodeOrType.data = 0
             form.productCodeOrTypeInput.data=productCodeInput
@@ -384,6 +387,11 @@ def edit_procurement(procurementCode):
                 return render_template('procurement.html', form=form, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
                                        authority=authority[2], username=username)
             elif authority[2]=='3' or authority[2]=='8':
+                form.productCodeOrType.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.productCodeOrTypeInput.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.productNum.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.client.render_kw = {"class": "form-control", "readonly": 'true'}
+                form.remark.render_kw = {"class": "form-control", "readonly": 'true'}
                 return render_template('procurement.html', setting=1, form=form, products=products,materials=materials,productCodeInput=productCodeInput,productTypeInput=productTypeInput,productNumInput=productNumInput,
                                        authority=authority[2], username=username)
     else:

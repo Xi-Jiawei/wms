@@ -693,8 +693,22 @@ def select_procurementByCode(procurementCode):
 
 # xijiawei
 # 根据采购代号汇总采购物料
+# def select_materialsOfProcurementByCode(procurementCode):
+#     sql = "select materialInfo.materialCode,materialInfo.materialName,materialInfo.materialType,materialInfo.unit,materialInfo.inventoryNum+m.sum,m.sum,materialInfo.inventoryNum,materialInfo.supplier from materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m where materialInfo.materialCode=m.materialCode;"%(procurementCode)
+#     try:
+#         lock.acquire()
+#         cur.execute(sql)
+#         result = cur.fetchall()
+#         lock.release()
+#         return result
+#         conn.close()
+#     except:
+#         conn.rollback()
+
+# xijiawei
+# 根据采购代号查询采购
 def select_materialsOfProcurementByCode(procurementCode):
-    sql = "select materialInfo.materialCode,materialInfo.materialName,materialInfo.materialType,materialInfo.unit,materialInfo.inventoryNum+m.sum,m.sum,materialInfo.inventoryNum,materialInfo.supplier from materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m where materialInfo.materialCode=m.materialCode;"%(procurementCode)
+    sql = "select p.materialCode,m.materialName,m.materialType,m.unit,p.beforeinventoryNum,p.materialNum,(p.beforeinventoryNum-p.materialNum),m.supplier from procurementAggre p,materialInfo m where p.procurementCode='%s' and p.materialCode=m.materialCode;"%(procurementCode)
     try:
         lock.acquire()
         cur.execute(sql)
@@ -746,15 +760,19 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
     try:
         lock.acquire()
         for i in range(productCodeArr.__len__()):
-            sql = "insert into procurement (procurementCode,productCode,productNum,client,remark,entryClerk,entryTime)value('%s','%s','%d','%s','%s','%s','%s');" \
+            sql = "insert into procurement (procurementCode,productCode,productNum,client,remark,entryClerk,entryTime) value('%s','%s','%d','%s','%s','%s','%s');" \
                   % (procurementCode,productCodeArr[i],int(productNumArr[i]),client,remarkArr[i],entryClerk,entryTime)
             # 执行SQL语句
             cur.execute(sql)
         # 更新materialInOut
         cur.execute("select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum),materialInfo.unit,materialInfo.price,materialInfo.supplier from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode;" % (procurementCode))
         result = cur.fetchall()
-        lock.release()
         for i in result:
+            cur.execute("select inventoryNum from materialInfo where materialCode='%s';" % (i[0]))
+            inventoryNum = cur.fetchall()[0][0]
+            cur.execute("insert into procurementAggre (procurementCode, materialCode, beforeinventoryNum, materialNum) value('%s','%s','%d','%d');" % (procurementCode,i[0],inventoryNum,i[1]))
+
+            lock.release()
             # documentNumber=uuid.uuid1() # 使用uuid生成唯一代号
             documentNumber=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
             print(documentNumber)
@@ -766,7 +784,7 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
             # insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,"系统账号")
             # insert_materialInOut(documentNumber,documentTime,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk)
             myThread(target=insert_materialInOut, args=(documentNumber,documentTime,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk,))
-        lock.acquire()
+            lock.acquire()
         # 更新materialInfo
         cur.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurement p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum-m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney-price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
         # 提交到数据库执行
@@ -1303,6 +1321,155 @@ def delete_materialInOutByDocNum(documentNumber):
         conn.close()
     # except:
     #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_concated_orders():
+    try:
+        sql = "select orderCode, group_concat(distinct client), group_concat(distinct orderDate), group_concat(productType), max(deliveryDate), (sum(deliveryNum)<=sum(deliveredNum)), group_concat(remark) from orders group by orderCode;"
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_orderByCode(orderCode):
+    try:
+        sql = "select orders.productType, deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), deliveredNum, orders.client, address, telephone, account, date_format(orderDate,'%%Y-%%m-%%d'), orders.remark, uint, price from orders,productInfo where orderCode='%s' and orders.productType=productInfo.productType;"%(orderCode)
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_orderByCodeAndType(orderCode,productType):
+    try:
+        lock.acquire()
+        cur.execute("select deliveryNum-deliveredNum,inventoryNum from orders,productInfo where orderCode='%s' and orders.productType='%s' and orders.productType=productInfo.productType;" % (orderCode, productType))
+        result = cur.fetchall()
+        lock.release()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def insert_order(orderCode, productType, deliveryNum, deliveryDate, deliveredNum, client, orderDate, remark, entryTime, entryClerk):
+    try:
+        sql = "insert into orders (orderCode, productType, deliveryNum, deliveryDate, deliveredNum, client, orderDate, remark, entryTime, entryClerk) values('%s','%s','%d','%s','%d','%s','%s','%s','%s','%s');"%(orderCode, productType, deliveryNum, deliveryDate, deliveredNum, client, orderDate, remark, entryTime, entryClerk)
+        lock.acquire()
+        cur.execute(sql)
+        conn.commit()
+        lock.release()
+        return
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def update_order(orderCode, productType, sendNum, client, address, telephone, account):
+    try:
+        sql = "update orders set deliveredNum=deliveredNum+'%d', client='%s', address='%s', telephone='%s', account='%s' where orderCode='%s' and productType='%s';"%(sendNum, client, address, telephone, account, orderCode, productType)
+        lock.acquire()
+        cur.execute(sql)
+        conn.commit()
+        lock.release()
+        return
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def delete_order(orderCode):
+    try:
+        sql = "delete from orders where orderCode='%s';"%(orderCode)
+        lock.acquire()
+        cur.execute(sql)
+        conn.commit()
+        lock.release()
+        return
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单，暂不可用
+def select_deliverWithOrderByCode(orderCode):
+    try:
+        sql = "select orders.productType, orders.deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum,productInfo.inventoryNum-sendNum,delivery.remark, orders.client, date_format(orderDate,'%Y-%m-%d') from orders,delivery,productInfo where orders.orderCode='%s' and orders.orderCode=delivery.orderCode and orders.productType=productInfo.productType;"%(orderCode)
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_deliversByOrderCode(orderCode,productType):
+    try:
+        sql = "select deliveryCode, date_format(sendDate,'%%Y-%%m-%%d'), sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark from delivery,productInfo where orderCode='%s' and delivery.productType='%s' and delivery.productType=productInfo.productType;"%(orderCode,productType)
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_deliverByCode(deliveryCode):
+    try:
+        sql = "select orders.productType, deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), date_format(sendDate,'%%Y-%%m-%%d'), sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark, delivery.client, delivery.address, delivery.telephone, delivery.account, orders.orderDate, productInfo.uint, productInfo.price, delivery.entryClerk from delivery,orders,productInfo where deliveryCode='%s' and delivery.orderCode=orders.orderCode and delivery.productType=orders.productType and delivery.productType=productInfo.productType;"%(deliveryCode)
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        return result
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def insert_deliver(deliveryCode, orderCode, productType, uint, price, beforeDeliveryNum, sendDate, sendNum, remark, client, address, telephone, account, entryTime, entryClerk):
+    try:
+        sql = "insert into delivery (deliveryCode, orderCode, productType, uint, price, beforeDeliveryNum, sendDate, sendNum, remark, client, address, telephone, account, entryTime, entryClerk) values('%s','%s','%s','%s','%d','%d','%s','%d','%s','%s','%s','%s','%s','%s','%s');"%(deliveryCode, orderCode, productType, uint, price, beforeDeliveryNum, sendDate, sendNum, remark, client, address, telephone, account, entryTime, entryClerk)
+        lock.acquire()
+        cur.execute(sql)
+        conn.commit()
+        lock.release()
+        return
+        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()

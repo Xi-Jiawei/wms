@@ -1,5 +1,5 @@
 from flask_wtf import Form
-from wtforms import StringField,SubmitField,SelectField,TextAreaField
+from wtforms import StringField,SubmitField,SelectField,TextAreaField,DateField
 from wtforms.validators import Required
 from wtforms.validators import DataRequired # 引入Form验证父类
 
@@ -398,6 +398,39 @@ class ProductForm(Form):
             "class": "form-control",
             "placeholder": "产品编码/型号",
             "required": 'required'  # 表示输入框不能为空，并有提示信息
+        }
+    )
+
+    orderCode=StringField(
+        # 标签
+        label="订单号",
+        # 验证器
+        validators=[
+            DataRequired('请输入订单号')
+        ],
+        description="订单号",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "orderCode",
+            "class": "form-control",
+            "placeholder": "请输入订单号",
+            "required": 'required'  # 表示输入框不能为空，并有提示信息
+        }
+    )
+    orderDate=DateField(
+        label='订单日期',
+        format='%Y-%m-%d',
+        # 验证器
+        validators=[
+            DataRequired('请输入订单日期'),
+        ],
+        description="订单日期",
+        # 附加选项,会自动在前端判别
+        render_kw={
+            "id": "orderDate",
+            "class": "form-control",
+            "placeholder": "请输入订单日期",
+            "required": 'required',  # 表示输入框不能为空，并有提示信息
         }
     )
 
