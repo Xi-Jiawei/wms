@@ -1,0 +1,313 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>永琪智控仓库管理系统</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
+    <link rel="stylesheet" href="/static/bootstrap/pe-icon-7-filled.css">
+    <link rel="stylesheet" href="/static/bootstrap/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/bootstrap/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+    <style>
+        .footer{
+            position:absolute;
+            bottom:0;
+            width:75%;
+            height:60px;
+        }
+    </style>
+</head>
+<body>
+<!-- Left Panel -->
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="{{url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
+                </li>
+                <li class="menu-title">菜单</li><!-- /.menu-title -->
+
+                <li>
+                    <a href="{{ url_for('statement.statement') }}"> <i class="menu-icon fa fa-th"></i>账务报表</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('statement.statement_receivable') }}"> <i class="menu-icon fa fa-th"></i>应收账款</a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('statement.statement_payable') }}"> <i class="menu-icon fa fa-th"></i>应付账款</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('statement.statement_salary') }}"> <i class="menu-icon fa fa-th"></i>工资查询</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('statement.statement_othercosts') }}"> <i class="menu-icon fa fa-th"></i>其他支出</a>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
+<!-- /#left-panel -->
+
+<!-- Right Panel -->
+<div id="right-panel" class="right-panel">
+
+    <!-- Header-->
+    <header id="header" class="header">
+        <div class="top-left">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for("user_login")}}"><img src="/static/images/logo.png" alt="Logo"></a>
+                <a class="navbar-brand hidden" href="{{ url_for("user_login")}}"><img src="/static/images/logo2.png" alt="Logo"></a>
+                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="header-menu">
+                <div class="user-area dropdown float-right">
+                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <img class="user-avatar rounded-circle" src="/static/images/admin.jpg" alt="{{ personName }}">
+                    </a>
+                    <div class="user-menu dropdown-menu">
+                        <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+                        <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power -off"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- /#Header-->
+
+    <!-- content -->
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card" style="overflow: hidden">
+                        <div class="card-body">
+
+                            <div class="row" style="position:relative;">
+                                <form id="searchForm" method="post" novalidate="novalidate">
+                                    <div class="col-xs-12" style="width: 240px;">
+                                        <label class="control-label mb-1">供应商</label>
+                                        <input type="text" class="form-control" id="supplierCode" name="supplier" placeholder="输入供应商" list="supplierList"/>
+                                        <datalist id="supplierList">
+                                            {% if suppliers %}
+                                                {% for i in suppliers %}
+                                                    <option value="{{ i }}"/>
+                                                {% endfor %}
+                                            {% endif %}
+                                        </datalist>
+                                    </div>
+                                    <div class="col-xs-12" style="padding-left: 20px;width: 240px;">
+                                        <label class="control-label mb-1">选择月份</label>
+                                        <input type="month" id="month" name="month" class="form-control"
+                                               {% if month %}
+                                                value="{{ month }}"
+                                               {% endif %}
+                                        >
+                                    </div>
+                                    <div class="col-xs-12" style="padding-left: 20px;padding-top:27px;width: 240px;">
+                                        <button type="submit" id="search" name="search" class="btn btn-default" style="width: 240px;">查询</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <hr align="left" style="width: 100%;color: #987cb9;size: 3px">
+                            <!--<h3>供应商"<span id="clientHeader" style="color: #8a6d3b">"</span></h3>-->
+
+                            <div class="row" style="position:relative;width:100%;">
+                                <table id="payableTable" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>物料型号</th>
+                                        <th>上月结余应付款</th>
+                                        <th>本月新增应付款</th>
+                                        <th>本月应付款</th>
+                                        <th>本月实付款</th>
+                                        <th>未付余款</th>
+                                        <th>备注</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for i in payablesOfMaterial %}
+                                        <tr>
+                                            <td>{{ i[0] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>{{ i[1] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>{{ i[2] }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        {% if payable %}
+                                        <td>合计</td>
+                                        <td>{{ payable[0][1] }}</td>
+                                        <td>{{ payable[0][2] }}</td>
+                                        <td>{{ payable[0][3] }}</td>
+                                        <td>{{ payable[0][4] }}</td>
+                                        <td>{{ payable[0][3]-payable[0][4] }}</td>
+                                        <td>{{ payable[0][5] }}</td>
+                                        {% else %}
+                                        <td>合计</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>0</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        {% endif %}
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div>
+    <!-- /#content -->
+</div>
+<!-- /#right-panel -->
+
+<!-- Scripts -->
+<script src="/static/jquery/jquery-2.1.4.min.js"></script>
+<script src="/static/jquery/popper.min.js"></script>
+<script src="/static/jquery/bootstrap.min.js"></script>
+<script src="/static/jquery/jquery.matchHeight.min.js"></script>
+<script src="/static/jquery/main.js"></script>
+<script src="/static/jquery/datatables.min.js"></script>
+<script src="/static/jquery/dataTables.bootstrap.min.js"></script>
+<script src="/static/jquery/dataTables.buttons.min.js"></script>
+<script src="/static/jquery/buttons.bootstrap.min.js"></script>
+<script src="/static/jquery/jszip.min.js"></script>
+<script src="/static/jquery/vfs_fonts.js"></script>
+<script src="/static/jquery/buttons.html5.min.js"></script>
+<script src="/static/jquery/buttons.print.min.js"></script>
+<script src="/static/jquery/buttons.colVis.min.js"></script>
+<script src="/static/jquery/datatables-init.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var table=$('#payableTable').DataTable();
+
+        table.on('search.dt', function () {
+            console.log("合计");
+            console.log(table.rows({filter: 'applied'}).nodes());
+            console.log(table.rows({filter: 'applied'}).nodes().length);
+            console.log(table.rows({filter: 'applied'}).data());
+            console.log(table.rows({filter: 'applied'}).data().length);
+
+            var data = table.rows({filter: 'applied'}).data();
+            var length = table.rows({filter: 'applied'}).nodes().length;
+            var payableSum=0;
+            for (var i = 0; i < length; i++) {
+                payableSum += parseFloat(data[i][3]);
+            }
+
+            $("#payableTable tfoot tr td").eq(3).text(payableSum.toFixed(2));
+        });
+    });
+    $("#searchForm").submit(function(e) {
+        e.preventDefault();
+
+        var data = {
+            'supplierCode':$('#supplierCode').val(),
+            'month': $('#month').val()
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/statement_payable",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var payable=callback['payable'];
+                    var payablesOfMaterial=callback['payablesOfMaterial'];
+                    var table=$('#payableTable').DataTable();
+                    table.clear();
+                    for (var i = 0; i < payablesOfMaterial.length; i++) {
+                        table.row.add([
+                            payablesOfMaterial[i][0],
+                            '-',
+                            '-',
+                            payablesOfMaterial[i][1],
+                            '-',
+                            '-',
+                            payablesOfMaterial[i][2]
+                        ]);
+                    }
+                    table.draw();
+                    var tfootRow=$('#payableTable tfoot tr td');
+                    tfootRow.eq(1).text(payable[0][1]);
+                    tfootRow.eq(2).text(payable[0][2]);
+                    tfootRow.eq(3).text(payable[0][3]);
+                    tfootRow.eq(4).text(payable[0][4]);
+                    tfootRow.eq(5).text(payable[0][3]-payable[0][4]);
+                    tfootRow.eq(6).text(payable[0][5]);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });
+    $('#supplierCode').on("input", function () {
+        console.log("过滤");
+        var filterStr=$(this).val();
+
+        $.ajax({
+            url: "/search_supplier/"+filterStr,
+            type: "GET",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+                if(callback['ok']){
+                    var suppliers=callback['suppliers'];//materialCode,materialName,materialType
+
+                    $("#supplierList").empty();
+                    if(suppliers!=null)
+                        for(var i=0;i<suppliers.length;i++)
+                            $("#supplierList").append('<option value="'+suppliers[i]+'"/>');
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                //alert('返回值错误');
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -161,8 +161,10 @@ class ProductForm(Form):
         description="客户名称",
         # 附加选项,会自动在前端判别
         render_kw={
+            "id": "clientCode",
             "class": "form-control",
             "placeholder": "请输入客户名称",
+            "list":"clientList",
             "required": 'required'  # 表示输入框不能为空，并有提示信息
         }
     )

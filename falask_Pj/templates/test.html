@@ -37,6 +37,60 @@
         .itable td,.ii_table td{ border-right:2px solid #b88787; }
         .ii_table{ border-left:2px solid #b88787; }
         .invoice_bottom p{ display:inline-block; width:168px; padding-left:14px;}
+
+        /*tab切换样式*/
+        *{
+            margin:0;
+            padding:0;
+            text-decoration:none;
+            list-style:none;
+        }
+        a{
+            color:#fff;
+            font-size:13px;
+            display:block;
+        }
+        a:hover{
+            color:#ccc;
+        }
+        .wrap{
+            margin:700px auto;
+            width:250px;
+            height:auto;
+        }
+        .container-top{
+            height:30px;
+        }
+        .container-bottom{
+            height:60px;
+            overflow:hidden;
+        }
+        .container-top ul{
+            height:30px;
+        }
+        .container-top ul li{
+            float:left;
+            width:50px;
+            height:30px;
+            line-height:30px;
+            text-align:center;
+            background-color:#ccc;
+        }
+        .container-bottom ul{
+            height:60px;
+            background-image:linear-gradient(to right,#FF00FF,#E066FF);
+        }
+        .container-bottom ul li{
+            width:125px;
+            height:30px;
+            line-height:30px;
+            float:left;
+            text-align:center;
+            background:none;
+        }
+        .select{
+            background-image:linear-gradient(to right,dimgray,gray);
+        }
     </style>
 </head>
 <body>
@@ -290,6 +344,65 @@
     </div>
 </div>
 
+<!--tab切换-->
+<div class="card" style="position:relative;width: 100%;left: 0;top: 50px">
+    <div id="product_table_div" class="card-body">
+        <div class="wrap">
+		<div class="container-top" id="tabList">
+			<ul>
+				<li><a href="">论坛</a></li>
+				<li><a href="">博客</a></li>
+				<li><a href="">交流</a></li>
+				<li><a href="">社区</a></li>
+				<li><a href="">反馈</a></li>
+			</ul>
+		</div>
+		<div class="container-bottom" id="item">
+			<div class="forum">
+				<ul>
+					<li><a href="#">论坛A</a></li>
+					<li><a href="#">论坛B</a></li>
+					<li><a href="#">论坛C</a></li>
+					<li><a href="#">论坛D</a></li>
+				</ul>
+			</div>
+			<div class="blog">
+				<ul>
+					<li><a href="#">博客A</a></li>
+					<li><a href="#">博客B</a></li>
+					<li><a href="#">博客C</a></li>
+					<li><a href="#">博客D</a></li>
+				</ul>
+			</div>
+			<div class="discuss">
+				<ul>
+					<li><a href="#">交流A</a></li>
+					<li><a href="#">交流B</a></li>
+					<li><a href="#">交流C</a></li>
+					<li><a href="#">交流D</a></li>
+				</ul>
+			</div>
+			<div class="community">
+				<ul>
+					<li><a href="#">社区A</a></li>
+					<li><a href="#">社区B</a></li>
+					<li><a href="#">社区C</a></li>
+					<li><a href="#">社区D</a></li>
+				</ul>
+			</div>
+			<div class="con">
+				<ul>
+					<li><a href="#">反馈A</a></li>
+					<li><a href="#">反馈B</a></li>
+					<li><a href="#">反馈C</a></li>
+					<li><a href="#">反馈D</a></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+    </div>
+</div>
+
 <!--可编辑表格-->
 <div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
     <div id="product_table_div" class="card-body">
@@ -345,6 +458,11 @@
         var filterStr=$(this).val();
         console.log(filterStr);
         var data={'filterStr':filterStr};
+
+        console.log(document.getElementById("search"));
+        document.getElementById("search").textContent="00000";
+        console.log(document.getElementById("search"));
+        alert("测试");
 
         $.ajax({
                 url: "/search_material",
@@ -806,6 +924,36 @@
 
         $("#billMoneyCapital").text(billMondeySumCapital);
     });
+
+    <!--tab切换-->
+	//封装通过id来查找元素的函数，不需要引入jquery库;
+	/*function $(id){
+		return typeof id === "string"?document.getElementById(id):document;
+	}*/
+	window.onload = function(){
+		//获取5个标题名;
+		var items = document.getElementById("tabList").getElementsByTagName("li");
+		//获取5个内容盒子;
+		var	divs = document.getElementById("item").getElementsByTagName("div");
+		if(items.length != divs.length){
+			return;
+		}
+		console.log("tab切换");
+		console.log(items);
+
+		//循环遍历标题名和内容盒子;
+		for(var i = 0,len = items.length; i < len; i++){
+			items[i].id = i;
+			items[i].onmouseover = function(){
+				for(var j = 0,len = items.length; j < len; j++){
+					items[j].className = "";
+					divs[j].style.display = "none";
+				}
+				this.className = "select";
+				divs[this.id].style.display = "block";
+			}
+		}
+	};
 
     /**
      * JS实现可编辑的表格

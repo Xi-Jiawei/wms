@@ -41,6 +41,36 @@ def show_products():
         return render_template('access_fail.html')
 
 # xijiawei
+# 成品管理
+@product_app.route('/productInfoByCode/<productCode>', methods=['GET'])
+def productInfoByCode(productCode):
+    print(session)
+    print(session.keys())
+    print(session.get('username'))
+    if session.get('username'):
+        # productType,client,uint,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+        thread = myThread(target=select_productInfoByCode, args=(productCode,))
+        productInfo = thread.get_result()
+        return render_template('products_show.html', productInfo=productInfo)
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 成品管理
+@product_app.route('/productInfoByType/<productType>', methods=['GET'])
+def productInfoByType(productType):
+    print(session)
+    print(session.keys())
+    print(session.get('username'))
+    if session.get('username'):
+        # productCode,client,uint,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+        thread = myThread(target=select_productInfoByType, args=(productType,))
+        productInfo = thread.get_result()
+        return jsonify({'ok': True,'productInfo':productInfo})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
 # 添加成品
 @product_app.route('/add_product', methods=['GET', 'POST'])
 def add_product():
@@ -140,18 +170,19 @@ def edit_product(productCode):
         if authority[1]=='2':
             print("当前权限仅限查看")
 
-            # productInfo = select_productInfoByCode(productCode) # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+            # productInfo = select_productInfoByCode(productCode) # productType,client,uint,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
             thread = myThread(target=select_productInfoByCode, args=(productCode,))
             productInfo = thread.get_result()
             form.productCode.data = productCode
             form.productType.data = productInfo[0][0]
             form.client.data = productInfo[0][1]
-            form.price.data = productInfo[0][2]
-            form.profit.data = productInfo[0][3]
-            form.totalCost.data = productInfo[0][4]
-            form.taxRate.data = productInfo[0][5]
-            form.entryClerk.data = productInfo[0][13]
-            form.remark.data = productInfo[0][11]
+            # productInfo[0][2] # uint
+            form.price.data = productInfo[0][3]
+            form.profit.data = productInfo[0][4]
+            form.totalCost.data = productInfo[0][5]
+            form.taxRate.data = productInfo[0][6]
+            form.entryClerk.data = productInfo[0][14]
+            form.remark.data = productInfo[0][12]
             form.productCode.render_kw={"class": "form-control","readonly": 'true'}
             form.productType.render_kw={"class": "form-control","readonly": 'true'}
             form.client.render_kw={"class": "form-control","readonly": 'true'}
@@ -160,11 +191,11 @@ def edit_product(productCode):
             form.taxRate.render_kw={"class": "form-control","readonly": 'true'}
             form.entryClerk.render_kw={"class": "form-control","readonly": 'true'}
             form.remark.render_kw={"class": "form-control","readonly": 'true'}
-            materialCost = str(productInfo[0][6])
-            processCost = str(productInfo[0][7])
-            adminstrationCost = str(productInfo[0][8])
-            supplementaryCost = str(productInfo[0][9])
-            operatingCost = str(productInfo[0][10])
+            materialCost = str(productInfo[0][7])
+            processCost = str(productInfo[0][8])
+            adminstrationCost = str(productInfo[0][9])
+            supplementaryCost = str(productInfo[0][10])
+            operatingCost = str(productInfo[0][11])
 
             # materialsOfProduct = select_materialsOfProductByCode(productCode)
             thread = myThread(target=select_materialsOfProductByCode, args=(productCode,))
@@ -247,20 +278,21 @@ def edit_product(productCode):
                 form.productCode.data = productCode
                 form.productType.data = productInfo[0][0]
                 form.client.data = productInfo[0][1]
-                form.price.data = productInfo[0][2]
-                form.profit.data = productInfo[0][3]
-                form.totalCost.data = productInfo[0][4]
-                form.taxRate.data = productInfo[0][5]
-                form.entryClerk.data = productInfo[0][13]
+                # productInfo[0][2] # uint
+                form.price.data = productInfo[0][3]
+                form.profit.data = productInfo[0][4]
+                form.totalCost.data = productInfo[0][5]
+                form.taxRate.data = productInfo[0][6]
+                form.entryClerk.data = productInfo[0][14]
                 form.productCode.render_kw = {"class": "form-control", "readonly": 'true'}
                 form.productType.render_kw = {"class": "form-control", "readonly": 'true'}
                 form.entryClerk.render_kw = {"class": "form-control", "readonly": 'true'}
-                form.remark.data = productInfo[0][11]
-                materialCost = str(productInfo[0][6])
-                processCost = str(productInfo[0][7])
-                adminstrationCost = str(productInfo[0][8])
-                supplementaryCost = str(productInfo[0][9])
-                operatingCost = str(productInfo[0][10])
+                form.remark.data = productInfo[0][12]
+                materialCost = str(productInfo[0][7])
+                processCost = str(productInfo[0][8])
+                adminstrationCost = str(productInfo[0][9])
+                supplementaryCost = str(productInfo[0][10])
+                operatingCost = str(productInfo[0][11])
 
                 # materialsOfProduct = select_materialsOfProductByCode(productCode)
                 thread = myThread(target=select_materialsOfProductByCode, args=(productCode,))

@@ -270,7 +270,7 @@
                     for(var i=1;i<table.rows.length;i++){
                         var chkOrder = table.rows[i].cells[0].firstChild;
                         if(chkOrder){
-                            if(chkOrder.type = "CHECKBOX"){
+                            if(chkOrder.type == "checkbox"){
                                 chkOrder.checked=true;
                                 //chkOrder.setAttribute("checked", true);
                             }
@@ -280,7 +280,7 @@
                     for(var i=1;i<table.rows.length;i++){
                         var chkOrder = table.rows[i].cells[0].firstChild;
                         if(chkOrder){
-                            if(chkOrder.type = "CHECKBOX"){
+                            if(chkOrder.type == "checkbox"){
                                 chkOrder.checked=false;
                                 //chkOrder.setAttribute("checked", false);
                             }

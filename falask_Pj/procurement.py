@@ -126,7 +126,7 @@ def calculate_procurement():
             # materialsOfProduct = select_materialsOfProductByCode(productCodeArr[i])  # materialCode,materialName,materialType,materialNum,materialPrice,materialCost,patchPoint,patchPrice,patchCost
             thread = myThread(target=select_materialsOfProductByCode, args=(productCodeArr[i],))
             materialsOfProduct = thread.get_result()
-            # productInfo = select_productInfoByCode(productCodeArr[i])  # productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+            # productInfo = select_productInfoByCode(productCodeArr[i])  # productType,client,uint,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
             thread = myThread(target=select_productInfoByCode, args=(productCodeArr[i],))
             productInfo = thread.get_result()
             product = []

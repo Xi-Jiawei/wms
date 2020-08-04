@@ -12,6 +12,8 @@ from product import product_app
 from procurement import procurement_app
 from material import material_app
 from order import order_app
+from financial import financial_app
+from statement import statement_app
 
 # app = Flask(__name__)
 if getattr(sys, 'frozen', False):
@@ -243,6 +245,12 @@ app.register_blueprint(procurement_app)
 # xijiawei
 # 添加“order.py”蓝本
 app.register_blueprint(order_app)
+# xijiawei
+# 添加“financial.py”蓝本
+app.register_blueprint(financial_app)
+# xijiawei
+# 添加“statement.py”蓝本
+app.register_blueprint(statement_app)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

@@ -1,0 +1,521 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>永琪智控仓库管理系统</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
+    <link rel="stylesheet" href="/static/bootstrap/pe-icon-7-filled.css">
+    <link rel="stylesheet" href="/static/bootstrap/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/bootstrap/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+    <style>
+        /*tab切换样式*/
+        *{
+            margin:0;
+            padding:0;
+            text-decoration:none;
+            list-style:none;
+        }
+        a{
+            color:#fff;
+            font-size:13px;
+            display:block;
+        }
+        a:hover{
+            color:#ccc;
+        }
+        .wrap{
+            margin:0 auto;
+            width:100%;
+            height:auto;
+        }
+        .container-top{
+            width:100%;
+            height:40px;
+        }
+        .container-top ul{
+            height:40px;
+        }
+        .container-top ul li{
+            float:left;
+            width:50%;
+            height:40px;
+            line-height:40px;
+            text-align:center;
+            background-color:#ccc;
+        }
+        .container-top ul li a{
+            font-size: 20px;
+        }
+        .select{
+            background-image:linear-gradient(to right,dimgray,gray);
+        }
+    </style>
+</head>
+<body>
+<!-- Left Panel -->
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="{{url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
+                </li>
+                <li class="menu-title">菜单</li><!-- /.menu-title -->
+
+                <li>
+                    <a href="{{ url_for('statement.statement') }}"> <i class="menu-icon fa fa-th"></i>账务报表</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('statement.statement_receivable') }}"> <i class="menu-icon fa fa-th"></i>应收账款</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('statement.statement_payable') }}"> <i class="menu-icon fa fa-th"></i>应付账款</a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('statement.statement_salary') }}"> <i class="menu-icon fa fa-th"></i>工资查询</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('statement.statement_othercosts') }}"> <i class="menu-icon fa fa-th"></i>其他支出</a>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
+<!-- /#left-panel -->
+
+<!-- Right Panel -->
+<div id="right-panel" class="right-panel">
+
+    <!-- Header-->
+    <header id="header" class="header">
+        <div class="top-left">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for("user_login")}}"><img src="/static/images/logo.png" alt="Logo"></a>
+                <a class="navbar-brand hidden" href="{{ url_for("user_login")}}"><img src="/static/images/logo2.png" alt="Logo"></a>
+                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="header-menu">
+                <div class="user-area dropdown float-right">
+                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <img class="user-avatar rounded-circle" src="/static/images/admin.jpg" alt="{{ personName }}">
+                    </a>
+                    <div class="user-menu dropdown-menu">
+                        <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+                        <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power -off"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- /#Header-->
+
+    <!-- content -->
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card" style="overflow: hidden">
+                        <div class="card-body">
+                            <div class="wrap">
+                                <div class="container-top" id="tabList">
+                                    <ul>
+                                        <li><a>工&nbsp;&nbsp;&nbsp;&nbsp;人&nbsp;&nbsp;&nbsp;&nbsp;工&nbsp;&nbsp;&nbsp;&nbsp;资</a></li>
+                                        <li><a>管&nbsp;&nbsp;&nbsp;&nbsp;理&nbsp;&nbsp;&nbsp;&nbsp;工&nbsp;&nbsp;&nbsp;&nbsp;资</a></li>
+                                    </ul>
+                                </div>
+                                <div id="item">
+                                    <div class="tab" style="position:relative;">
+                                        <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px">
+                                            <div class="col-xs-12" style="position:relative;left: 0;width: 20%">
+                                                <input type="month" id="workerSalaryMonth" name="month" class="form-control"
+                                                        {% if month %}
+                                                       value="{{ month }}"
+                                                        {% endif %}
+                                                />
+                                            </div>
+                                            <!--<div class="col-xs-12" style="position:relative;padding-left: 60%;width: 80%;">
+                                                <input type="text"  id="workerSearch" class="form-control" style="width: 100%" placeholder="输入过滤内容"/>
+                                            </div>-->
+                                        </div>
+                                        <table id="workerSalary" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2">发放月份</th>
+                                                <th style='display:none'>员工id</th>
+                                                <th rowspan="2">员工</th>
+                                                <th rowspan="2">岗位</th>
+                                                <th rowspan="2">上班时间</th>
+                                                <th rowspan="2">计时时间</th>
+                                                <th colspan="6">应发金额</th>
+                                                <th colspan="4">应缴金额</th>
+                                                <th rowspan="2">实发工资</th>
+                                                <th rowspan="2">社保（公司部分）</th>
+                                                <th rowspan="2">工资费用</th>
+                                            </tr>
+                                            <tr>
+                                                <th>计时工资</th>
+                                                <th>计件工资</th>
+                                                <th>工龄工资</th>
+                                                <th>补贴</th>
+                                                <th>处罚</th>
+                                                <th>应发合计</th>
+                                                <th>代缴个税</th>
+                                                <th>代缴社保（个人部分）</th>
+                                                <th>其他</th>
+                                                <th>应缴合计</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if workerSalary %}
+                                                {% for i in workerSalary %}
+                                                    <tr>
+                                                        <td>{{ month }}</td>
+                                                        <td style='display:none'>{{ i[1] }}</td>
+                                                        <td>{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                        <td>{{ i[4] }}</td>
+                                                        <td>{{ i[5] }}</td>
+                                                        <td class='payablewage'>{{ i[6] }}</td>
+                                                        <td class='payablewage'>{{ i[7] }}</td>
+                                                        <td class='payablewage'>{{ i[8] }}</td>
+                                                        <td class='payablewage'>{{ i[9] }}</td>
+                                                        <td class='payablewage'>{{ i[10] }}</td>
+                                                        <td>{{ i[11] }}</td>
+                                                        <td class='dues'>{{ i[12] }}</td>
+                                                        <td class='dues'>{{ i[13] }}</td>
+                                                        <td class='dues'>{{ i[14] }}</td>
+                                                        <td>{{ i[15] }}</td>
+                                                        <td>{{ i[16] }}</td>
+                                                        <td>{{ i[17] }}</td>
+                                                        <td>{{ i[18] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+
+                                                {% if workerSalary.__len__()==0 %}
+                                                    <tr>
+                                                        <td colspan='19' style='text-align: center'>No data available in table</td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endif %}
+                                            </tbody>
+                                            <tfoot>
+                                            {% if workerSalarySum %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>{{ workerSalarySum[0][0] }}</td>
+                                                </tr>
+                                            {% endif %}
+                                            </tfoot>
+                                        </table>
+                                    </div>
+
+                                    <div class="tab" style="display:none; position:relative;">
+                                        <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px">
+                                            <div class="col-xs-12" style="position:relative;left: 0;width: 20%">
+                                                <input type="month" id="managerSalaryMonth" name="month" class="form-control"
+                                                        {% if month %}
+                                                       value="{{ month }}"
+                                                        {% endif %}
+                                                />
+                                            </div>
+                                            <!--<div class="col-xs-12" style="position:relative;padding-left: 60%;width: 80%;">
+                                                <input type="text"  id="managerSearch" class="form-control" style="width: 100%" placeholder="输入过滤内容"/>
+                                            </div>-->
+                                        </div>
+                                        <table id="managerSalary" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2">发放月份</th>
+                                                <th style='display:none'>员工id</th>
+                                                <th rowspan="2">员工</th>
+                                                <th rowspan="2">岗位</th>
+                                                <th rowspan="2">上班时间</th>
+                                                <th rowspan="2">计时时间</th>
+                                                <th colspan="8">应发金额</th>
+                                                <th colspan="4">应缴金额</th>
+                                                <th rowspan="2">实发工资</th>
+                                                <th rowspan="2">社保（公司部分）</th>
+                                                <th rowspan="2">工资费用</th>
+                                            </tr>
+                                            <tr>
+                                                <th>基本工资</th>
+                                                <th>岗位工资</th>
+                                                <th>加班工资</th>
+                                                <th>绩效工资</th>
+                                                <th>工龄工资</th>
+                                                <th>补贴</th>
+                                                <th>处罚</th>
+                                                <th>应发合计</th>
+                                                <th>代缴个税</th>
+                                                <th>代缴社保（个人部分）</th>
+                                                <th>其他</th>
+                                                <th>应缴合计</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if managerSalary %}
+                                                {% for i in managerSalary %}
+                                                    <tr>
+                                                        <td>{{ month }}</td>
+                                                        <td style='display:none'>{{ i[1] }}</td>
+                                                        <td>{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                        <td>{{ i[4] }}</td>
+                                                        <td>{{ i[5] }}</td>
+                                                        <td class='payablewage'>{{ i[6] }}</td>
+                                                        <td class='payablewage'>{{ i[7] }}</td>
+                                                        <td class='payablewage'>{{ i[8] }}</td>
+                                                        <td class='payablewage'>{{ i[9] }}</td>
+                                                        <td class='payablewage'>{{ i[10] }}</td>
+                                                        <td class='payablewage'>{{ i[11] }}</td>
+                                                        <td class='payablewage'>{{ i[12] }}</td>
+                                                        <td>{{ i[13] }}</td>
+                                                        <td class='dues'>{{ i[14] }}</td>
+                                                        <td class='dues'>{{ i[15] }}</td>
+                                                        <td class='dues'>{{ i[16] }}</td>
+                                                        <td>{{ i[17] }}</td>
+                                                        <td>{{ i[18] }}</td>
+                                                        <td>{{ i[19] }}</td>
+                                                        <td>{{ i[20] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                                {% if managerSalary.__len__()==0 %}
+                                                    <tr>
+                                                        <td colspan='21' style='text-align: center'>No data available in table</td>
+                                                    </tr>
+                                                {% endif %}
+                                            {% endif %}
+                                            </tbody>
+                                            <tfoot>
+                                            {% if managerSalarySum %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>{{ managerSalarySum[0][0] }}</td>
+                                                </tr>
+                                            {% endif %}
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div>
+    <!-- /#content -->
+</div>
+<!-- /#right-panel -->
+
+<!-- Scripts -->
+<script src="/static/jquery/jquery-2.1.4.min.js"></script>
+<script src="/static/jquery/popper.min.js"></script>
+<script src="/static/jquery/bootstrap.min.js"></script>
+<script src="/static/jquery/jquery.matchHeight.min.js"></script>
+<script src="/static/jquery/main.js"></script>
+<script src="/static/jquery/datatables.min.js"></script>
+<script src="/static/jquery/dataTables.bootstrap.min.js"></script>
+<script src="/static/jquery/dataTables.buttons.min.js"></script>
+<script src="/static/jquery/buttons.bootstrap.min.js"></script>
+<script src="/static/jquery/jszip.min.js"></script>
+<script src="/static/jquery/vfs_fonts.js"></script>
+<script src="/static/jquery/buttons.html5.min.js"></script>
+<script src="/static/jquery/buttons.print.min.js"></script>
+<script src="/static/jquery/buttons.colVis.min.js"></script>
+<script src="/static/jquery/datatables-init.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+    });
+	window.onload = function(){
+		console.log("tab切换");
+		//获取5个标题名;
+		var items = document.getElementById("tabList").getElementsByTagName("li");
+		//获取5个内容盒子;
+		var tabs = document.getElementById("item").getElementsByClassName("tab");
+		if(items.length != tabs.length){
+			return;
+		}
+		console.log(items);
+
+		//循环遍历标题名和内容盒子;
+        items[0].className = "select"; // 默认第一个被选中
+		for(var i = 0,len = items.length; i < len; i++){
+			items[i].id = i;
+			items[i].onmouseover = function(){
+				for(var j = 0,len = items.length; j < len; j++){
+					items[j].className = "";
+					tabs[j].style.display = "none";
+				}
+				this.className = "select";
+				tabs[this.id].style.display = "block";
+			}
+		}
+	};
+	$('#workerSalaryMonth').on("change", function () {
+	    $.ajax({
+            url: "/search_worker_salary/"+this.value,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var salaries=callback['salaries'];
+                    var salarySum=callback['salarySum'];
+                    var tbody = document.getElementById("workerSalary").children[1];
+                    $('#workerSalary tbody').html("");
+                    /*for (var i = 0; i < salaries.length; i++)
+                        tbody.rows[i].cells[2].innerHTML=salaries[i][1];*/
+                    for (var i = 0; i < salaries.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td>" + salaries[i][0] + "</td>\n" +
+                            "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
+                            "<td>" + salaries[i][2] + "</td>\n" +
+                            "<td>" + salaries[i][3] + "</td>\n" +
+                            "<td>" + salaries[i][4] + "</td>\n" +
+                            "<td>" + salaries[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][10] + "</td>\n" +
+                            "<td>" + salaries[i][11] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][12] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][14] + "</td>\n" +
+                            "<td>" + salaries[i][15] + "</td>\n" +
+                            "<td>" + salaries[i][16] + "</td>\n" +
+                            "<td>" + salaries[i][17] + "</td>\n" +
+                            "<td>" + salaries[i][18] + "</td></tr>";
+
+                    if(!salaries.length)
+                        tbody.insertRow(i).innerHTML="<tr><td colspan='18' style='text-align: center'>No data available in table</td></tr>";
+
+                    if(salarySum) {
+                        var tfootRow = $('#workerSalary tfoot tr td');
+                        tfootRow.eq(17).text(salarySum[0][0]);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });
+	$('#managerSalaryMonth').on("change", function () {
+	    $.ajax({
+            url: "/search_manager_salary/"+this.value,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var salaries=callback['salaries'];
+                    var salarySum=callback['salarySum'];
+                    var tbody = document.getElementById("managerSalary").children[1];
+                    $('#managerSalary tbody').html("");
+                    /*for (var i = 0; i < salaryArr.length; i++)
+                        tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
+                    for (var i = 0; i < salaries.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td>" + salaries[i][0] + "</td>\n" +
+                            "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
+                            "<td>" + salaries[i][2] + "</td>\n" +
+                            "<td>" + salaries[i][3] + "</td>\n" +
+                            "<td>" + salaries[i][4] + "</td>\n" +
+                            "<td>" + salaries[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][10] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][11] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][12] + "</td>\n" +
+                            "<td>" + salaries[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][14] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][15] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][16] + "</td>\n" +
+                            "<td>" + salaries[i][17] + "</td>\n" +
+                            "<td>" + salaries[i][18] + "</td>\n" +
+                            "<td>" + salaries[i][19] + "</td>\n" +
+                            "<td>" + salaries[i][20] + "</td></tr>";
+
+                    if(!salaries.length)
+                        tbody.insertRow(i).innerHTML="<tr><td colspan='20' style='text-align: center'>No data available in table</td></tr>";
+
+                    if(salarySum) {
+                        var tfootRow = $('#managerSalary tfoot tr td');
+                        tfootRow.eq(19).text(salarySum[0][0]);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });
+</script>
+</body>
+</html>

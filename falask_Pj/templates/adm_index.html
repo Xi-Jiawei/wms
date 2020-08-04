@@ -83,7 +83,7 @@
                 </li>
                 <li class="menu-title">菜单</li><!-- /.menu-title -->
                 <li>
-                    <a href="{{ url_for("material.show_material") }}"> <i class="menu-icon fa fa-cogs"></i>物料管理</a>
+                    <a href="{{ url_for("material.show_material") }}"> <i class="menu-icon fa fa-magnet"></i>物料管理</a>
                 </li>
                 <li>
                     <a href="{{ url_for("product.show_products") }}"> <i class="menu-icon fa fa-th"></i>成品管理</a>
@@ -92,13 +92,19 @@
                     <a href="{{ url_for("procurement.procurement_history") }}"> <i class="menu-icon fa fa-table"></i>采购管理</a>
                 </li>
                 <li>
-                    <a href="{{ url_for("order.order") }}"> <i class="menu-icon fa fa-table"></i>订单管理</a>
+                    <a href="{{ url_for("order.order") }}"> <i class="menu-icon fa fa-adn"></i>订单管理</a>
                 </li>
                 <li>
-                    <a href="{{ url_for("show_users") }}"> <i class="menu-icon fa fa-table"></i>人员管理</a>
+                    <a href="{{ url_for("financial.financial_receivable") }}"> <i class="menu-icon fa fa-anchor"></i>财务管理</a>
+                </li>
+                <li>
+                    <a href="{{ url_for("statement.statement") }}"> <i class="menu-icon fa fa-angellist"></i>报表查询</a>
+                </li>
+                <li>
+                    <a href="{{ url_for("show_users") }}"> <i class="menu-icon fa fa-ban"></i>人员管理</a>
                 </li>
                  <li>
-                    <a href="{{ url_for("change_password") }}"> <i class="menu-icon fa fa-table"></i>修改个人密码</a>
+                    <a href="{{ url_for("change_password") }}"> <i class="menu-icon fa fa-cogs"></i>修改个人密码</a>
                 </li>
             </ul>
         </div><!-- /.navbar-collapse -->

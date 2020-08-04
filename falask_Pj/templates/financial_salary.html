@@ -1,0 +1,1346 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>永琪智控仓库管理系统</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
+    <link rel="stylesheet" href="/static/bootstrap/pe-icon-7-filled.css">
+    <link rel="stylesheet" href="/static/bootstrap/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/bootstrap/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+    <style>
+        /*tab切换样式*/
+        *{
+            margin:0;
+            padding:0;
+            text-decoration:none;
+            list-style:none;
+        }
+        a{
+            color:#fff;
+            font-size:13px;
+            display:block;
+        }
+        a:hover{
+            color:#ccc;
+        }
+        .wrap{
+            margin:0 auto;
+            width:100%;
+            height:auto;
+        }
+        .container-top{
+            width:100%;
+            height:40px;
+        }
+        .container-top ul{
+            height:40px;
+        }
+        .container-top ul li{
+            float:left;
+            width:50%;
+            height:40px;
+            line-height:40px;
+            text-align:center;
+            background-color:#ccc;
+        }
+        .container-top ul li a{
+            font-size: 20px;
+        }
+        .select{
+            background-image:linear-gradient(to right,dimgray,gray);
+        }
+    </style>
+</head>
+<body>
+<!-- Left Panel -->
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="{{url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
+                </li>
+                <li class="menu-title">菜单</li><!-- /.menu-title -->
+
+                <li>
+                    <a href="{{ url_for('financial.financial_receivable') }}"> <i class="menu-icon fa fa-th"></i>收款记账</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('financial.financial_payable') }}"> <i class="menu-icon fa fa-th"></i>付款记账</a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('financial.financial_salary') }}"> <i class="menu-icon fa fa-th"></i>工资管理</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('financial.financial_othercosts') }}"> <i class="menu-icon fa fa-th"></i>其他支出</a>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
+<!-- /#left-panel -->
+
+<!-- Right Panel -->
+<div id="right-panel" class="right-panel">
+
+    <!-- Header-->
+    <header id="header" class="header">
+        <div class="top-left">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for("user_login")}}"><img src="/static/images/logo.png" alt="Logo"></a>
+                <a class="navbar-brand hidden" href="{{ url_for("user_login")}}"><img src="/static/images/logo2.png" alt="Logo"></a>
+                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="header-menu">
+                <div class="user-area dropdown float-right">
+                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <img class="user-avatar rounded-circle" src="/static/images/admin.jpg" alt="{{ personName }}">
+                    </a>
+                    <div class="user-menu dropdown-menu">
+                        <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+                        <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power -off"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- /#Header-->
+
+    <!-- content -->
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card" style="overflow: hidden">
+                        <div class="card-body">
+                            <!--模态框-->
+                            <div class="modal fade" id="workerSalaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                员工工资信息录入
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">员工姓名</label>
+                                                    <input id="workerName" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">员工岗位</label>
+                                                    <input id="workerPosition" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">上班时间</label>
+                                                    <input id="workerWorkhours" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">计时时间</label>
+                                                    <input id="workerOverhours" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">计时工资</label>
+                                                    <input id="timewage" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">计件工资</label>
+                                                    <input id="piecewage" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">工龄工资</label>
+                                                    <input id="workerWorkagewage" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">补贴</label>
+                                                    <input id="workerSubsidy" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">处罚</label>
+                                                    <input id="workerAmerce" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">个人所得税</label>
+                                                    <input id="workerTax" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">社保（个人部分）</label>
+                                                    <input id="workerSocialSecurityOfPersonal" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">社保（公司部分）</label>
+                                                    <input id="workerSocialSecurityOfEnterprise" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="workerSalaryModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="workerSalaryModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
+                            </div>
+
+                            <!--模态框-->
+                            <div class="modal fade" id="managerSalaryModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                员工工资信息录入
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">员工姓名</label>
+                                                    <input id="managerName" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">员工岗位</label>
+                                                    <input id="managerPosition" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">上班时间</label>
+                                                    <input id="managerWorkhours" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">加班时间</label>
+                                                    <input id="managerOverhours" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">基本工资</label>
+                                                    <input id="basewage" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">岗位工资</label>
+                                                    <input id="jobwage" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">加班工资</label>
+                                                    <input id="overtimewage" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">绩效工资</label>
+                                                    <input id="performancewage" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">工龄工资</label>
+                                                    <input id="managerWorkagewage" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">补贴</label>
+                                                    <input id="managerSubsidy" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">处罚</label>
+                                                    <input id="managerAmerce" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">个人所得税</label>
+                                                    <input id="managerTax" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="width: 100%;">
+                                                <div class="col-xs-12" style="position:relative; left: 2%; width: 50%">
+                                                    <label class="control-label mb-1">社保（个人部分）</label>
+                                                    <input id="managerSocialSecurityOfPersonal" type="text" class="form-control">
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative; left: 3%; width: 50%">
+                                                    <label class="control-label mb-1">社保（公司部分）</label>
+                                                    <input id="managerSocialSecurityOfEnterprise" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="managerSalaryModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="managerSalaryModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
+                            </div>
+
+                            <div class="wrap">
+                                <div class="container-top" id="tabList">
+                                    <ul>
+                                        <li><a>工&nbsp;&nbsp;&nbsp;&nbsp;人&nbsp;&nbsp;&nbsp;&nbsp;工&nbsp;&nbsp;&nbsp;&nbsp;资</a></li>
+                                        <li><a>管&nbsp;&nbsp;&nbsp;&nbsp;理&nbsp;&nbsp;&nbsp;&nbsp;工&nbsp;&nbsp;&nbsp;&nbsp;资</a></li>
+                                    </ul>
+                                </div>
+                                <div id="item">
+                                    <div class="tab" style="position:relative;">
+                                        <input style="display: none" id="workerSalaryMonth"
+                                                {% if month %}
+                                               value="{{ month }}"
+                                                {% endif %}
+                                        />
+
+                                        <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
+                                            <div class="col-xs-12" style="position:relative;left: 0;width: 13%">
+                                                <button type="button" class="btn btn-default" style="width: 100%" data-toggle="modal" data-target="#workerSalaryModal" onclick="addWorkerSalary()">添加</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="deleteWorkerSalaries()">删除</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="setWorkerSalaryRowEditable()">编辑</button>
+                                            </div>
+                                        </div>
+                                        <table id="workerSalary" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2"><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                <th rowspan="2">发放月份</th>
+                                                <th style='display:none'>员工id</th>
+                                                <th rowspan="2">员工</th>
+                                                <th rowspan="2">岗位</th>
+                                                <th rowspan="2">上班时间</th>
+                                                <th rowspan="2">计时时间</th>
+                                                <th colspan="6">应发金额</th>
+                                                <th colspan="4">应缴金额</th>
+                                                <th rowspan="2">实发工资</th>
+                                                <th rowspan="2">社保（公司部分）</th>
+                                                <th rowspan="2">工资费用</th>
+                                            </tr>
+                                            <tr>
+                                                <th>计时工资</th>
+                                                <th>计件工资</th>
+                                                <th>工龄工资</th>
+                                                <th>补贴</th>
+                                                <th>处罚</th>
+                                                <th>应发合计</th>
+                                                <th>代缴个税</th>
+                                                <th>代缴社保（个人部分）</th>
+                                                <th>其他</th>
+                                                <th>应缴合计</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if workerSalary %}
+                                                {% for i in workerSalary %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
+                                                        <td>{{ month }}</td>
+                                                        <td style='display:none'>{{ i[1] }}</td>
+                                                        <td>{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                        <td>{{ i[4] }}</td>
+                                                        <td>{{ i[5] }}</td>
+                                                        <td class='payablewage'>{{ i[6] }}</td>
+                                                        <td class='payablewage'>{{ i[7] }}</td>
+                                                        <td class='payablewage'>{{ i[8] }}</td>
+                                                        <td class='payablewage'>{{ i[9] }}</td>
+                                                        <td class='payablewage'>{{ i[10] }}</td>
+                                                        <td>{{ i[11] }}</td>
+                                                        <td class='dues'>{{ i[12] }}</td>
+                                                        <td class='dues'>{{ i[13] }}</td>
+                                                        <td class='dues'>{{ i[14] }}</td>
+                                                        <td>{{ i[15] }}</td>
+                                                        <td>{{ i[16] }}</td>
+                                                        <td>{{ i[17] }}</td>
+                                                        <td>{{ i[18] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </tbody>
+                                        </table>
+                                        <div id="workerSalaryButtonToolbar" class="row" style="display:none;position:relative;left: 68%;width:100%;height: 42px;">
+                                            <div class="col-xs-12" style="position:relative;right: 20px;width: 16%">
+                                                <button type="submit" class="btn btn-default" style="width: 100%" onclick="workerSalarySave()">保存</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;right: 0;width: 16%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="workerSalaryCancel()">取消</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="tab" style="display:none; position:relative;">
+                                        <input style="display: none" id="managerSalaryMonth"
+                                                {% if month %}
+                                               value="{{ month }}"
+                                                {% endif %}
+                                        />
+
+                                        <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
+                                            <div class="col-xs-12" style="position:relative;left: 0;width: 13%">
+                                                <button type="button" class="btn btn-default" style="width: 100%" data-toggle="modal" data-target="#managerSalaryModal" onclick="addManagerSalary()">添加</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="deleteManagerSalaries()">删除</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="setManagerSalaryRowEditable()">编辑</button>
+                                            </div>
+                                        </div>
+                                        <table id="managerSalary" class="table table-striped table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2"><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                <th rowspan="2">发放月份</th>
+                                                <th style='display:none'>员工id</th>
+                                                <th rowspan="2">员工</th>
+                                                <th rowspan="2">岗位</th>
+                                                <th rowspan="2">上班时间</th>
+                                                <th rowspan="2">计时时间</th>
+                                                <th colspan="8">应发金额</th>
+                                                <th colspan="4">应缴金额</th>
+                                                <th rowspan="2">实发工资</th>
+                                                <th rowspan="2">社保（公司部分）</th>
+                                                <th rowspan="2">工资费用</th>
+                                            </tr>
+                                            <tr>
+                                                <th>基本工资</th>
+                                                <th>岗位工资</th>
+                                                <th>加班工资</th>
+                                                <th>绩效工资</th>
+                                                <th>工龄工资</th>
+                                                <th>补贴</th>
+                                                <th>处罚</th>
+                                                <th>应发合计</th>
+                                                <th>代缴个税</th>
+                                                <th>代缴社保（个人部分）</th>
+                                                <th>其他</th>
+                                                <th>应缴合计</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if managerSalary %}
+                                                {% for i in managerSalary %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
+                                                        <td>{{ month }}</td>
+                                                        <td style='display:none'>{{ i[1] }}</td>
+                                                        <td>{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                        <td>{{ i[4] }}</td>
+                                                        <td>{{ i[5] }}</td>
+                                                        <td class='payablewage'>{{ i[6] }}</td>
+                                                        <td class='payablewage'>{{ i[7] }}</td>
+                                                        <td class='payablewage'>{{ i[8] }}</td>
+                                                        <td class='payablewage'>{{ i[9] }}</td>
+                                                        <td class='payablewage'>{{ i[10] }}</td>
+                                                        <td class='payablewage'>{{ i[11] }}</td>
+                                                        <td class='payablewage'>{{ i[12] }}</td>
+                                                        <td>{{ i[13] }}</td>
+                                                        <td class='dues'>{{ i[14] }}</td>
+                                                        <td class='dues'>{{ i[15] }}</td>
+                                                        <td class='dues'>{{ i[16] }}</td>
+                                                        <td>{{ i[17] }}</td>
+                                                        <td>{{ i[18] }}</td>
+                                                        <td>{{ i[19] }}</td>
+                                                        <td>{{ i[10] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </tbody>
+                                        </table>
+                                        <div id="managerSalaryButtonToolbar" class="row" style="display:none;position:relative;left: 68%;width:100%;height: 42px;">
+                                            <div class="col-xs-12" style="position:relative;right: 20px;width: 16%">
+                                                <button type="submit" class="btn btn-default" style="width: 100%" onclick="managerSalarySave()">保存</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;right: 0;width: 16%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="managerSalaryCancel()">取消</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div>
+    <!-- /#content -->
+</div>
+<!-- /#right-panel -->
+
+<!-- Scripts -->
+<script src="/static/jquery/jquery-2.1.4.min.js"></script>
+<script src="/static/jquery/popper.min.js"></script>
+<script src="/static/jquery/bootstrap.min.js"></script>
+<script src="/static/jquery/jquery.matchHeight.min.js"></script>
+<script src="/static/jquery/main.js"></script>
+<script src="/static/jquery/datatables.min.js"></script>
+<script src="/static/jquery/dataTables.bootstrap.min.js"></script>
+<script src="/static/jquery/dataTables.buttons.min.js"></script>
+<script src="/static/jquery/buttons.bootstrap.min.js"></script>
+<script src="/static/jquery/jszip.min.js"></script>
+<script src="/static/jquery/vfs_fonts.js"></script>
+<script src="/static/jquery/buttons.html5.min.js"></script>
+<script src="/static/jquery/buttons.print.min.js"></script>
+<script src="/static/jquery/buttons.colVis.min.js"></script>
+<script src="/static/jquery/datatables-init.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+    });
+	window.onload = function(){
+		console.log("tab切换");
+		//获取5个标题名;
+		var items = document.getElementById("tabList").getElementsByTagName("li");
+		//获取5个内容盒子;
+		var tabs = document.getElementById("item").getElementsByClassName("tab");
+		if(items.length != tabs.length){
+			return;
+		}
+		console.log(items);
+
+		//循环遍历标题名和内容盒子;
+        items[0].className = "select"; // 默认第一个被选中
+		for(var i = 0,len = items.length; i < len; i++){
+			items[i].id = i;
+			items[i].onclick = function(){
+				for(var j = 0,len = items.length; j < len; j++){
+					items[j].className = "";
+					tabs[j].style.display = "none";
+				}
+				this.className = "select";
+				tabs[this.id].style.display = "block";
+			}
+		}
+	};
+
+	function addWorkerSalary() {
+        $('#workerSalaryButtonToolbar').hide();
+        var rows = document.getElementById("workerSalary").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",false);
+            rows[i].cells[3].setAttribute("contenteditable",false);
+            rows[i].cells[4].setAttribute("contenteditable",false);
+            rows[i].cells[5].setAttribute("contenteditable",false);
+            rows[i].cells[6].setAttribute("contenteditable",false);
+            rows[i].cells[7].setAttribute("contenteditable",false);
+            rows[i].cells[8].setAttribute("contenteditable",false);
+            rows[i].cells[9].setAttribute("contenteditable",false);
+            rows[i].cells[10].setAttribute("contenteditable",false);
+            rows[i].cells[11].setAttribute("contenteditable",false);
+            rows[i].cells[13].setAttribute("contenteditable",false);
+            rows[i].cells[14].setAttribute("contenteditable",false);
+            rows[i].cells[15].setAttribute("contenteditable",false);
+            rows[i].cells[18].setAttribute("contenteditable",false);
+        }
+    }
+    function deleteWorkerSalaries() {
+        var tbody=document.getElementById("workerSalary").children[1];
+        var length=tbody.rows.length,j=0;
+	    var staffidArr=new Array();
+        for(var i=length-1;i>=0;i--){
+            var checktd=tbody.rows[i].cells[0].children[0];
+            if(checktd.checked)
+                staffidArr[j++]=tbody.rows[i].cells[2].innerHTML;
+        }
+	    var data={'staffidArr':staffidArr};
+
+	    $.ajax({
+            url: "/delete_salaries",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    for(var i=length-1;i>=0;i--){
+                        var checktd=tbody.rows[i].cells[0].children[0];
+                        if(checktd.checked)
+                            tbody.deleteRow(i);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function workerSalaryModalSubmit() {
+	    var name=$('#workerName').val();
+        var position=$('#workerPosition').val();
+        var workhours=parseInt($('#workerWorkhours').val());
+        var overhours=parseInt($('#workerOverhours').val());
+        var timewage=parseFloat($('#timewage').val());
+        var piecewage=parseFloat($('#piecewage').val());
+        var workagewage=parseFloat($('#workerWorkagewage').val());
+        var subsidy=parseFloat($('#workerSubsidy').val());
+        var amerce=parseFloat($('#workerAmerce').val());
+        var tax=parseFloat($('#workerTax').val());
+        var socialSecurityOfPersonal=parseFloat($('#workerSocialSecurityOfPersonal').val());
+        var socialSecurityOfEnterprise=parseFloat($('#workerSocialSecurityOfEnterprise').val());
+	    var data = {
+            'name': name,
+            'position': position,
+            'workhours': workhours,
+            'overhours': overhours,
+            'timewage': timewage,
+            'piecewage': piecewage,
+            'workagewage': workagewage,
+            'subsidy': subsidy,
+            'amerce': amerce,
+            'tax': tax,
+            'socialSecurityOfPersonal': socialSecurityOfPersonal,
+            'socialSecurityOfEnterprise': socialSecurityOfEnterprise
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/add_worker_salary", //注意：不要写成"/add_supplementaries/"，一定要与后端路由地址完全对应，多一个斜杠少一个斜杠都不行
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if (callback['ok']) {
+                    var month=callback['month'];
+                    var staffid=callback['staffid'];
+                    var tbody = document.getElementById("workerSalary").children[1];
+                    tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + month + "</td>\n" +
+                            "<td style='display:none'>" + staffid + "</td>\n" +
+                            "<td>" + name + "</td>\n" +
+                            "<td>" + position + "</td>\n" +
+                            "<td>" + workhours + "</td>\n" +
+                            "<td>" + overhours + "</td>\n" +
+                            "<td class='payablewage'>" + timewage + "</td>\n" +
+                            "<td class='payablewage'>" + piecewage + "</td>\n" +
+                            "<td class='payablewage'>" + workagewage + "</td>\n" +
+                            "<td class='payablewage'>" + subsidy + "</td>\n" +
+                            "<td class='payablewage'>" + amerce + "</td>\n" +
+                            "<td>" + (timewage+piecewage+workagewage+subsidy-amerce) + "</td>\n" +
+                            "<td class='dues'>" + tax + "</td>\n" +
+                            "<td class='dues'>" + socialSecurityOfPersonal + "</td>\n" +
+                            "<td class='dues'>0</td>\n" +
+                            "<td>" + (tax+socialSecurityOfPersonal) + "</td>\n" +
+                            "<td>" + (timewage+piecewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
+                            "<td>" + socialSecurityOfEnterprise + "</td>\n" +
+                            "<td>" + (timewage+piecewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function setWorkerSalaryRowEditable() {
+	    var rows = document.getElementById("workerSalary").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",true);
+            rows[i].cells[3].setAttribute("contenteditable",true);
+            rows[i].cells[4].setAttribute("contenteditable",true);
+            rows[i].cells[5].setAttribute("contenteditable",true);
+            rows[i].cells[6].setAttribute("contenteditable",true);
+            rows[i].cells[7].setAttribute("contenteditable",true);
+            rows[i].cells[8].setAttribute("contenteditable",true);
+            rows[i].cells[9].setAttribute("contenteditable",true);
+            rows[i].cells[10].setAttribute("contenteditable",true);
+            rows[i].cells[11].setAttribute("contenteditable",true);
+            rows[i].cells[13].setAttribute("contenteditable",true);
+            rows[i].cells[14].setAttribute("contenteditable",true);
+            rows[i].cells[15].setAttribute("contenteditable",true);
+            rows[i].cells[18].setAttribute("contenteditable",true);
+        }
+
+        $('#workerSalaryButtonToolbar').show();
+    }
+    function workerSalarySave() {
+        /*正则表达式判断年月日期格式，yyyy-mm*/
+        var reg=/^[0-9]{4}-(0[1-9]|1[012])$/;
+
+	    var rows = document.getElementById("workerSalary").children[1].rows;
+	    var salaries=new Array();
+        for (var i = 0; i < rows.length; i++) {
+            salaries[i] = new Array();
+            console.log(rows[i].cells[1].innerHTML);
+            console.log(reg.exec("2020-08"));
+            if (!reg.exec(rows[i].cells[1].innerHTML)) {
+                alert("日期格式不正确！");
+                return;
+            }
+            if (!$.isNumeric(rows[i].cells[5].innerHTML)||
+                !$.isNumeric(rows[i].cells[6].innerHTML)||
+                !$.isNumeric(rows[i].cells[7].innerHTML)||
+                !$.isNumeric(rows[i].cells[8].innerHTML)||
+                !$.isNumeric(rows[i].cells[9].innerHTML)||
+                !$.isNumeric(rows[i].cells[10].innerHTML)||
+                !$.isNumeric(rows[i].cells[11].innerHTML)||
+                !$.isNumeric(rows[i].cells[12].innerHTML)||
+                !$.isNumeric(rows[i].cells[13].innerHTML)||
+                !$.isNumeric(rows[i].cells[14].innerHTML)||
+                !$.isNumeric(rows[i].cells[15].innerHTML)||
+                !$.isNumeric(rows[i].cells[16].innerHTML)||
+                !$.isNumeric(rows[i].cells[17].innerHTML)||
+                !$.isNumeric(rows[i].cells[18].innerHTML)||
+                !$.isNumeric(rows[i].cells[19].innerHTML)) {
+                alert("请输入正确的金额！");
+                return;
+            }
+            salaries[i][0] = rows[i].cells[1].innerHTML; // month
+            salaries[i][1] = rows[i].cells[2].innerHTML; // staffid
+            salaries[i][2] = rows[i].cells[3].innerHTML; // name
+            salaries[i][3] = rows[i].cells[4].innerHTML; // position
+            salaries[i][4] = parseInt(rows[i].cells[5].innerHTML); // workhours
+            salaries[i][5] = parseInt(rows[i].cells[6].innerHTML); // overhours
+            salaries[i][6] = parseFloat(rows[i].cells[7].innerHTML); // timewage
+            salaries[i][7] = parseFloat(rows[i].cells[8].innerHTML); // piecewage
+            salaries[i][8] = parseFloat(rows[i].cells[9].innerHTML); // workagewage
+            salaries[i][9] = parseFloat(rows[i].cells[10].innerHTML); // subsidy
+            salaries[i][10] = parseFloat(rows[i].cells[11].innerHTML); // amerce
+            salaries[i][11] = parseFloat(rows[i].cells[13].innerHTML); // tax
+            salaries[i][12] = parseFloat(rows[i].cells[14].innerHTML); // otherdues
+            salaries[i][13] = parseFloat(rows[i].cells[15].innerHTML); // socialSecurityOfPersonal
+            salaries[i][14] = parseFloat(rows[i].cells[18].innerHTML); // socialSecurityOfEnterprise
+        }
+	    var data = {
+            'salaries': salaries,
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/edit_worker_salary", //注意：不要写成"/add_supplementaries/"，一定要与后端路由地址完全对应，多一个斜杠少一个斜杠都不行
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if (callback['ok']) {
+                    var salaryArr=callback['salaryArr'];
+                    var tbody = document.getElementById("workerSalary").children[1];
+                    $('#workerSalary tbody').html("");
+                    /*for (var i = 0; i < salaryArr.length; i++)
+                        tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
+                    for (var i = 0; i < salaryArr.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + salaryArr[i][0] + "</td>\n" +
+                            "<td style='display:none'>" + salaryArr[i][1] + "</td>\n" +
+                            "<td>" + salaryArr[i][2] + "</td>\n" +
+                            "<td>" + salaryArr[i][3] + "</td>\n" +
+                            "<td>" + salaryArr[i][4] + "</td>\n" +
+                            "<td>" + salaryArr[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][10] + "</td>\n" +
+                            "<td>" + salaryArr[i][11] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][12] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][14] + "</td>\n" +
+                            "<td>" + salaryArr[i][15] + "</td>\n" +
+                            "<td>" + salaryArr[i][16] + "</td>\n" +
+                            "<td>" + salaryArr[i][17] + "</td>\n" +
+                            "<td>" + salaryArr[i][18] + "</td></tr>";
+
+                    $('#workerSalaryButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function workerSalaryCancel() {
+        $('#workerSalaryButtonToolbar').hide();
+        var rows = document.getElementById("workerSalary").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",false);
+            rows[i].cells[3].setAttribute("contenteditable",false);
+            rows[i].cells[4].setAttribute("contenteditable",false);
+            rows[i].cells[5].setAttribute("contenteditable",false);
+            rows[i].cells[6].setAttribute("contenteditable",false);
+            rows[i].cells[7].setAttribute("contenteditable",false);
+            rows[i].cells[8].setAttribute("contenteditable",false);
+            rows[i].cells[9].setAttribute("contenteditable",false);
+            rows[i].cells[10].setAttribute("contenteditable",false);
+            rows[i].cells[11].setAttribute("contenteditable",false);
+            rows[i].cells[13].setAttribute("contenteditable",false);
+            rows[i].cells[14].setAttribute("contenteditable",false);
+            rows[i].cells[15].setAttribute("contenteditable",false);
+            rows[i].cells[18].setAttribute("contenteditable",false);
+        }
+
+        /*$.ajax({
+            url: "/search_worker_salary/"+$('#workerSalaryMonth').val(),
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var salaries=callback['salaries'];
+                    var salarySum=callback['salarySum'];
+                    var tbody = document.getElementById("workerSalary").children[1];
+                    $('#workerSalary tbody').html("");
+                    for (var i = 0; i < salaries.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + salaries[i][0] + "</td>\n" +
+                            "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
+                            "<td>" + salaries[i][2] + "</td>\n" +
+                            "<td>" + salaries[i][3] + "</td>\n" +
+                            "<td>" + salaries[i][4] + "</td>\n" +
+                            "<td>" + salaries[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][10] + "</td>\n" +
+                            "<td>" + salaries[i][11] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][12] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][14] + "</td>\n" +
+                            "<td>" + salaries[i][15] + "</td>\n" +
+                            "<td>" + salaries[i][16] + "</td>\n" +
+                            "<td>" + salaries[i][17] + "</td>\n" +
+                            "<td>" + salaries[i][18] + "</td></tr>";
+
+                    if(!salaries.length)
+                        tbody.insertRow(i).innerHTML="<tr><td colspan='18' style='text-align: center'>No data available in table</td></tr>";
+
+                    if(salarySum) {
+                        var tfootRow = $('#workerSalary tfoot tr td');
+                        tfootRow.eq(17).text(salarySum[0][0]);
+                    }
+
+                    $('#workerSalaryButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });*/
+    }
+    function workerSalaryModalCancel() {
+        $('#workerName').val("");
+        $('#workerPosition').val("");
+        $('#workerWorkhours').val("");
+        $('#workerOverhours').val("");
+        $('#timewage').val("");
+        $('#piecewage').val("");
+        $('#workerWorkagewage').val("");
+        $('#workerSubsidy').val("");
+        $('#workerAmerce').val("");
+        $('#workerTax').val("");
+        $('#workerSocialSecurityOfPersonal').val("");
+        $('#workerSocialSecurityOfEnterprise').val("");
+    }
+    var workerSalaryTable=$('#workerSalary');
+    workerSalaryTable.on("input", '.payablewage', function () {
+        var row=this.parentElement;
+        var timewage=0, piecewage=0, workagewage=0, subsidy=0, amerce=0, payablewage, totaldues, socialSecurityOfEnterprise, salaryExpense;
+        if($.isNumeric(row.cells[7].textContent))
+            timewage=parseFloat(row.cells[7].textContent);
+        if($.isNumeric(row.cells[8].textContent))
+            piecewage=parseFloat(row.cells[8].textContent);
+        if($.isNumeric(row.cells[9].textContent))
+            workagewage=parseFloat(row.cells[9].textContent);
+        if($.isNumeric(row.cells[10].textContent))
+            subsidy=parseFloat(row.cells[10].textContent);
+        if($.isNumeric(row.cells[11].textContent))
+            amerce=parseFloat(row.cells[11].textContent);
+        if($.isNumeric(row.cells[16].textContent))
+            totaldues=parseFloat(row.cells[16].textContent);
+        if($.isNumeric(row.cells[18].textContent))
+            socialSecurityOfEnterprise=parseFloat(row.cells[18].textContent);
+        payablewage=timewage+piecewage+workagewage+subsidy-amerce;
+        row.cells[12].textContent=payablewage.toFixed(2);
+        row.cells[17].textContent=(payablewage-totaldues).toFixed(2);
+        row.cells[19].textContent=(payablewage+socialSecurityOfEnterprise).toFixed(2);
+    });
+	workerSalaryTable.on("input", '.dues', function () {
+        var row=this.parentElement;
+        var tax=0, socialSecurityOfPersonal=0, otherdues=0, payablewage, totaldues;
+        if($.isNumeric(row.cells[13].textContent))
+            tax=parseFloat(row.cells[13].textContent);
+        if($.isNumeric(row.cells[14].textContent))
+            socialSecurityOfPersonal=parseFloat(row.cells[14].textContent);
+        if($.isNumeric(row.cells[15].textContent))
+            otherdues=parseFloat(row.cells[15].textContent);
+        if($.isNumeric(row.cells[12].textContent))
+            payablewage=parseFloat(row.cells[12].textContent);
+        if($.isNumeric(row.cells[18].textContent))
+            socialSecurityOfEnterprise=parseFloat(row.cells[18].textContent);
+        totaldues=tax+socialSecurityOfPersonal+otherdues;
+        row.cells[16].textContent=totaldues.toFixed(2);
+        row.cells[17].textContent=(payablewage-totaldues).toFixed(2);
+    });
+
+	function addManagerSalary() {
+        $('#managerSalaryButtonToolbar').hide();
+        var rows = document.getElementById("managerSalary").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",false);
+            rows[i].cells[3].setAttribute("contenteditable",false);
+            rows[i].cells[4].setAttribute("contenteditable",false);
+            rows[i].cells[5].setAttribute("contenteditable",false);
+            rows[i].cells[6].setAttribute("contenteditable",false);
+            rows[i].cells[7].setAttribute("contenteditable",false);
+            rows[i].cells[8].setAttribute("contenteditable",false);
+            rows[i].cells[9].setAttribute("contenteditable",false);
+            rows[i].cells[10].setAttribute("contenteditable",false);
+            rows[i].cells[11].setAttribute("contenteditable",false);
+            rows[i].cells[12].setAttribute("contenteditable",false);
+            rows[i].cells[13].setAttribute("contenteditable",false);
+            rows[i].cells[15].setAttribute("contenteditable",false);
+            rows[i].cells[16].setAttribute("contenteditable",false);
+            rows[i].cells[17].setAttribute("contenteditable",false);
+            rows[i].cells[20].setAttribute("contenteditable",false);
+        }
+    }
+    function deleteManagerSalaries() {
+        var tbody=document.getElementById("managerSalary").children[1];
+        var length=tbody.rows.length,j=0;
+	    var staffidArr=new Array();
+        for(var i=length-1;i>=0;i--){
+            var checktd=tbody.rows[i].cells[0].children[0];
+            if(checktd.checked)
+                staffidArr[j++]=tbody.rows[i].cells[2].innerHTML;
+        }
+	    var data={'staffidArr':staffidArr};
+
+	    $.ajax({
+            url: "/delete_salaries",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    for(var i=length-1;i>=0;i--){
+                        var checktd=tbody.rows[i].cells[0].children[0];
+                        if(checktd.checked)
+                            tbody.deleteRow(i);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function managerSalaryModalSubmit() {
+	    var name=$('#managerName').val();
+        var position=$('#managerPosition').val();
+        var workhours=parseInt($('#managerWorkhours').val());
+        var overhours=parseInt($('#managerOverhours').val());
+        var basewage=parseFloat($('#basewage').val());
+        var jobwage=parseFloat($('#jobwage').val());
+        var overtimewage=parseFloat($('#overtimewage').val());
+        var performancewage=parseFloat($('#performancewage').val());
+        var workagewage=parseFloat($('#managerWorkagewage').val());
+        var subsidy=parseFloat($('#managerSubsidy').val());
+        var amerce=parseFloat($('#managerAmerce').val());
+        var tax=parseFloat($('#managerTax').val());
+        var socialSecurityOfPersonal=parseFloat($('#managerSocialSecurityOfPersonal').val());
+        var socialSecurityOfEnterprise=parseFloat($('#managerSocialSecurityOfEnterprise').val());
+	    var data = {
+            'name': name,
+            'position': position,
+            'workhours': workhours,
+            'overhours': overhours,
+            'basewage': basewage,
+            'jobwage': jobwage,
+            'overtimewage': overtimewage,
+            'performancewage': performancewage,
+            'workagewage': workagewage,
+            'subsidy': subsidy,
+            'amerce': amerce,
+            'tax': tax,
+            'socialSecurityOfPersonal': socialSecurityOfPersonal,
+            'socialSecurityOfEnterprise': socialSecurityOfEnterprise
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/add_manager_salary", //注意：不要写成"/add_supplementaries/"，一定要与后端路由地址完全对应，多一个斜杠少一个斜杠都不行
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if (callback['ok']) {
+                    var month=callback['month'];
+                    var staffid=callback['staffid'];
+                    var tbody = document.getElementById("managerSalary").children[1];
+                    tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + month + "</td>\n" +
+                            "<td style='display:none'>" + staffid + "</td>\n" +
+                            "<td>" + name + "</td>\n" +
+                            "<td>" + position + "</td>\n" +
+                            "<td>" + workhours + "</td>\n" +
+                            "<td>" + overhours + "</td>\n" +
+                            "<td class='payablewage'>" + basewage + "</td>\n" +
+                            "<td class='payablewage'>" + jobwage + "</td>\n" +
+                            "<td class='payablewage'>" + overtimewage + "</td>\n" +
+                            "<td class='payablewage'>" + performancewage + "</td>\n" +
+                            "<td class='payablewage'>" + workagewage + "</td>\n" +
+                            "<td class='payablewage'>" + subsidy + "</td>\n" +
+                            "<td class='payablewage'>" + amerce + "</td>\n" +
+                            "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce) + "</td>\n" +
+                            "<td class='dues'>" + tax + "</td>\n" +
+                            "<td class='dues'>" + socialSecurityOfPersonal + "</td>\n" +
+                            "<td class='dues'>0</td>\n" +
+                            "<td>" + (tax+socialSecurityOfPersonal) + "</td>\n" +
+                            "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
+                            "<td>" + socialSecurityOfEnterprise + "</td>\n" +
+                            "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function setManagerSalaryRowEditable() {
+	    var rows = document.getElementById("managerSalary").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",true);
+            rows[i].cells[3].setAttribute("contenteditable",true);
+            rows[i].cells[4].setAttribute("contenteditable",true);
+            rows[i].cells[5].setAttribute("contenteditable",true);
+            rows[i].cells[6].setAttribute("contenteditable",true);
+            rows[i].cells[7].setAttribute("contenteditable",true);
+            rows[i].cells[8].setAttribute("contenteditable",true);
+            rows[i].cells[9].setAttribute("contenteditable",true);
+            rows[i].cells[10].setAttribute("contenteditable",true);
+            rows[i].cells[11].setAttribute("contenteditable",true);
+            rows[i].cells[12].setAttribute("contenteditable",true);
+            rows[i].cells[13].setAttribute("contenteditable",true);
+            rows[i].cells[15].setAttribute("contenteditable",true);
+            rows[i].cells[16].setAttribute("contenteditable",true);
+            rows[i].cells[17].setAttribute("contenteditable",true);
+            rows[i].cells[20].setAttribute("contenteditable",true);
+        }
+
+        $('#managerSalaryButtonToolbar').show();
+    }
+    function managerSalarySave() {
+        /*正则表达式判断年月日期格式，yyyy-mm*/
+        var reg=/^[0-9]{4}-(0[1-9]|1[012])$/;
+
+	    var rows = document.getElementById("managerSalary").children[1].rows;
+	    var salaries=new Array();
+        for (var i = 0; i < rows.length; i++) {
+            salaries[i] = new Array();
+            if (!reg.exec(rows[i].cells[1].innerHTML)) {
+                alert("日期格式不正确！");
+                return;
+            }
+            if (!$.isNumeric(rows[i].cells[5].innerHTML)||
+                !$.isNumeric(rows[i].cells[6].innerHTML)||
+                !$.isNumeric(rows[i].cells[7].innerHTML)||
+                !$.isNumeric(rows[i].cells[8].innerHTML)||
+                !$.isNumeric(rows[i].cells[9].innerHTML)||
+                !$.isNumeric(rows[i].cells[10].innerHTML)||
+                !$.isNumeric(rows[i].cells[11].innerHTML)||
+                !$.isNumeric(rows[i].cells[12].innerHTML)||
+                !$.isNumeric(rows[i].cells[13].innerHTML)||
+                !$.isNumeric(rows[i].cells[14].innerHTML)||
+                !$.isNumeric(rows[i].cells[15].innerHTML)||
+                !$.isNumeric(rows[i].cells[16].innerHTML)||
+                !$.isNumeric(rows[i].cells[17].innerHTML)||
+                !$.isNumeric(rows[i].cells[18].innerHTML)||
+                !$.isNumeric(rows[i].cells[19].innerHTML)||
+                !$.isNumeric(rows[i].cells[20].innerHTML)||
+                !$.isNumeric(rows[i].cells[21].innerHTML)) {
+                alert("请输入正确的金额！");
+                return;
+            }
+            salaries[i][0] = rows[i].cells[1].innerHTML; // month
+            salaries[i][1] = rows[i].cells[2].innerHTML; // staffid
+            salaries[i][2] = rows[i].cells[3].innerHTML; // name
+            salaries[i][3] = rows[i].cells[4].innerHTML; // position
+            salaries[i][4] = parseInt(rows[i].cells[5].innerHTML); // workhours
+            salaries[i][5] = parseInt(rows[i].cells[6].innerHTML); // overhours
+            salaries[i][6] = parseFloat(rows[i].cells[7].innerHTML); // basewage
+            salaries[i][7] = parseFloat(rows[i].cells[8].innerHTML); // jobwage
+            salaries[i][8] = parseFloat(rows[i].cells[9].innerHTML); // overtimewage
+            salaries[i][9] = parseFloat(rows[i].cells[10].innerHTML); // performancewage
+            salaries[i][10] = parseFloat(rows[i].cells[11].innerHTML); // workagewage
+            salaries[i][11] = parseFloat(rows[i].cells[12].innerHTML); // subsidy
+            salaries[i][12] = parseFloat(rows[i].cells[13].innerHTML); // amerce
+            salaries[i][13] = parseFloat(rows[i].cells[15].innerHTML); // tax
+            salaries[i][14] = parseFloat(rows[i].cells[16].innerHTML); // otherdues
+            salaries[i][15] = parseFloat(rows[i].cells[17].innerHTML); // socialSecurityOfPersonal
+            salaries[i][16] = parseFloat(rows[i].cells[20].innerHTML); // socialSecurityOfEnterprise
+        }
+	    var data = {
+            'salaries': salaries,
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/edit_manager_salary", //注意：不要写成"/add_supplementaries/"，一定要与后端路由地址完全对应，多一个斜杠少一个斜杠都不行
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if (callback['ok']) {
+                    var salaryArr=callback['salaryArr'];
+                    var tbody = document.getElementById("managerSalary").children[1];
+                    $('#managerSalary tbody').html("");
+                    /*for (var i = 0; i < salaryArr.length; i++)
+                        tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
+                    for (var i = 0; i < salaryArr.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + salaryArr[i][0] + "</td>\n" +
+                            "<td style='display:none'>" + salaryArr[i][1] + "</td>\n" +
+                            "<td>" + salaryArr[i][2] + "</td>\n" +
+                            "<td>" + salaryArr[i][3] + "</td>\n" +
+                            "<td>" + salaryArr[i][4] + "</td>\n" +
+                            "<td>" + salaryArr[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][10] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][11] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][12] + "</td>\n" +
+                            "<td>" + salaryArr[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][14] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][15] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][16] + "</td>\n" +
+                            "<td>" + salaryArr[i][17] + "</td>\n" +
+                            "<td>" + salaryArr[i][18] + "</td>\n" +
+                            "<td>" + salaryArr[i][19] + "</td>\n" +
+                            "<td>" + salaryArr[i][20] + "</td></tr>";
+
+                    $('#managerSalaryButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function managerSalaryCancel() {
+        $('#managerSalaryButtonToolbar').hide();
+        var rows = document.getElementById("managerSalary").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",false);
+            rows[i].cells[3].setAttribute("contenteditable",false);
+            rows[i].cells[4].setAttribute("contenteditable",false);
+            rows[i].cells[5].setAttribute("contenteditable",false);
+            rows[i].cells[6].setAttribute("contenteditable",false);
+            rows[i].cells[7].setAttribute("contenteditable",false);
+            rows[i].cells[8].setAttribute("contenteditable",false);
+            rows[i].cells[9].setAttribute("contenteditable",false);
+            rows[i].cells[10].setAttribute("contenteditable",false);
+            rows[i].cells[11].setAttribute("contenteditable",false);
+            rows[i].cells[12].setAttribute("contenteditable",false);
+            rows[i].cells[13].setAttribute("contenteditable",false);
+            rows[i].cells[15].setAttribute("contenteditable",false);
+            rows[i].cells[16].setAttribute("contenteditable",false);
+            rows[i].cells[17].setAttribute("contenteditable",false);
+            rows[i].cells[20].setAttribute("contenteditable",false);
+        }
+
+        /*$.ajax({
+            url: "/search_manager_salary/"+$('#managerSalaryMonth').val(),
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var salaries=callback['salaries'];
+                    var salarySum=callback['salarySum'];
+                    var tbody = document.getElementById("managerSalary").children[1];
+                    $('#managerSalary tbody').html("");
+                    for (var i = 0; i < salaries.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + salaries[i][0] + "</td>\n" +
+                            "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
+                            "<td>" + salaries[i][2] + "</td>\n" +
+                            "<td>" + salaries[i][3] + "</td>\n" +
+                            "<td>" + salaries[i][4] + "</td>\n" +
+                            "<td>" + salaries[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][10] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][11] + "</td>\n" +
+                            "<td class='payablewage'>" + salaries[i][12] + "</td>\n" +
+                            "<td>" + salaries[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][14] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][15] + "</td>\n" +
+                            "<td class='dues'>" + salaries[i][16] + "</td>\n" +
+                            "<td>" + salaries[i][17] + "</td>\n" +
+                            "<td>" + salaries[i][18] + "</td>\n" +
+                            "<td>" + salaries[i][19] + "</td>\n" +
+                            "<td>" + salaries[i][20] + "</td></tr>";
+
+                    if(!salaries.length)
+                        tbody.insertRow(i).innerHTML="<tr><td colspan='20' style='text-align: center'>No data available in table</td></tr>";
+
+                    if(salarySum) {
+                        var tfootRow = $('#managerSalary tfoot tr td');
+                        tfootRow.eq(19).text(salarySum[0][0]);
+                    }
+
+                    $('#managerSalaryButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });*/
+    }
+    function managerSalaryModalCancel() {
+        $('#managerName').val("");
+        $('#managerPosition').val("");
+        $('#managerWorkhours').val("");
+        $('#managerOverhours').val("");
+        $('#basewage').val("");
+        $('#jobwage').val("");
+        $('#overtimewage').val("");
+        $('#performancewage').val("");
+        $('#managerWorkagewage').val("");
+        $('#managerSubsidy').val("");
+        $('#managerAmerce').val("");
+        $('#managerTax').val("");
+        $('#managerSocialSecurityOfPersonal').val("");
+        $('#managerSocialSecurityOfEnterprise').val("");
+    }
+    var managerSalaryTable=$('#managerSalary');
+    managerSalaryTable.on("input", '.payablewage', function () {
+        var row=this.parentElement;
+        var basewage=0, jobwage=0, overtimewage=0, performancewage=0, workagewage=0, subsidy=0, amerce=0, payablewage, totaldues, socialSecurityOfEnterprise, salaryExpense;
+        if($.isNumeric(row.cells[7].textContent))
+            basewage=parseFloat(row.cells[7].textContent);
+        if($.isNumeric(row.cells[8].textContent))
+            jobwage=parseFloat(row.cells[8].textContent);
+        if($.isNumeric(row.cells[9].textContent))
+            overtimewage=parseFloat(row.cells[9].textContent);
+        if($.isNumeric(row.cells[10].textContent))
+            performancewage=parseFloat(row.cells[10].textContent);
+        if($.isNumeric(row.cells[11].textContent))
+            workagewage=parseFloat(row.cells[11].textContent);
+        if($.isNumeric(row.cells[12].textContent))
+            subsidy=parseFloat(row.cells[12].textContent);
+        if($.isNumeric(row.cells[13].textContent))
+            amerce=parseFloat(row.cells[13].textContent);
+        if($.isNumeric(row.cells[18].textContent))
+            totaldues=parseFloat(row.cells[18].textContent);
+        if($.isNumeric(row.cells[20].textContent))
+            socialSecurityOfEnterprise=parseFloat(row.cells[20].textContent);
+        payablewage=basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce;
+        row.cells[14].textContent=payablewage.toFixed(2);
+        row.cells[19].textContent=(payablewage-totaldues).toFixed(2);
+        row.cells[21].textContent=(payablewage+socialSecurityOfEnterprise).toFixed(2);
+    });
+	managerSalaryTable.on("input", '.dues', function () {
+        var row=this.parentElement;
+        var tax=0, socialSecurityOfPersonal=0, otherdues=0, payablewage, totaldues;
+        if($.isNumeric(row.cells[15].textContent))
+            tax=parseFloat(row.cells[15].textContent);
+        if($.isNumeric(row.cells[16].textContent))
+            socialSecurityOfPersonal=parseFloat(row.cells[16].textContent);
+        if($.isNumeric(row.cells[17].textContent))
+            otherdues=parseFloat(row.cells[17].textContent);
+        if($.isNumeric(row.cells[14].textContent))
+            payablewage=parseFloat(row.cells[14].textContent);
+        if($.isNumeric(row.cells[20].textContent))
+            socialSecurityOfEnterprise=parseFloat(row.cells[20].textContent);
+        totaldues=tax+socialSecurityOfPersonal+otherdues;
+        row.cells[18].textContent=totaldues.toFixed(2);
+        row.cells[19].textContent=(payablewage-totaldues).toFixed(2);
+    });
+
+</script>
+</body>
+</html>

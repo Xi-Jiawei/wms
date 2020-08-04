@@ -1,0 +1,1494 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang=""> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang=""> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang=""> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js" lang=""> <!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>永琪智控仓库管理系统</title>
+    <meta name="description" content="Ela Admin - HTML5 Admin Template">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/static/bootstrap/normalize.css">
+    <link rel="stylesheet" href="/static/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/themify-icons.css">
+    <link rel="stylesheet" href="/static/bootstrap/pe-icon-7-filled.css">
+    <link rel="stylesheet" href="/static/bootstrap/flag-icon.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/cs-skin-elastic.css">
+    <link rel="stylesheet" href="/static/bootstrap/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="/static/bootstrap/style.css">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800' rel='stylesheet' type='text/css'>
+    <!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/html5shiv/3.7.3/html5shiv.min.js"></script> -->
+
+    <style>
+        /*tab切换样式*/
+        *{
+            margin:0;
+            padding:0;
+            text-decoration:none;
+            list-style:none;
+        }
+        a{
+            color:#fff;
+            font-size:13px;
+            display:block;
+        }
+        a:hover{
+            color:#ccc;
+        }
+        .wrap{
+            margin:0 auto;
+            width:100%;
+            height:auto;
+        }
+        .container-top{
+            width:100%;
+            height:40px;
+        }
+        .container-top ul{
+            height:40px;
+        }
+        .container-top ul li{
+            float:left;
+            width:33%;
+            height:40px;
+            line-height:40px;
+            text-align:center;
+            background-color:#ccc;
+        }
+        .container-top ul li a{
+            font-size: 20px;
+        }
+        .select{
+            background-image:linear-gradient(to right,dimgray,gray);
+        }
+    </style>
+</head>
+<body>
+<!-- Left Panel -->
+<aside id="left-panel" class="left-panel">
+    <nav class="navbar navbar-expand-sm navbar-default">
+        <div id="main-menu" class="main-menu collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="{{url_for("user_login")}}"><i class="menu-icon fa fa-laptop"></i>回到主页 </a>
+                </li>
+                <li class="menu-title">菜单</li><!-- /.menu-title -->
+
+                <li>
+                    <a href="{{ url_for('financial.financial_receivable') }}"> <i class="menu-icon fa fa-th"></i>收款记账</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('financial.financial_payable') }}"> <i class="menu-icon fa fa-th"></i>付款记账</a>
+                </li>
+                <li>
+                    <a href="{{ url_for('financial.financial_salary') }}"> <i class="menu-icon fa fa-th"></i>工资管理</a>
+                </li>
+                <li class="active">
+                    <a href="{{ url_for('financial.financial_othercosts') }}"> <i class="menu-icon fa fa-th"></i>其他支出</a>
+                </li>
+            </ul>
+        </div><!-- /.navbar-collapse -->
+    </nav>
+</aside>
+<!-- /#left-panel -->
+
+<!-- Right Panel -->
+<div id="right-panel" class="right-panel">
+
+    <!-- Header-->
+    <header id="header" class="header">
+        <div class="top-left">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="{{ url_for("user_login")}}"><img src="/static/images/logo.png" alt="Logo"></a>
+                <a class="navbar-brand hidden" href="{{ url_for("user_login")}}"><img src="/static/images/logo2.png" alt="Logo"></a>
+                <a id="menuToggle" class="menutoggle"><i class="fa fa-bars"></i></a>
+            </div>
+        </div>
+        <div class="top-right">
+            <div class="header-menu">
+                <div class="user-area dropdown float-right">
+                    <a href="#" class="dropdown-toggle active" data-toggle="dropdown" aria-haspopup="true"
+                       aria-expanded="false">
+                        <img class="user-avatar rounded-circle" src="/static/images/admin.jpg" alt="{{ personName }}">
+                    </a>
+                    <div class="user-menu dropdown-menu">
+                        <a class="nav-link" href="#"><i class="fa fa-cog"></i>Settings</a>
+                        <a class="nav-link" href="{{ url_for("out") }}"><i class="fa fa-power -off"></i>Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- /#Header-->
+
+    <!-- content -->
+    <div class="content">
+        <div class="animated fadeIn">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card" style="overflow: hidden">
+                        <div class="card-body">
+                            <!--模态框-->
+                            <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                收款信息录入
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input id="rowindex" type="text" style="display:none" class="form-control">
+                                            <input id="beforePayable" type="text" style="display:none" class="form-control">
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">供应商</label>
+                                                <div class="col-xs-12">
+                                                    <input id="modalSupplierCode" type="text" readonly="readonly" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">付款日期</label>
+                                                <div class="col-xs-12">
+                                                    <input id="paymentDate" type="date" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">付款金额</label>
+                                                <div class="col-xs-12">
+                                                    <input id="payment" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">备注</label>
+                                                <div class="col-xs-12">
+                                                    <input id="remark" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="paymentModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="paymentModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
+                            </div>
+
+                            <!--模态框-->
+                            <div class="modal fade" id="operationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                辅料信息录入
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">入库日期</label>
+                                                <div class="col-xs-12">
+                                                    <input id="receiptDate" type="date" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">型号</label>
+                                                <div class="col-xs-12">
+                                                    <input id="supplementaryType" type="text" readonly="readonly" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">交易客户</label>
+                                                <div class="col-xs-12">
+                                                    <input id="supplier" type="text" readonly="readonly" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">数量</label>
+                                                <div class="col-xs-12">
+                                                    <input id="supplementaryNum" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">单价</label>
+                                                <div class="col-xs-12">
+                                                    <input id="price" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">备注</label>
+                                                <div class="col-xs-12">
+                                                    <input id="remark" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="operationModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="operationModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
+                            </div>
+
+                            <!--模态框-->
+                            <div class="modal fade" id="aftersaleModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                辅料信息录入
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">入库日期</label>
+                                                <div class="col-xs-12">
+                                                    <input id="receiptDate" type="date" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">型号</label>
+                                                <div class="col-xs-12">
+                                                    <input id="supplementaryType" type="text" readonly="readonly" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">交易客户</label>
+                                                <div class="col-xs-12">
+                                                    <input id="supplier" type="text" readonly="readonly" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">数量</label>
+                                                <div class="col-xs-12">
+                                                    <input id="supplementaryNum" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">单价</label>
+                                                <div class="col-xs-12">
+                                                    <input id="price" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">备注</label>
+                                                <div class="col-xs-12">
+                                                    <input id="remark" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="aftersaleModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="aftersaleModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
+                            </div>
+
+                            <div class="wrap">
+                                <div class="container-top" id="tabList">
+                                    <ul>
+                                        <li><a>辅&nbsp;&nbsp;&nbsp;&nbsp;料</a></li>
+                                        <li><a>运&nbsp;&nbsp;&nbsp;&nbsp;营</a></li>
+                                        <li><a>售&nbsp;&nbsp;&nbsp;&nbsp;后</a></li>
+                                    </ul>
+                                </div>
+                                <div id="item">
+                                    <div class="tab" style="position:relative;">
+                                        <div id="mainDialog">
+                                            <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
+                                                <div class="col-xs-12" style="position:relative;left: 0;width: 13%">
+                                                    <button type="button" class="btn btn-default" style="width: 100%" onclick="addSupplementaries()">添加</button>
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
+                                                    <button type="button" class="btn btn-default" style="width: 100%" onclick="deleteSupplementaries()">删除</button>
+                                                </div>
+                                            </div>
+
+                                            <table id="supplementary" class="table table-striped table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                    <th>供应商</th>
+                                                    <th>上期结余</th>
+                                                    <th>本期应付</th>
+                                                    <th>应付</th>
+                                                    <th>已付</th>
+                                                    <th>余款</th>
+                                                    <th>备注</th>
+                                                    <th>付款</th>
+                                                    <th style="width: 60px">编辑</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% if supplementaryPayables %}
+                                                {% for i in supplementaryPayables %}
+                                                <tr>
+                                                    <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
+                                                    <td>{{ i[0] }}</td>
+                                                    <td>{{ i[1] }}</td>
+                                                    <td>{{ i[2] }}</td>
+                                                    <td>{{ i[3] }}</td>
+                                                    <td>{{ i[4] }}</td>
+                                                    <td>{{ i[3]-i[4] }}</td>
+                                                    <td>{{ i[5] }}</td>
+                                                    <td><a data-toggle="modal" data-target="#paymentModal" onclick='paymentModal("{{ i[0] }}","{{ i[3]-i[4] }}")'> 付款 </a></td>
+                                                    <th style="width: 60px"><a onclick='editSupplementary("{{ i[0] }}")'> 编辑 </a><a onclick='deleteSupplementary("{{ i[0] }}")'> 删除 </a></th>
+                                                </tr>
+                                                {% endfor %}
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div id="addSupplementariesDialog" style="display: none;">
+                                            <input style="display: none" id="supplierCode"/>
+                                            <input style="display: none" id="editflag"/>
+
+                                            <table id="supplementaries" class="table table-striped table-bordered">
+                                                <thead>
+                                                <tr>
+                                                    <th><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                    <th>入库日期</th>
+                                                    <th>辅料型号</th>
+                                                    <th>供应商</th>
+                                                    <th>数量</th>
+                                                    <th>单价</th>
+                                                    <th>金额</th>
+                                                    <th>备注</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+
+                                            <div id="buttonToolbar" class="row" style="position:relative;left: 68%;width:100%;height: 42px;">
+                                                <div class="col-xs-12" style="position:relative;right: 20px;width: 16%">
+                                                    <button type="submit" class="btn btn-default" style="width: 100%" onclick="buttonSubmit()">保存</button>
+                                                </div>
+                                                <div class="col-xs-12" style="position:relative;right: 0;width: 16%;">
+                                                    <button type="button" class="btn btn-default" style="width: 100%" onclick="buttonCancel()">取消</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab" style="display: none;position:relative;">
+                                        <input id="operationRowindex" type="text" style="display:none" class="form-control">
+
+                                        <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
+                                            <div class="col-xs-12" style="position:relative;left: 0;width: 13%">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="addOperationRow()">添加</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="deleteOperations()">删除</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 54%;width: 74%;">
+                                                <input type="month" id="operationMonth" name="month" class="form-control"
+                                                        {% if month %}
+                                                       value="{{ month }}"
+                                                        {% endif %}
+                                                />
+                                            </div>
+                                        </div>
+                                        <table id="operation" class="table table-striped table-bordered" style="position:relative;">
+                                            <thead>
+                                            <tr>
+                                                <th><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                <th style='display:none'>费用编码</th>
+                                                <th>日期</th>
+                                                <th>金额</th>
+                                                <th>备注</th>
+                                                <th>编辑</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if operations %}
+                                                {% for i in operations %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></td>
+                                                        <td style='display:none'>{{ i[0] }}</td>
+                                                        <td>{{ i[1] }}</td>
+                                                        <td>{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                        <td><a onclick="setOperationRowEditable()">编辑</a><a onclick="deleteOperation('{{ i[0] }}')">删除</a></td> <!--特别警惕要在事件方法的参数加引号，防止报错“financial_othercosts:445 Uncaught ReferenceError: C2020080211155586 is not defined at HTMLAnchorElement.onclick (financial_othercosts:445) onclick”-->
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </tbody>
+                                        </table>
+
+                                        <div id="operationButtonToolbar" class="row" style="display: none;position:relative;left: 82%;width:100%;height: 42px;">
+                                            <div class="col-xs-12" style="position:relative;padding-right: 2%;width: 18%">
+                                                <button type="submit" class="btn btn-default" style="width: 100%" onclick="operationSave()">保存</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;width: 16%">
+                                                <button type="submit" class="btn btn-default" style="width: 100%" onclick="operationCancel()">取消</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab" style="display: none;position:relative;">
+                                        <input id="aftersaleRowindex" type="text" style="display:none" class="form-control">
+
+                                        <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
+                                            <div class="col-xs-12" style="position:relative;left: 0;width: 13%">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="addAftersaleRow()">添加</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
+                                                <button type="button" class="btn btn-default" style="width: 100%" onclick="deleteAftersales()">删除</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;padding-left: 54%;width: 74%;">
+                                                <input type="month" id="aftersaleMonth" name="month" class="form-control"
+                                                        {% if month %}
+                                                       value="{{ month }}"
+                                                        {% endif %}
+                                                />
+                                            </div>
+                                        </div>
+                                        <table id="aftersale" class="table table-striped table-bordered" style="position:relative;">
+                                            <thead>
+                                            <tr>
+                                                <th><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                <th style='display:none'>费用编码</th>
+                                                <th>日期</th>
+                                                <th>型号</th>
+                                                <th>客户</th>
+                                                <th>人工成本</th>
+                                                <th>材料费用</th>
+                                                <th>其他费用</th>
+                                                <th>快递单号</th>
+                                                <th>备注</th>
+                                                <th>编辑</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if aftersales %}
+                                                {% for i in aftersales %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></td>
+                                                        <td style='display:none'>{{ i[0] }}</td>
+                                                        <td>{{ i[1] }}</td>
+                                                        <td>{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                        <td>{{ i[4] }}</td>
+                                                        <td>{{ i[5] }}</td>
+                                                        <td>{{ i[6] }}</td>
+                                                        <td>{{ i[7] }}</td>
+                                                        <td>{{ i[8] }}</td>
+                                                        <td><a onclick="setAftersaleRowEditable()">编辑</a><a onclick="deleteAftersale('{{ i[0] }}')">删除</a></td> <!--特别警惕要在事件方法的参数加引号，防止报错“financial_othercosts:445 Uncaught ReferenceError: C2020080211155586 is not defined at HTMLAnchorElement.onclick (financial_othercosts:445) onclick”-->
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </tbody>
+                                        </table>
+                                        <div id="aftersaleButtonToolbar" class="row" style="display: none;position:relative;left: 70%;width:100%;height: 42px;">
+                                            <div class="col-xs-12" style="position:relative;padding-right: 2%;width: 18%">
+                                                <button type="submit" class="btn btn-default" style="width: 100%" onclick="aftersaleSave()">保存</button>
+                                            </div>
+                                            <div class="col-xs-12" style="position:relative;width: 16%">
+                                                <button type="submit" class="btn btn-default" style="width: 100%" onclick="aftersaleCancel()">取消</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div><!-- .animated -->
+    </div>
+    <!-- /#content -->
+</div>
+<!-- /#right-panel -->
+
+<!-- Scripts -->
+<script src="/static/jquery/jquery-2.1.4.min.js"></script>
+<script src="/static/jquery/popper.min.js"></script>
+<script src="/static/jquery/bootstrap.min.js"></script>
+<script src="/static/jquery/jquery.matchHeight.min.js"></script>
+<script src="/static/jquery/main.js"></script>
+<script src="/static/jquery/datatables.min.js"></script>
+<script src="/static/jquery/dataTables.bootstrap.min.js"></script>
+<script src="/static/jquery/dataTables.buttons.min.js"></script>
+<script src="/static/jquery/buttons.bootstrap.min.js"></script>
+<script src="/static/jquery/jszip.min.js"></script>
+<script src="/static/jquery/vfs_fonts.js"></script>
+<script src="/static/jquery/buttons.html5.min.js"></script>
+<script src="/static/jquery/buttons.print.min.js"></script>
+<script src="/static/jquery/buttons.colVis.min.js"></script>
+<script src="/static/jquery/datatables-init.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#supplementaries').DataTable({
+            'paging': false,
+            //"info" : false,
+            'filter':false,
+            'dom': 'Bfrtip',
+            'buttons': [
+                {
+                    'text': '添加',
+                    action: function ( e, dt, node, config ) {
+                        console.log(this);
+                        this.row.add([
+                            '<input type=\'checkbox\' name=\'checkbox\' value=\'checkbox\' />',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            ''
+                        ]).draw();
+
+                        /*设置单元格可编辑*/
+                        var data=this.rows().data();
+                        var length=this.rows().nodes().length;
+                        this.cell(length-1, 1).node().setAttribute("contenteditable",true); //productType
+                        this.cell(length-1, 2).node().setAttribute("contenteditable",true); //productNum
+                        this.cell(length-1, 3).node().setAttribute("contenteditable",true); //deliveryDate
+                        this.cell(length-1, 4).node().setAttribute("contenteditable",true); //remark
+                        this.cell(length-1, 5).node().setAttribute("contenteditable",true); //remark
+                        this.cell(length-1, 7).node().setAttribute("contenteditable",true); //remark
+                    }
+                },
+                {
+                    'text': '删除',
+                    action: function ( e, dt, node, config ) {
+                        /*dom删除方式，不适用*/
+                        /*$("#orderItem").find('tr > td:first-child input:checkbox').each(function(){
+                            console.log(this);
+                            console.log(this.parentElement.parentElement);
+                            console.log(this.parentElement.parentElement.rowIndex);
+                            if(this.parentElement.parentElement.rowIndex&&this.checked)
+                                this.parentElement.parentElement.remove();
+                        });*/
+                        /*datatable方式*/
+                        console.log(this);
+                        var length=this.rows().nodes().length;
+                        for(var i=length-1;i>=0;i--){
+                            console.log(this.row(i).data());
+                            console.log(this.row(i).node());
+                            console.log(this.cell(i, 0).node());
+                            console.log(this.cell(i, 0).node().firstChild);
+                            var checktd=this.cell(i, 0).node().firstChild;
+                            if(checktd.checked) {
+                                this.row(i).node().remove();
+                                this.row(i).remove();
+                            }
+                        }
+                        console.log(this.rows().data());
+                    }
+                },
+            ]
+        });
+    });
+	window.onload = function(){
+		console.log("tab切换");
+		//获取5个标题名;
+		var items = document.getElementById("tabList").getElementsByTagName("li");
+		//获取5个内容盒子;
+		var tabs = document.getElementById("item").getElementsByClassName("tab");
+		if(items.length != tabs.length){
+			return;
+		}
+		console.log(items);
+
+		//循环遍历标题名和内容盒子;
+        items[0].className = "select"; // 默认第一个被选中
+		for(var i = 0,len = items.length; i < len; i++){
+			items[i].id = i;
+			items[i].onclick = function(){
+				for(var j = 0,len = items.length; j < len; j++){
+					items[j].className = "";
+					tabs[j].style.display = "none";
+				}
+				this.className = "select";
+				tabs[this.id].style.display = "block";
+			}
+		}
+	};
+
+	function addSupplementaries() {
+        $('#mainDialog').hide();
+        $('#addSupplementariesDialog').show();
+        $("#editflag").val(0);
+    }
+    function buttonSubmit() {
+        /*正则表达式判断日期格式*/
+        var reg=/^(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29)$/;
+
+        var supplementaries = new Array();
+        var trList = $("#supplementaries tbody").children("tr");
+        for (var i = 0; i < trList.length; i++) {
+            supplementaries[i] = new Array();
+            var tdArr = trList.eq(i).find("td");
+            if (tdArr.eq(2).text() === "" || !$.isNumeric(tdArr.eq(4).text()) || !$.isNumeric(tdArr.eq(5).text())) {
+                alert("请输入型号、数量、单价！");
+                return;
+            }
+            if (tdArr.eq(3).text() === "") {
+                alert("请输入供应商！");
+                return;
+            }
+            if (!reg.exec(tdArr.eq(1).text())) {
+                alert("日期格式不正确！");
+                return;
+            }
+            supplementaries[i][0] = tdArr.eq(3).text();//供应商
+            supplementaries[i][1] = tdArr.eq(1).text();//入库日期
+            supplementaries[i][2] = tdArr.eq(2).text();//型号
+            supplementaries[i][3] = parseInt(tdArr.eq(4).text());//数量
+            supplementaries[i][4] = parseFloat(tdArr.eq(5).text());//单价
+            supplementaries[i][5] = parseInt(tdArr.eq(4).text())*parseFloat(tdArr.eq(5).text());//金额
+            supplementaries[i][6] = tdArr.eq(6).text();//备注
+        }
+        var data={'supplementaries':supplementaries}
+        console.log(data);
+
+        var editflag = $("#editflag").val();
+        if (editflag==0) {
+            $.ajax({
+                url: "/add_supplementaries", //注意：不要写成"/add_supplementaries/"，一定要与后端路由地址完全对应，多一个斜杠少一个斜杠都不行
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback['ok']) {
+                        var payables = callback['payables']; // supplierCode,remainPayable,addPayable,payable,payment,remark
+                        var tbody = document.getElementById("supplementary").children[1];
+                        $('#supplementary tbody').html("");
+                        for (var i = 0; i < payables.length; i++)
+                            tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                                "<td>" + payables[i][0] + "</td>\n" +
+                                "<td>" + payables[i][1].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][2].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][3].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][4].toFixed(2) + "</td>\n" +
+                                "<td>" + (payables[i][3] - payables[i][4]).toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][5] + "</td>\n" +
+                                "<td><a data-toggle='modal' data-target='#paymentModal' onclick='paymentModal(\"" + payables[i][0] + "\",\"" + (payables[i][3] - payables[i][4]) + "\")'> 付款 </a></td></tr>" +
+                                "<td><a onclick='editSupplementary(\"" + payables[i][0] + "\")'> 编辑 </a><a onclick='deleteSupplementary(\"" + payables[i][0] + "\")'> 删除 </a></td></tr>";
+
+                        $('#mainDialog').show();
+                        $('#addSupplementariesDialog').hide();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }else {
+            $.ajax({
+                url: "/edit_supplementary/"+$("#supplierCode").val(), //注意：不要写成"/add_supplementaries/"，一定要与后端路由地址完全对应，多一个斜杠少一个斜杠都不行
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback['ok']) {
+                        var payables = callback['payables']; // supplierCode,remainPayable,addPayable,payable,payment,remark
+                        var tbody = document.getElementById("supplementary").children[1];
+                        $('#supplementary tbody').html("");
+                        for (var i = 0; i < payables.length; i++)
+                            tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                                "<td>" + payables[i][0] + "</td>\n" +
+                                "<td>" + payables[i][1].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][2].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][3].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][4].toFixed(2) + "</td>\n" +
+                                "<td>" + (payables[i][3] - payables[i][4]).toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][5] + "</td>\n" +
+                                "<td><a data-toggle='modal' data-target='#paymentModal' onclick='paymentModal(\"" + payables[i][0] + "\",\"" + (payables[i][3] - payables[i][4]) + "\")'> 付款 </a></td></tr>" +
+                                "<td><a onclick='editSupplementary(\"" + payables[i][0] + "\")'> 编辑 </a><a onclick='deleteSupplementary(\"" + payables[i][0] + "\")'> 删除 </a></td></tr>";
+
+                        $('#mainDialog').show();
+                        $('#addSupplementariesDialog').hide();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
+    }
+    function buttonCancel() {
+        $('#mainDialog').show();
+        $('#addSupplementariesDialog').hide();
+    }
+    function editSupplementary(supplierCode) {
+	    $.ajax({
+            url: "/edit_supplementary/"+supplierCode,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var supplementary=callback['supplementary']; // supplierCode,supplementaryCode,inDate,inNum,price,remark
+                    var tbody=document.getElementById("supplementaries").children[1];
+                    $('#supplementaries tbody').html("");
+                    for(var i=0;i<supplementary.length;i++)
+                        tbody.insertRow(i).innerHTML="<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td contenteditable='true'>" + supplementary[i][2] + "</td>\n" +
+                            "<td contenteditable='true'>" + supplementary[i][1] + "</td>\n" +
+                            "<td contenteditable='true'>" + supplementary[i][0] + "</td>\n" +
+                            "<td contenteditable='true'>" + supplementary[i][3] + "</td>\n" +
+                            "<td contenteditable='true'>" + supplementary[i][4].toFixed(2) + "</td>\n" +
+                            "<td>" + (supplementary[i][3]*supplementary[i][4]).toFixed(2) + "</td>\n" +
+                            "<td contenteditable='true'>" + supplementary[i][5] + "</td></tr>";
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+
+        $('#mainDialog').hide();
+        $('#addSupplementariesDialog').show();
+        $("#editflag").val(1);
+        $("#supplierCode").val(supplierCode);
+    }
+    function deleteSupplementary(supplierCode) {
+	    console.log(event.currentTarget);
+	    console.log(event.currentTarget.parentElement.parentElement);
+	    console.log(event.currentTarget.parentElement.parentElement.rowIndex);
+	    var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
+
+	    var supplierCodeArr=new Array();
+	    supplierCodeArr[0]=supplierCode;
+	    var data={'supplierCodeArr':supplierCodeArr};
+	    $.ajax({
+            url: "/delete_supplementaries",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var table=document.getElementById("supplementary");
+                    table.deleteRow(rowindex);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function deleteSupplementaries() {
+        var tbody=document.getElementById("supplementary").children[1];
+        var length=tbody.rows.length,j=0;
+	    var supplierCodeArr=new Array();
+        for(var i=length-1;i>=0;i--){
+            var checktd=tbody.rows[i].cells[0].children[0];
+            if(checktd.checked)
+                supplierCodeArr[j++]=tbody.rows[i].cells[1].innerHTML;
+        }
+	    var data={'supplierCodeArr':supplierCodeArr};
+
+	    $.ajax({
+            url: "/delete_supplementaries",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    for(var i=length-1;i>=0;i--){
+                        var checktd=tbody.rows[i].cells[0].children[0];
+                        if(checktd.checked)
+                            tbody.deleteRow(i);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+	function paymentModal(supplierCode,beforePayable){
+        $('#modalSupplierCode').val(supplierCode);
+        $('#beforePayable').val(beforePayable);
+        var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
+        $('#rowindex').val(rowindex);
+    }
+    function paymentModalSubmit(supplierCode) {
+	    var supplierCode=$('#modalSupplierCode').val();
+        var payment=$('#payment').val();
+        var data = {
+            'supplierCode': supplierCode,
+            'beforePayable': $('#beforePayable').val(),
+            'paymentDate': $('#paymentDate').val(),
+            'payment': payment,
+            'remark': $('#remark').val()
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/supplementary_payments/"+supplierCode,
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var row=document.getElementById("supplementary").rows[$("#rowindex").val()];
+                    row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat(payment)).toFixed(2);
+                    row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat(payment)).toFixed(2);
+
+                    $('#modalSupplierCode').val("");
+                    $('#beforePayable').val("");
+                    $('#paymentDate').val("");
+                    $('#payment').val("");
+                    $('#remark').val("");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function paymentModalCancel() {
+        $('#modalSupplierCode').val("");
+        $('#beforePayable').val("");
+        $('#paymentDate').val("");
+        $('#payment').val("");
+        $('#remark').val("");
+    }
+
+    var operationAddRowCount=0;
+    function operationModalSubmit() {
+
+    }
+    function operationModalCancel() {
+
+    }
+    $('#operationMonth').on("change", function () {
+        console.log("选择月份");
+        console.log(this);
+        console.log(this.value);
+
+        $.ajax({
+            url: "/search_operation/"+this.value,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var operationArr=callback['operationArr'];
+                    $('#operation tbody').html("");
+                    var tbody=document.getElementById("operation").children[1];
+                    for(var i=0;i<operationArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                            "<td>" + operationArr[i][1] + "</td>\n" +
+                            "<td>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                            "<td>" + operationArr[i][3] + "</td>\n" +
+                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }
+
+                    operationAddRowCount=0;
+                    $('#operationButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });
+	function addOperationRow() {
+	    var tbody=document.getElementById("operation").children[1];
+        tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+            "<td style='display:none'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td></td></tr>";
+
+        operationAddRowCount++;
+
+        $('#operationButtonToolbar').show();
+    }
+	function operationSave() {
+        /*正则表达式判断日期格式*/
+        var reg=/^(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29)$/;
+
+	    var tbody=document.getElementById("operation").children[1];
+	    var rows = document.getElementById("operation").children[1].rows;
+	    var operations=new Array();
+        for (var i = 0; i < rows.length; i++) {
+            operations[i] = new Array();
+            console.log(rows[i].cells[2]);
+            if (!reg.exec(rows[i].cells[2].innerHTML)) {
+                alert("日期格式不正确！");
+                return;
+            }
+            if (!$.isNumeric(rows[i].cells[3].innerHTML)) {
+                alert("请输入正确的金额！");
+                return;
+            }
+            if (rows[i].cells[4].innerHTML === "") {
+                alert("请输入费用说明！");
+                return;
+            }
+            operations[i][0] = rows[i].cells[1].innerHTML; // costCode
+            operations[i][1] = rows[i].cells[2].innerHTML;
+            operations[i][2] = parseFloat(rows[i].cells[3].innerHTML);
+            operations[i][3] = rows[i].cells[4].innerHTML;
+        }
+        var data={'operations':operations};
+        console.log(data);
+
+        $.ajax({
+            url: "/add_operations",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var operationArr=callback['operationArr'];
+                    $('#operation tbody').html("");
+                    console.log(rows);
+                    for(var i=0;i<operationArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                            "<td>" + operationArr[i][1] + "</td>\n" +
+                            "<td>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                            "<td>" + operationArr[i][3] + "</td>\n" +
+                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }
+
+                    operationAddRowCount=0;
+                    $('#operationButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function operationCancel() {
+        $('#operationButtonToolbar').hide();
+        /*var rows = document.getElementById("operation").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",false);
+            rows[i].cells[2].setAttribute("contenteditable",false);
+            rows[i].cells[3].setAttribute("contenteditable",false);
+        }*/
+        var tbody = document.getElementById("operation").children[1];
+        var rows = tbody.rows;
+        var rowindex=$('#operationRowindex').val();
+        console.log(rowindex);
+        console.log(operationAddRowCount);
+        if(rowindex!="") {
+            rows[rowindex].cells[2].setAttribute("contenteditable", false);
+            rows[rowindex].cells[3].setAttribute("contenteditable", false);
+            rows[rowindex].cells[4].setAttribute("contenteditable", false);
+        }
+        for(var length=rows.length,i=length-1;i>length-1-operationAddRowCount;i--)
+            tbody.deleteRow(i);
+        operationAddRowCount=0;
+
+        /*$.ajax({
+            url: "/search_operation/"+$('#operationMonth').val(),
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var operationArr=callback['operationArr'];
+                    $('#operation tbody').html("");
+                    var tbody=document.getElementById("operation").children[1];
+                    for(var i=0;i<operationArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                            "<td>" + operationArr[i][1] + "</td>\n" +
+                            "<td>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                            "<td>" + operationArr[i][3] + "</td>\n" +
+                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }
+
+                    $('#operationButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });*/
+    }
+    function setOperationRowEditable() {
+        var row=event.currentTarget.parentElement.parentElement;
+        console.log(row);
+        console.log(row.cells[2]);
+        row.cells[2].setAttribute("contenteditable",true);
+        row.cells[3].setAttribute("contenteditable",true);
+        row.cells[4].setAttribute("contenteditable",true);
+
+        $('#operationRowindex').val(row.rowIndex-1);
+
+        $('#operationButtonToolbar').show();
+    }
+    function deleteOperation(costCode){
+	    var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
+        var table=document.getElementById("operation");
+	    if(costCode=="") {
+            table.deleteRow(rowindex);
+            operationAddRowCount--;
+        }else {
+            var costCodeArr = new Array();
+            costCodeArr[0] = costCode;
+            var data = {'costCodeArr': costCodeArr};
+
+            $.ajax({
+                url: "/delete_operations",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback['ok']) {
+                        table.deleteRow(rowindex);
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
+	}
+    function deleteOperations() {
+        var tbody=document.getElementById("operation").children[1];
+        var length=tbody.rows.length,j=0;
+	    var costCodeArr=new Array();
+        for(var i=length-1;i>=0;i--){
+            var checktd=tbody.rows[i].cells[0].children[0];
+            if(checktd.checked) {
+                if(tbody.rows[i].cells[1].innerHTML=="") {
+                    tbody.deleteRow(i);
+                    operationAddRowCount--;
+                }
+                else
+                    costCodeArr[j++] = tbody.rows[i].cells[1].innerHTML;
+            }
+        }
+	    var data={'costCodeArr':costCodeArr};
+
+	    $.ajax({
+            url: "/delete_operations",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    length=tbody.rows.length;
+                    for(var i=length-1;i>=0;i--){
+                        var checktd=tbody.rows[i].cells[0].children[0];
+                        if(checktd.checked)
+                            tbody.deleteRow(i);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+
+    var aftersaleAddRowCount=0;
+    function aftersaleModalSubmit() {
+
+    }
+    function aftersaleModalCancel() {
+
+    }
+    $('#aftersaleMonth').on("change", function () {
+        console.log("选择月份");
+        console.log(this);
+        console.log(this.value);
+
+        $.ajax({
+            url: "/search_aftersale/"+this.value,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var aftersaleArr=callback['aftersaleArr'];
+                    $('#aftersale tbody').html("");
+                    var tbody=document.getElementById("aftersale").children[1];
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td>\n" +
+                            "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }
+
+                    aftersaleAddRowCount=0;
+                    $('#aftersaleButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });
+	function addAftersaleRow() {
+	    var tbody=document.getElementById("aftersale").children[1];
+        tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+            "<td style='display:none'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td></td></tr>";
+
+        aftersaleAddRowCount++;
+
+        $('#aftersaleButtonToolbar').show();
+    }
+	function aftersaleSave() {
+        /*正则表达式判断日期格式*/
+        var reg=/^(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})-(((0[13578]|1[02])-(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)-(0[1-9]|[12][0-9]|30))|(02-(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))-02-29)$/;
+
+	    var tbody=document.getElementById("aftersale").children[1];
+	    var rows = document.getElementById("aftersale").children[1].rows;
+	    var aftersales=new Array();
+        for (var i = 0; i < rows.length; i++) {
+            aftersales[i] = new Array();
+            console.log(rows[i].cells[2]);
+            if (!reg.exec(rows[i].cells[2].innerHTML)) {
+                alert("日期格式不正确！");
+                return;
+            }
+            if (rows[i].cells[3].innerHTML === "") {
+                alert("请输入成品型号！");
+                return;
+            }
+            if (rows[i].cells[4].innerHTML === "") {
+                alert("请输入客户名称！");
+                return;
+            }
+            if (!$.isNumeric(rows[i].cells[5].innerHTML) || !$.isNumeric(rows[i].cells[6].innerHTML) || !$.isNumeric(rows[i].cells[7].innerHTML)) {
+                alert("请输入正确的金额！");
+                return;
+            }
+            aftersales[i][0] = rows[i].cells[1].innerHTML; // costCode
+            aftersales[i][1] = rows[i].cells[2].innerHTML;
+            aftersales[i][2] = rows[i].cells[3].innerHTML;
+            aftersales[i][3] = rows[i].cells[4].innerHTML;
+            aftersales[i][4] = parseFloat(rows[i].cells[5].innerHTML);
+            aftersales[i][5] = parseFloat(rows[i].cells[6].innerHTML);
+            aftersales[i][6] = parseFloat(rows[i].cells[7].innerHTML);
+            aftersales[i][7] = rows[i].cells[8].innerHTML;
+            aftersales[i][8] = rows[i].cells[9].innerHTML;
+        }
+        var data={'aftersales':aftersales};
+        console.log(data);
+
+        $.ajax({
+            url: "/add_aftersales",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var aftersaleArr=callback['aftersaleArr']; // costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark
+                    $('#aftersale tbody').html("");
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td>\n" +
+                            "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }
+
+                    aftersaleAddRowCount=0;
+                    $('#aftersaleButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function aftersaleCancel() {
+        $('#aftersaleButtonToolbar').hide();
+        /*var rows = document.getElementById("aftersale").children[1].rows;
+        for (var i = 0; i < rows.length; i++) {
+            rows[i].cells[1].setAttribute("contenteditable",false);
+            rows[i].cells[2].setAttribute("contenteditable",false);
+            rows[i].cells[3].setAttribute("contenteditable",false);
+            rows[i].cells[4].setAttribute("contenteditable",false);
+            rows[i].cells[5].setAttribute("contenteditable",false);
+            rows[i].cells[6].setAttribute("contenteditable",false);
+            rows[i].cells[7].setAttribute("contenteditable",false);
+            rows[i].cells[8].setAttribute("contenteditable",false);
+        }*/
+        var tbody = document.getElementById("aftersale").children[1];
+        var rows = tbody.rows;
+        var rowindex=$('#aftersaleRowindex').val();
+        console.log(rowindex);
+        console.log(aftersaleAddRowCount);
+        if(rowindex!="") {
+            rows[rowindex].cells[2].setAttribute("contenteditable", false);
+            rows[rowindex].cells[3].setAttribute("contenteditable", false);
+            rows[rowindex].cells[4].setAttribute("contenteditable", false);
+            rows[rowindex].cells[5].setAttribute("contenteditable", false);
+            rows[rowindex].cells[6].setAttribute("contenteditable", false);
+            rows[rowindex].cells[7].setAttribute("contenteditable", false);
+            rows[rowindex].cells[8].setAttribute("contenteditable", false);
+            rows[rowindex].cells[9].setAttribute("contenteditable", false);
+        }
+        for(var length=rows.length,i=length-1;i>length-1-aftersaleAddRowCount;i--)
+            tbody.deleteRow(i);
+        aftersaleAddRowCount=0;
+
+        /*$.ajax({
+            url: "/search_aftersale/"+$('#aftersaleMonth').val(),
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var aftersaleArr=callback['aftersaleArr'];
+                    $('#aftersale tbody').html("");
+                    var tbody=document.getElementById("aftersale").children[1];
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td>\n" +
+                            "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }
+
+                    $('#aftersaleButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });*/
+    }
+    function setAftersaleRowEditable() {
+        var row=event.currentTarget.parentElement.parentElement;
+        console.log(row);
+        console.log(row.cells[2]);
+        row.cells[2].setAttribute("contenteditable",true);
+        row.cells[3].setAttribute("contenteditable",true);
+        row.cells[4].setAttribute("contenteditable",true);
+        row.cells[5].setAttribute("contenteditable",true);
+        row.cells[6].setAttribute("contenteditable",true);
+        row.cells[7].setAttribute("contenteditable",true);
+        row.cells[8].setAttribute("contenteditable",true);
+        row.cells[9].setAttribute("contenteditable",true);
+
+        $('#aftersaleRowindex').val(row.rowIndex-1);
+
+        $('#aftersaleButtonToolbar').show();
+    }
+    function deleteAftersale(costCode){
+	    var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
+        var table=document.getElementById("aftersale");
+	    if(costCode=="") {
+            table.deleteRow(rowindex);
+            aftersaleAddRowCount--;
+        }else {
+            var costCodeArr = new Array();
+            costCodeArr[0] = costCode;
+            var data = {'costCodeArr': costCodeArr};
+
+            $.ajax({
+                url: "/delete_aftersales",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+
+                    if (callback['ok']) {
+                        table.deleteRow(rowindex);
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
+	}
+    function deleteAftersales() {
+        var tbody=document.getElementById("aftersale").children[1];
+        var length=tbody.rows.length,j=0;
+	    var costCodeArr=new Array();
+        for(var i=length-1;i>=0;i--){
+            var checktd=tbody.rows[i].cells[0].children[0];
+            if(checktd.checked) {
+                if(tbody.rows[i].cells[1].innerHTML=="") {
+                    tbody.deleteRow(i);
+                    aftersaleAddRowCount--;
+                }
+                else
+                    costCodeArr[j++] = tbody.rows[i].cells[1].innerHTML;
+            }
+        }
+	    var data={'costCodeArr':costCodeArr};
+
+	    $.ajax({
+            url: "/delete_aftersales",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    length=tbody.rows.length;
+                    for(var i=length-1;i>=0;i--){
+                        var checktd=tbody.rows[i].cells[0].children[0];
+                        if(checktd.checked)
+                            tbody.deleteRow(i);
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+</script>
+</body>
+</html>
