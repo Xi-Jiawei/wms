@@ -1606,9 +1606,9 @@ def delete_order(orderCode):
         cur.execute("update clients,(select group_concat(distinct clientCode) as cliCode,sum(receivable) as sumReceivable from orders where orderCode='%s' group by orderCode) as t set receivable=receivable-t.sumReceivable where clients.clientCode=t.cliCode;" % (orderCode))
         cur.execute("update receivableReport,(select group_concat(distinct clientCode) as cliCode, date_format(group_concat(distinct orderDate),'%%Y-%%m') as cliDate, sum(receivable) as sumReceivable from orders where orderCode='%s' group by orderCode) as t set addReceivable=addReceivable-t.sumReceivable,receivable=receivable-t.sumReceivable where receivableReport.clientCode=t.cliCode and receivableReport.month=t.cliDate;" % (orderCode)) # 更新该月的addReceivable
         cur.execute("update receivableReport,(select group_concat(distinct clientCode) as cliCode, date_format(group_concat(distinct orderDate),'%%Y-%%m') as cliDate, sum(receivable) as sumReceivable from orders where orderCode='%s' group by orderCode) as t set remainReceivable=remainReceivable-t.sumReceivable,receivable=receivable-t.sumReceivable where receivableReport.clientCode=t.cliCode and receivableReport.month>t.cliDate;" % (orderCode)) # 更新该月以后月份的remainReceivable
-        cur.execute("update orderGroupByProductType,(select group_concat(distinct clientCode) as cliCode,group_concat(distinct productType) as prdType,sum(deliveryNum) as deliveryNumSum,sum(receivable) as receivableSum from orders where orderCode='%s' group by orderCode, productType) as t set deliveryNum=deliveryNum-t.deliveryNumSum,receivable=receivable-t.receivableSum where orderGroupByProductType.clientCode=t.cliCode and orderGroupByProductType.productType=t.prdType;" % (orderCode))
-        cur.execute("update receivableReportGroupByProductType,(select group_concat(distinct clientCode) as cliCode,group_concat(distinct productType) as prdType, date_format(group_concat(distinct orderDate),'%%Y-%%m') as cliDate, sum(deliveryNum) as deliveryNumSum,sum(receivable) as receivableSum from orders where orderCode='%s' group by orderCode, productType) as t set addDeliveryNum=addDeliveryNum-t.deliveryNumSum,deliveryNum=deliveryNum-t.deliveryNumSum,addReceivable=addReceivable-t.receivableSum,receivable=receivable-t.receivableSum where clientCode=t.cliCode and productType=t.prdType and month=t.cliDate;" % (orderCode)) # 更新该月的addDeliveryNum和addReceivable
-        cur.execute("update receivableReportGroupByProductType,(select group_concat(distinct clientCode) as cliCode,group_concat(distinct productType) as prdType, date_format(group_concat(distinct orderDate),'%%Y-%%m') as cliDate, sum(deliveryNum) as deliveryNumSum,sum(receivable) as receivableSum from orders where orderCode='%s' group by orderCode, productType) as t set remainDeliveryNum=remainDeliveryNum-t.deliveryNumSum,deliveryNum=deliveryNum-t.deliveryNumSum,remainReceivable=remainReceivable-t.receivableSum,receivable=receivable-t.receivableSum where clientCode=t.cliCode and productType=t.prdType and month>t.cliDate;" % (orderCode)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
+        cur.execute("update orderGroupByProductType a,orders b set a.deliveryNum=a.deliveryNum-b.deliveryNum,a.receivable=a.receivable-b.receivable where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType;" % (orderCode))
+        cur.execute("update receivableReportGroupByProductType a,orders b set a.addDeliveryNum=a.addDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum,a.addReceivable=a.addReceivable-b.receivable,a.receivable=a.receivable-b.receivable where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month=date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月的addDeliveryNum和addReceivable
+        cur.execute("update receivableReportGroupByProductType a,orders b set a.remainDeliveryNum=a.remainDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum,a.remainReceivable=a.remainReceivable-b.receivable,a.receivable=a.receivable-b.receivable where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month>date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
         cur.execute("delete from orders where orderCode='%s';"%(orderCode))
         conn.commit()
         lock.release()
@@ -1636,7 +1636,7 @@ def select_deliveryByCode(deliveryCode):
         conn.rollback()
 
 # xijiawei
-# 查询某个订单的所有出货记录（暂不用）
+# 查询某个订单的所有出货记录（弃用），因为此方式可能会查询出某些客户0条出货记录，这样查询结果里就没有该客户，但是实际要求是希望每个客户才能出现在查询结果里，即使该客户没有出货记录
 def select_deliveryWithOrderByCode(orderCode):
     try:
         sql = "select orders.productType, orders.deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum,productInfo.inventoryNum-sendNum,delivery.remark, orders.clientCode, date_format(orderDate,'%Y-%m-%d') from orders,delivery,productInfo where orders.orderCode='%s' and orders.orderCode=delivery.orderCode and orders.productType=productInfo.productType;"%(orderCode)
@@ -2279,8 +2279,8 @@ def delete_supplementaryByCode(inCode, entryTime, entryClerk):
 
         # 更新应付款报表
         month=entryTime[0:7]
-        cur.execute("update supplementaryPayableReport a,supplementary b set addPayable=addPayable-inNum*price,payable=payable-inNum*price, entryTime='%s', entryClerk='%s' where inCode='%s' and a.supplierCode=b.supplierCode and month=date_format(b.inDate,'%%Y-%%m');" % (entryTime, entryClerk, inCode)) # 更新该月的addPayable
-        cur.execute("update supplementaryPayableReport a,supplementary b set remainPayable=remainPayable-inNum*price,payable=payable-inNum*price, entryTime='%s', entryClerk='%s' where inCode='%s' and a.supplierCode=b.supplierCode and month>date_format(b.inDate,'%%Y-%%m');" % (entryTime, entryClerk, inCode)) # 更新该月以后月份的remainPayable
+        cur.execute("update supplementaryPayableReport a,supplementary b set addPayable=addPayable-inNum*price,payable=payable-inNum*price, a.entryTime='%s', a.entryClerk='%s' where inCode='%s' and a.supplierCode=b.supplierCode and month=date_format(b.inDate,'%%Y-%%m');" % (entryTime, entryClerk, inCode)) # 更新该月的addPayable
+        cur.execute("update supplementaryPayableReport a,supplementary b set remainPayable=remainPayable-inNum*price,payable=payable-inNum*price, a.entryTime='%s', a.entryClerk='%s' where inCode='%s' and a.supplierCode=b.supplierCode and month>date_format(b.inDate,'%%Y-%%m');" % (entryTime, entryClerk, inCode)) # 更新该月以后月份的remainPayable
 
         # 删除
         cur.execute("delete from supplementary where inCode='%s';"%(inCode))
@@ -2303,14 +2303,14 @@ def delete_supplementaryBySupplierCode(supplierCode, entryTime, entryClerk):
         # cur.execute("update supplementaryPayableReport,(select sum(inNum*price) as payableSum from supplementary where supplierCode='%s') t set addPayable=addPayable-t.payableSum,payable=payable-t.payableSum, entryTime='%s', entryClerk='%s' where supplierCode='%s' and month='%s';" % (supplierCode, entryTime, entryClerk, supplierCode, month))
         # # 删除
         # cur.execute("delete from supplementary where supplierCode='%s';"%(supplierCode))
+        # conn.commit()
 
         cur.execute("select inCode from supplementary where supplierCode='%s';"%supplierCode)
         result = cur.fetchall()
+        lock.release()
         for i in result:
             myThread(target=delete_supplementaryByCode, args=(i[0], entryTime, entryClerk,))
 
-        conn.commit()
-        lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()

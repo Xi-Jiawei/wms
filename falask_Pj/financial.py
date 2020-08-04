@@ -364,11 +364,14 @@ def add_supplementaries():
 @financial_app.route('/delete_supplementaries', methods=['POST'])
 def delete_supplementaries():
     if session.get('username'):
+        username = session['username']
         if request.method == "POST":
             data = request.get_json()
             supplierCodeArr = data['supplierCodeArr']  # 不要写成orderCode=request.data["orderCode"]
+            entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            entryClerk = username
             for i in supplierCodeArr:
-                myThread(target=delete_supplementaryBySupplierCode, args=(i[0], ))
+                myThread(target=delete_supplementaryBySupplierCode, args=(i, entryTime, entryClerk, ))
             return jsonify({'ok': True})
     else:
         return render_template('access_fail.html')

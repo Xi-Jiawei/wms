@@ -150,7 +150,7 @@ def deliver(orderCode):
             return jsonify({'ok': True,'productOfOrderArr':products})
         elif request.method=="GET":
             # 方式一，sql连接，不适用：
-            # thread = myThread(target=select_deliverWithOrderByCode, args=(orderCode,))
+            # thread = myThread(target=select_deliveryWithOrderByCode, args=(orderCode,))
             # productOfDeliverArr = thread.get_result()
             # productType = ''
             # products=[]
