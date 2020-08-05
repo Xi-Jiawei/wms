@@ -105,8 +105,8 @@
                                 <form id="searchForm" method="post" novalidate="novalidate">
                                     <div class="col-xs-12" style="width: 240px;">
                                         <label class="control-label mb-1">交易客户</label>
-                                        <input type="text" class="form-control" id="clientCode" name="client" placeholder="输入客户名称" list="list"/>
-                                        <datalist id="list">
+                                        <input type="text" class="form-control" id="clientCode" name="client" placeholder="输入客户名称" list="clientList"/>
+                                        <datalist id="clientList">
                                             {% if clients %}
                                                 {% for i in clients %}
                                                     <option value="{{ i }}"/>

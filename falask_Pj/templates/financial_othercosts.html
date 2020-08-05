@@ -145,8 +145,7 @@
                                             </h4>
                                         </div>
                                         <div class="modal-body">
-                                            <input id="rowindex" type="text" style="display:none" class="form-control">
-                                            <input id="beforePayable" type="text" style="display:none" class="form-control">
+                                            <input id="beforePayable" type="text" style="display:none">
                                             <div class="row" style="padding-left: 10px;padding-right: 10px">
                                                 <label class="control-label mb-1" style="padding-left: 20px;">供应商</label>
                                                 <div class="col-xs-12">
@@ -363,6 +362,7 @@
 
                                         <div id="addSupplementariesDialog" style="display: none;">
                                             <input style="display: none" id="supplierCode"/>
+                                            <input style="display: none" id="supplementaryRowindex"/>
                                             <input style="display: none" id="editflag"/>
 
                                             <table id="supplementaries" class="table table-striped table-bordered">
@@ -550,6 +550,8 @@
                     'text': '添加',
                     action: function ( e, dt, node, config ) {
                         console.log(this);
+                        console.log(this.rows().nodes().length);
+                        console.log(document.getElementById("supplementaries"));
                         this.row.add([
                             '<input type=\'checkbox\' name=\'checkbox\' value=\'checkbox\' />',
                             '',
@@ -562,13 +564,14 @@
                         ]).draw();
 
                         /*设置单元格可编辑*/
-                        var data=this.rows().data();
                         var length=this.rows().nodes().length;
-                        this.cell(length-1, 1).node().setAttribute("contenteditable",true); //productType
-                        this.cell(length-1, 2).node().setAttribute("contenteditable",true); //productNum
-                        this.cell(length-1, 3).node().setAttribute("contenteditable",true); //deliveryDate
-                        this.cell(length-1, 4).node().setAttribute("contenteditable",true); //remark
-                        this.cell(length-1, 5).node().setAttribute("contenteditable",true); //remark
+                        this.cell(length-1, 1).node().setAttribute("contenteditable",true); //
+                        this.cell(length-1, 2).node().setAttribute("contenteditable",true); //
+                        this.cell(length-1, 3).node().setAttribute("contenteditable",true); //
+                        this.cell(length-1, 4).node().setAttribute("contenteditable",true); //supplementaryNum
+                        this.cell(length-1, 4).node().setAttribute("class","supplementaryNum"); //supplementaryNum
+                        this.cell(length-1, 5).node().setAttribute("contenteditable",true); //price
+                        this.cell(length-1, 5).node().setAttribute("class","price"); //price
                         this.cell(length-1, 7).node().setAttribute("contenteditable",true); //remark
                     }
                 },
@@ -630,6 +633,8 @@
 	};
 
 	function addSupplementaries() {
+        //$('#supplementaries tbody').html("");
+        $('#supplementaries').DataTable().clear().draw();
         $('#mainDialog').hide();
         $('#addSupplementariesDialog').show();
         $("#editflag").val(0);
@@ -661,7 +666,7 @@
             supplementaries[i][3] = parseInt(tdArr.eq(4).text());//数量
             supplementaries[i][4] = parseFloat(tdArr.eq(5).text());//单价
             supplementaries[i][5] = parseInt(tdArr.eq(4).text())*parseFloat(tdArr.eq(5).text());//金额
-            supplementaries[i][6] = tdArr.eq(6).text();//备注
+            supplementaries[i][6] = tdArr.eq(7).text();//备注
         }
         var data={'supplementaries':supplementaries}
         console.log(data);
@@ -717,20 +722,16 @@
                     console.log(callback);
 
                     if (callback['ok']) {
-                        var payables = callback['payables']; // supplierCode,remainPayable,addPayable,payable,payment,remark
-                        var tbody = document.getElementById("supplementary").children[1];
-                        $('#supplementary tbody').html("");
-                        for (var i = 0; i < payables.length; i++)
-                            tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
-                                "<td>" + payables[i][0] + "</td>\n" +
-                                "<td>" + payables[i][1].toFixed(2) + "</td>\n" +
-                                "<td>" + payables[i][2].toFixed(2) + "</td>\n" +
-                                "<td>" + payables[i][3].toFixed(2) + "</td>\n" +
-                                "<td>" + payables[i][4].toFixed(2) + "</td>\n" +
-                                "<td>" + (payables[i][3] - payables[i][4]).toFixed(2) + "</td>\n" +
-                                "<td>" + payables[i][5] + "</td>\n" +
-                                "<td><a data-toggle='modal' data-target='#paymentModal' onclick='paymentModal(\"" + payables[i][0] + "\",\"" + (payables[i][3] - payables[i][4]) + "\")'> 付款 </a></td></tr>" +
-                                "<td><a onclick='editSupplementary(\"" + payables[i][0] + "\")'> 编辑 </a><a onclick='deleteSupplementary(\"" + payables[i][0] + "\")'> 删除 </a></td></tr>";
+                        var payable = callback['payable']; // supplierCode,remainPayable,addPayable,payable,payment,remark
+                        var row= document.getElementById("supplementary").rows[$('#supplementaryRowindex').val()];
+                        row.cells[1].innerHTML=payable[0][0];
+                        row.cells[2].innerHTML=payable[0][1].toFixed(2);
+                        row.cells[3].innerHTML=payable[0][2].toFixed(2);
+                        row.cells[4].innerHTML=payable[0][3].toFixed(2);
+                        row.cells[5].innerHTML=payable[0][4].toFixed(2);
+                        row.cells[6].innerHTML=(payable[0][3] - payable[0][4]).toFixed(2);
+                        row.cells[7].innerHTML=payable[0][5];
+                        row.cells[8].innerHTML="<a data-toggle='modal' data-target='#paymentModal' onclick='paymentModal(\"" + payable[0][0] + "\",\"" + (payable[0][3] - payable[0][4]) + "\")'> 付款 </a>";
 
                         $('#mainDialog').show();
                         $('#addSupplementariesDialog').hide();
@@ -750,6 +751,9 @@
         $('#addSupplementariesDialog').hide();
     }
     function editSupplementary(supplierCode) {
+	    console.log(this);
+	    console.log(event.currentTarget);
+	    var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
 	    $.ajax({
             url: "/edit_supplementary/"+supplierCode,
             type: "GET",
@@ -760,7 +764,7 @@
 
                 if(callback['ok']) {
                     var supplementary=callback['supplementary']; // supplierCode,supplementaryCode,inDate,inNum,price,remark
-                    var tbody=document.getElementById("supplementaries").children[1];
+                    /*var tbody=document.getElementById("supplementaries").children[1];
                     $('#supplementaries tbody').html("");
                     for(var i=0;i<supplementary.length;i++)
                         tbody.insertRow(i).innerHTML="<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
@@ -770,7 +774,33 @@
                             "<td contenteditable='true'>" + supplementary[i][3] + "</td>\n" +
                             "<td contenteditable='true'>" + supplementary[i][4].toFixed(2) + "</td>\n" +
                             "<td>" + (supplementary[i][3]*supplementary[i][4]).toFixed(2) + "</td>\n" +
-                            "<td contenteditable='true'>" + supplementary[i][5] + "</td></tr>";
+                            "<td contenteditable='true'>" + supplementary[i][5] + "</td></tr>";*/
+                    // 注意，DOM API和DataTable API不要混用，要么统一使用DOM API，要么统一使用DataTable API
+                    var table=$('#supplementaries').DataTable();
+                    table.clear();
+                    for(var i=0;i<supplementary.length;i++) {
+                        table.row.add([
+                            '<input type=\'checkbox\' name=\'checkbox\' value=\'checkbox\' />',
+                            supplementary[i][2],
+                            supplementary[i][1],
+                            supplementary[i][0],
+                            supplementary[i][3],
+                            supplementary[i][4].toFixed(2),
+                            (supplementary[i][3] * supplementary[i][4]).toFixed(2),
+                            supplementary[i][5]
+                        ]);
+
+                        /*设置单元格可编辑*/
+                        table.cell(i, 1).node().setAttribute("contenteditable",true); //
+                        table.cell(i, 2).node().setAttribute("contenteditable",true); //
+                        table.cell(i, 3).node().setAttribute("contenteditable",true); //
+                        table.cell(i, 4).node().setAttribute("contenteditable",true); //supplementaryNum
+                        table.cell(i, 4).node().setAttribute("class","supplementaryNum"); //supplementaryNum
+                        table.cell(i, 5).node().setAttribute("contenteditable",true); //price
+                        table.cell(i, 5).node().setAttribute("class","price"); //price
+                        table.cell(i, 7).node().setAttribute("contenteditable",true); //remark
+                    }
+                    table.draw();
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -784,7 +814,9 @@
         $('#mainDialog').hide();
         $('#addSupplementariesDialog').show();
         $("#editflag").val(1);
+        $('#supplementaryRowindex').val(rowindex);
         $("#supplierCode").val(supplierCode);
+        console.log($('#supplementaryRowindex').val());
     }
     function deleteSupplementary(supplierCode) {
 	    console.log(event.currentTarget);
@@ -859,7 +891,7 @@
         $('#modalSupplierCode').val(supplierCode);
         $('#beforePayable').val(beforePayable);
         var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
-        $('#rowindex').val(rowindex);
+        $('#supplementaryRowindex').val(rowindex);
     }
     function paymentModalSubmit(supplierCode) {
 	    var supplierCode=$('#modalSupplierCode').val();
@@ -884,7 +916,7 @@
                 console.log(callback);
 
                 if(callback['ok']) {
-                    var row=document.getElementById("supplementary").rows[$("#rowindex").val()];
+                    var row=document.getElementById("supplementary").rows[$("#supplementaryRowindex").val()];
                     row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat(payment)).toFixed(2);
                     row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat(payment)).toFixed(2);
 
@@ -910,6 +942,26 @@
         $('#payment').val("");
         $('#remark').val("");
     }
+    $('#supplementaries').on("input", '.supplementaryNum', function (){
+        var row=this.parentElement;
+        var supplementaryNum=0, price=0, money=0;
+        if($.isNumeric(row.cells[4].textContent))
+            supplementaryNum=parseFloat(row.cells[4].textContent);
+        if($.isNumeric(row.cells[5].textContent))
+            price=parseFloat(row.cells[5].textContent);
+        money=supplementaryNum*price;
+        row.cells[6].textContent=money.toFixed(2);
+    });
+    $('#supplementaries').on("input", '.price', function (){
+        var row=this.parentElement;
+        var supplementaryNum=0, price=0, money=0;
+        if($.isNumeric(row.cells[4].textContent))
+            supplementaryNum=parseFloat(row.cells[4].textContent);
+        if($.isNumeric(row.cells[5].textContent))
+            price=parseFloat(row.cells[5].textContent);
+        money=supplementaryNum*price;
+        row.cells[6].textContent=money.toFixed(2);
+    });
 
     var operationAddRowCount=0;
     function operationModalSubmit() {

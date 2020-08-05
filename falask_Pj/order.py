@@ -132,9 +132,6 @@ def deliver(orderCode):
                 inventoryNum = productInfo[0][1]
                 myThread(target=insert_delivery, args=(deliveryCode, orderCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, client, client, address, contact, telephone, entryTime, entryClerk,))
 
-                # 更新orders
-                myThread(target=update_order, args=(orderCode, productType, sendNum, client, client, contact, address, telephone, ))
-
                 # 返回刷新数据
                 productDeliverRecord=[]
                 productDeliverRecord.append(productType)

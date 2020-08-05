@@ -185,7 +185,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% for i in clients %}
+                                    {% for i in receivables %}
                                         <tr>
                                             <td>{{ i[0] }}</td>
                                             <td>{{ i[1] }}</td>
@@ -301,10 +301,10 @@
 
                 if(callback['ok']) {
                     var receipts=callback['receipts']; // client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark]
-                    var table=document.getElementById("receiptsJournal");
+                    var tbody=document.getElementById("receiptsJournal").children[2]; // caption=document.getElementById("receiptsJournal").children[0]; thead=document.getElementById("receiptsJournal").children[1];
                     $('#receiptsJournal tbody').html("");
                     for(var i=0;i<receipts.length;i++){
-                        table.insertRow(i+1).innerHTML="<tr><td>"+receipts[i][0]+"</td>\n" +
+                        tbody.insertRow(i).innerHTML="<tr><td>"+receipts[i][0]+"</td>\n" +
                             "                                    <td>"+receipts[i][1]+"</td>\n" +
                             "                                    <td>"+receipts[i][2]+"</td>\n" +
                             "                                    <td>"+receipts[i][3]+"</td></tr>";

@@ -95,7 +95,7 @@
         <div class="animated fadeIn">
             <div class="row">
                 <div class="col-md-12">
-                    <!--订单出货窗口-->
+                    <!--付款日记窗口-->
                     <div id="paymentsJournalDialog" class="card" style="overflow: hidden;display: none">
                         <button type="button" class="close" onclick="dlgClose()">&times;</button>
                         <div class="card-body">
@@ -300,10 +300,10 @@
 
                 if(callback['ok']) {
                     var payments=callback['payments']; // client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark]
-                    var table=document.getElementById("paymentsJournal");
+                    var tbody=document.getElementById("paymentsJournal").children[2]; // caption=document.getElementById("paymentsJournal").children[0]; thead=document.getElementById("paymentsJournal").children[1];
                     $('#paymentsJournal tbody').html("");
                     for(var i=0;i<payments.length;i++){
-                        table.insertRow(i+1).innerHTML="<tr><td>"+payments[i][0]+"</td>\n" +
+                        tbody.insertRow(i).innerHTML="<tr><td>"+payments[i][0]+"</td>\n" +
                             "                                    <td>"+payments[i][1]+"</td>\n" +
                             "                                    <td>"+payments[i][2]+"</td>\n" +
                             "                                    <td>"+payments[i][3]+"</td></tr>";

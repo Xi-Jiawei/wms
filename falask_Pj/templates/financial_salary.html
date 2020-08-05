@@ -1341,6 +1341,61 @@
         row.cells[19].textContent=(payablewage-totaldues).toFixed(2);
     });
 
+    function checkAll() {
+        var mckeckbox=document.activeElement;
+        var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
+        console.log(mckeckbox);
+        console.log(table);
+        console.log(table.rows);
+        console.log(table.label);
+        console.log(table.tagName);
+        console.log(mckeckbox.checked);
+        if(table.tagName=="TABLE"){
+            if(mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type = "CHECKBOX"){
+                            chkOrder.checked=true;
+                            //chkOrder.setAttribute("checked", true);
+                        }
+                    }
+                }
+            }else if(!mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type == "checkbox"){
+                            chkOrder.checked=false;
+                            //chkOrder.setAttribute("checked", false);
+                        }
+                    }
+                }
+            }
+        }
+
+        /*var table=$(this).closest('table');
+        console.log($(this));
+        console.log(table);
+        console.log(table.eq(0));
+        //console.log(trArr);
+        var trArr = table.children("tbody")[0].children("tr");
+        if($(this).checked)
+        for (var i=0;i<trArr.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+            if(tdArr.eq(0).find("input").type=="checkbox"){
+                tdArr.eq(0).find("input").checked=true;
+            }
+        }
+        else {
+        if($(this).checked)
+        for (var i=0;i<trArr.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+            if(tdArr.eq(0).find("input").type=="checkbox"){
+                tdArr.eq(0).find("input").checked=false;
+            }
+        }}*/
+    }
 </script>
 </body>
 </html>

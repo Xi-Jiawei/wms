@@ -25,7 +25,7 @@ def financial_receivable():
             for i in clients:
                 thread = myThread(target=select_receivableReportByCode, args=(i[0], month,))
                 receivable = thread.get_result()
-                receivables.append(receivable)
+                receivables.append(receivable[0])
             return render_template('financial_receivable.html', form=form, receivables=receivables, username=username)
     else:
         return render_template('access_fail.html')
@@ -72,7 +72,7 @@ def financial_payable():
             for i in suppliers:
                 thread = myThread(target=select_payableReportByCode, args=(i[0], month,))
                 payable = thread.get_result()
-                payables.append(payable)
+                payables.append(payable[0])
             return render_template('financial_payable.html', form=form, username=username, payables=payables)
     else:
         return render_template('access_fail.html')
@@ -312,9 +312,7 @@ def edit_manager_salary():
 @financial_app.route('/financial_othercosts', methods=['GET'])
 def financial_othercosts():
     if session.get('username'):
-        if request.method == "POST":
-            print("")
-        elif request.method=="GET":
+        if request.method=="GET":
             username = session['username']
             form = ProductForm()
 
@@ -347,12 +345,16 @@ def add_supplementaries():
             supplementaries = data['supplementaries']  # supplierCode, inDate, supplementaryCode, inNum, price, money, remark
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             entryClerk = username
-            payables=[]
             for i in supplementaries:
                 thread = myThread(target=insert_supplementary,args=(i[0], i[2], i[1], i[3], i[4], i[6], entryTime, entryClerk,))
 
-                # 返回数据
-                thread = myThread(target=select_supplementaryPayableReportByCode, args=(i[0], entryTime[0:7],))  # supplierCode,remainPayable,addPayable,payable,payment,remark
+            # 返回数据
+            thread = myThread(target=select_supplementarySuppliers, args=())
+            suppliers = thread.get_result()
+            month = entryTime[0:7]
+            payables=[]
+            for i in suppliers:
+                thread = myThread(target=select_supplementaryPayableReportByCode, args=(i[0], month,)) # supplierCode,remainPayable,addPayable,payable,payment,remark
                 payable = thread.get_result()
                 payables.append(payable[0])
             return jsonify({'ok': True,'payables':payables})
@@ -398,11 +400,11 @@ def edit_supplementary(supplierCode):
             for i in supplementaries:
                 thread = myThread(target=insert_supplementary, args=(i[0], i[2], i[1], i[3], i[4], i[6], entryTime, entryClerk,))
 
-                # 返回数据
-                thread = myThread(target=select_supplementaryPayableReportByCode, args=(i[0], entryTime[0:7],))  # supplierCode,remainPayable,addPayable,payable,payment,remark
-                payable = thread.get_result()
-                payables.append(payable[0])
-            return jsonify({'ok': True, 'payables': payables})
+            # 返回数据
+            month = entryTime[0:7]
+            thread = myThread(target=select_supplementaryPayableReportByCode, args=(supplierCode, month,))  # supplierCode,remainPayable,addPayable,payable,payment,remark
+            payable = thread.get_result()
+            return jsonify({'ok': True, 'payable': payable})
         elif request.method=="GET":
             thread = myThread(target=select_supplementaryByCode, args=(supplierCode,))
             supplementary=thread.get_result()
