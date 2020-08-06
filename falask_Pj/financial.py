@@ -213,15 +213,16 @@ def edit_worker_salary():
 
 # xijiawei
 # 订单管理
-@financial_app.route('/delete_salaries', methods=['POST'])
-def delete_salaries():
+@financial_app.route('/delete_workerSalaries', methods=['POST'])
+def delete_workerSalaries():
     if session.get('username'):
         username = session['username']
         if request.method == "POST":
             data = request.get_json()
             staffidArr = data['staffidArr']
             for i in staffidArr:
-                myThread(target=delete_staffByID,args=(int(i), ))
+                # myThread(target=delete_staffByID,args=(int(i), ))
+                myThread(target=delete_workerSalaryByIDAndMonth,args=(int(i[1]), i[0] ))
             return jsonify({'ok': True})
     else:
         return render_template('access_fail.html')
@@ -302,6 +303,22 @@ def edit_manager_salary():
             thread = myThread(target=select_all_managerSalary, args=())
             salaryArr = thread.get_result()
             return jsonify({'ok': True, 'salaryArr': salaryArr})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
+@financial_app.route('/delete_managerSalaries', methods=['POST'])
+def delete_managerSalaries():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            staffidArr = data['staffidArr']
+            for i in staffidArr:
+                # myThread(target=delete_staffByID,args=(int(i), ))
+                myThread(target=delete_managerSalaryByIDAndMonth,args=(int(i[1]), i[0] ))
+            return jsonify({'ok': True})
     else:
         return render_template('access_fail.html')
 

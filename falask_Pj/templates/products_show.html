@@ -106,94 +106,109 @@
 
                             <label style="display: none" id="authority">{{ authority }}</label>
 
-<div class="modal fade" id="productModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
-                                &times;
-                            </button>
-                            <h4 class="modal-title" id="myModalLabel">
-                                复制成品
-                            </h4>
-                        </div>
-                        <div class="modal-body">
-                            <div class="row" style="padding-left: 10px;padding-right: 10px">
-                                <label class="control-label mb-1" style="padding-left: 20px;">被复制成品编码</label>
-                                <div class="col-xs-12">
-                                    <input id="productCode" type="text" class="form-control">
-                                </div>
+                            <div class="modal fade" id="copyProductModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                复制成品
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">被复制成品编码</label>
+                                                <div class="col-xs-12">
+                                                    <input id="copiedProductCode" type="text" class="form-control">
+                                                </div>
+                                            </div>
+
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">新成品编码</label>
+                                                <div class="col-xs-12">
+                                                    <input id="newProductCode" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">新成品型号</label>
+                                                <div class="col-xs-12">
+                                                    <input id="newProductType" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="copyProductModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="copyProductModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
                             </div>
 
-                            <div class="row" style="padding-left: 10px;padding-right: 10px">
-                                <label class="control-label mb-1" style="padding-left: 20px;">新成品编码</label>
-                                <div class="col-xs-12">
-                                    <input id="newProductCode" type="text" class="form-control">
-                                </div>
+                            <div class="modal fade" id="productInModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                成品入库
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <input id="productRowindex" type="text" style="display: none">
+
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">入库成品</label>
+                                                <div class="col-xs-12">
+                                                    <input id="productCode" type="text" class="form-control" readonly="readonly">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">入库数量</label>
+                                                <div class="col-xs-12">
+                                                    <input id="productNum" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">备注</label>
+                                                <div class="col-xs-12">
+                                                    <input id="remark" type="text" class="form-control">
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="productInModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="productInModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
                             </div>
-                            <div class="row" style="padding-left: 10px;padding-right: 10px">
-                                <label class="control-label mb-1" style="padding-left: 20px;">新成品型号</label>
-                                <div class="col-xs-12">
-                                    <input id="newProductType" type="text" class="form-control">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="modalCancel()">关闭
-                            </button>
-                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="modalSubmit()">
-                                确认
-                            </button>
-                        </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal -->
-            </div>
 
                             <div class="card-body">
-                                <table id="products_table" class="table table-striped table-bordered">
-                                    <thead>
-                                        <tr>
-                                            {% if authority=='1'%}
-                                                <th>成品编码</th>
-                                                <th>成品型号</th>
-                                                <th>交易客户</th>
-                                                <th>备注</th>
-                                                <th>录入时间</th>
-                                                <th>录入员</th>
-                                            {% elif authority=='4'%}
-                                                <th>操作</th>
-                                                <th>成品编码</th>
-                                                <th>成品型号</th>
-                                                <th>交易客户</th>
-                                                <th>备注</th>
-                                                <th>录入时间</th>
-                                                <th>录入员</th>
-                                            {% elif authority=='2'%}
-                                                <th>成品编码</th>
-                                                <th>成品型号</th>
-                                                <th>交易客户</th>
-                                                <th>成品价格</th>
-                                                <th>成品利润</th>
-                                                <th>总成本</th>
-                                                <th>备注</th>
-                                                <th>录入时间</th>
-                                                <th>录入员</th>
-                                            {% elif authority=='3' or authority=="8"%}
-                                                <th>操作</th>
-                                                <th>成品编码</th>
-                                                <th>成品型号</th>
-                                                <th>交易客户</th>
-                                                <th>成品价格</th>
-                                                <th>成品利润</th>
-                                                <th>总成本</th>
-                                                <th>备注</th>
-                                                <th>录入时间</th>
-                                                <th>录入员</th>
-                                            {% endif %}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                                <table id="product" class="table table-striped table-bordered">
                                     {% if authority=='1'%}
+                                        <thead>
+                                        <tr>
+                                            <th>成品编码</th>
+                                            <th>成品型号</th>
+                                            <th>交易客户</th>
+                                            <th>库存</th>
+                                            <th>备注</th>
+                                            <th>录入时间</th>
+                                            <th>录入员</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
                                         {% for i in products %}
                                             <tr>
                                                 <td>{{ i[0] }}</td>
@@ -202,51 +217,106 @@
                                                 <td>{{ i[6] }}</td>
                                                 <td>{{ i[7] }}</td>
                                                 <td>{{ i[8] }}</td>
+                                                <td>{{ i[9] }}</td>
                                             </tr>
                                         {% endfor %}
+                                        </tbody>
                                     {% elif authority=='2'%}
+                                        <thead>
+                                        <tr>
+                                            <th>成品编码</th>
+                                            <th>成品型号</th>
+                                            <th>交易客户</th>
+                                            <th>成品价格</th>
+                                            <th>成品利润</th>
+                                            <th>总成本</th>
+                                            <th>库存</th>
+                                            <th>备注</th>
+                                            <th>录入时间</th>
+                                            <th>录入员</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
                                         {% for i in products %}
                                             <tr>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[3] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[4] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[5] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[6] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[7] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[8] }}</a></td>
+                                                <td>{{ i[2] }}</td>
+                                                <td>{{ i[3] }}</td>
+                                                <td>{{ i[4] }}</td>
+                                                <td>{{ i[5] }}</td>
+                                                <td>{{ i[6] }}</td>
+                                                <td>{{ i[7] }}</td>
+                                                <td>{{ i[8] }}</td>
+                                                <td>{{ i[9] }}</td>
                                             </tr>
                                         {% endfor %}
+                                        </tbody>
                                     {% elif authority=='3' or authority=="8"%}
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>成品编码</th>
+                                            <th>成品型号</th>
+                                            <th>交易客户</th>
+                                            <th>成品价格</th>
+                                            <th>成品利润</th>
+                                            <th>总成本</th>
+                                            <th>库存</th>
+                                            <th>备注</th>
+                                            <th>录入时间</th>
+                                            <th>录入员</th>
+                                            <th>入库</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
                                         {% for i in products %}
                                             <tr>
-                                                <td><a data-toggle="modal" data-target="#productModal" onclick="modalEdit('{{ i[0] }}')"> 复制 </a></td>
+                                                <td><a data-toggle="modal" data-target="#copyProductModal" onclick="copyProduct('{{ i[0] }}')"> 复制 </a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[3] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[4] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[5] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[6] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[7] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[8] }}</a></td>
+                                                <td>{{ i[2] }}</td>
+                                                <td>{{ i[3] }}</td>
+                                                <td>{{ i[4] }}</td>
+                                                <td>{{ i[5] }}</td>
+                                                <td>{{ i[6] }}</td>
+                                                <td>{{ i[7] }}</td>
+                                                <td>{{ i[8] }}</td>
+                                                <td>{{ i[9] }}</td>
+                                                <td><a data-toggle="modal" data-target="#productInModal" onclick="productIn('{{ i[0] }}')"> 入库 </a></td>
                                             </tr>
                                         {% endfor %}
+                                        </tbody>
                                     {% elif authority=='4'%}
+                                        <thead>
+                                        <tr>
+                                            <th>操作</th>
+                                            <th>成品编码</th>
+                                            <th>成品型号</th>
+                                            <th>交易客户</th>
+                                            <th>库存</th>
+                                            <th>备注</th>
+                                            <th>录入时间</th>
+                                            <th>录入员</th>
+                                            <th>入库</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
                                         {% for i in products %}
                                             <tr>
-                                                <td><a data-toggle="modal" data-target="#productModal" onclick="modalEdit('{{ i[0] }}')"> 复制 </a></td>
+                                                <td><a data-toggle="modal" data-target="#copyProductModal" onclick="copyProduct('{{ i[0] }}')"> 复制 </a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[0] }}</a></td>
                                                 <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[1] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[2] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[6] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[7] }}</a></td>
-                                                <td><a href="{{ url_for("product.edit_product",productCode=i[0])}}">{{ i[8] }}</a></td>
+                                                <td>{{ i[2] }}</td>
+                                                <td>{{ i[6] }}</td>
+                                                <td>{{ i[7] }}</td>
+                                                <td>{{ i[8] }}</td>
+                                                <td>{{ i[9] }}</td>
+                                                <td><a data-toggle="modal" data-target="#productInModal" onclick="productIn('{{ i[0] }}')"> 入库 </a></td>
                                             </tr>
                                         {% endfor %}
+                                        </tbody>
                                     {% endif %}
-                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -277,25 +347,25 @@
 
     <script type="text/javascript">
         $(document).ready(function() {
-            $('#products_table').DataTable();
+            $('#product').DataTable();
         } );
 
-        function modalEdit(productCode){
-            $('#productCode').val(productCode);
+        function copyProduct(productCode){
+            $('#copiedProductCode').val(productCode);
         };
 
-        function modalCancel() {
-            $('#productCode').val("");
+        function copyProductModalCancel() {
+            $('#copiedProductCode').val("");
             $('#newProductCode').val("");
             $('#newProductType').val("");
         }
 
-        function modalSubmit()
+        function copyProductModalSubmit()
         {
             var authority=document.getElementById("authority").innerHTML;
 
             var data = {
-                'productCode': $("#productCode").val(),
+                'productCode': $("#copiedProductCode").val(),
                 'newProductCode':$("#newProductCode").val(),
                 'newProductType':$("#newProductType").val()
             };
@@ -317,31 +387,35 @@
                         var products=callback['products'];
                         console.log(products);
 
-                        var table = $('#products_table').DataTable();
+                        var table = $('#product').DataTable();
                         var tableData =new Array();
                         for(var i=0;i<products.length;i++){
                             tableData[i] =new Array();
                             if(authority=='4') {
-                                tableData[i][0] = "<a data-toggle='modal' data-target='#productModal' onclick='modalEdit(\""+i[0]+"\")'> 复制 </a>";
+                                tableData[i][0] = "<a data-toggle='modal' data-target='#copyProductModal' onclick='copyProduct(\""+i[0]+"\")'> 复制 </a>";
                                 //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
                                 tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
                                 tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
-                                tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
-                                tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
-                                tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
-                                tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
+                                tableData[i][3] = products[i][2];
+                                tableData[i][4] = products[i][6];
+                                tableData[i][5] = products[i][7];
+                                tableData[i][6] = products[i][8];
+                                tableData[i][7] = products[i][9];
+                                tableData[i][8] = "<a data-toggle='modal' data-target='#productInModal' onclick='productIn(\""+i[0]+"\")'> 入库 </a>";
                             }else {
-                                tableData[i][0] = "<a data-toggle='modal' data-target='#productModal' onclick='modalEdit(\""+i[0]+"\")'> 复制 </a>";
+                                tableData[i][0] = "<a data-toggle='modal' data-target='#copyProductModal' onclick='copyProduct(\""+i[0]+"\")'> 复制 </a>";
                                 //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
                                 tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
                                 tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
-                                tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
-                                tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][3]+ "</a>";
-                                tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][4]+ "</a>";
-                                tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][5]+ "</a>";
-                                tableData[i][7] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
-                                tableData[i][8] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
-                                tableData[i][9] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
+                                tableData[i][3] = products[i][2];
+                                tableData[i][4] = products[i][3];
+                                tableData[i][5] = products[i][4];
+                                tableData[i][6] = products[i][5];
+                                tableData[i][7] = products[i][6];
+                                tableData[i][8] = products[i][7];
+                                tableData[i][9] = products[i][8];
+                                tableData[i][10] = products[i][9];
+                                tableData[i][11] = "<a data-toggle='modal' data-target='#productInModal' onclick='productIn(\""+i[0]+"\")'> 入库 </a>";
                             }
                         }
                         table.clear();
@@ -359,73 +433,56 @@
             });
         }
 
-        function productCopy(productCode) {
-            if(confirm("确定复制此产品?")) {
-                var authority=document.getElementById("authority").innerHTML;
-
-                var data = {
-                    'productCode': productCode
-                };
-                console.log(data);
-
-                $.ajax({
-                    url: "/copy_product",
-                    type: "POST",
-                    dataType: "json",
-                    //data:$(this).serialize(),
-                    data: JSON.stringify(data),
-                    contentType: 'application/json; charset=UTF-8',
-                    success: function (callback) {
-                        console.log(callback);
-                        //alert(callback['ok']);//不要用callback.valueOf('ok')
-                        if (callback['ok']) {
-                            console.log(callback['ok']);
-
-                            var products=callback['products'];
-                            console.log(products);
-
-                            var table = $('#products_table').DataTable();
-                            var tableData =new Array();
-                            for(var i=0;i<products.length;i++){
-                                tableData[i] =new Array();
-                                if(authority=='4') {
-                                    tableData[i][0] = "<a onclick='productCopy(\"" + products[i][0] + "\")'> 复制 </a>";
-                                    //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
-                                    tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
-                                    tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
-                                    tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
-                                    tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
-                                    tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
-                                    tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
-                                }else {
-                                    tableData[i][0] = "<a onclick='productCopy(\"" + products[i][0] + "\")'> 复制 </a>";
-                                    //tableData[i][1] = "<a href='/edit_product?productCode="+products[i][0]+"'>"+products[i][0]+ "</a>";
-                                    tableData[i][1] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][0]+ "</a>";
-                                    tableData[i][2] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][1]+ "</a>";
-                                    tableData[i][3] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][2]+ "</a>";
-                                    tableData[i][4] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][3]+ "</a>";
-                                    tableData[i][5] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][4]+ "</a>";
-                                    tableData[i][6] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][5]+ "</a>";
-                                    tableData[i][7] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][6]+ "</a>";
-                                    tableData[i][8] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][7]+ "</a>";
-                                    tableData[i][9] = "<a href='/edit_product/"+products[i][0]+"'>"+products[i][8]+ "</a>";
-                                }
-                            }
-                            table.clear();
-                            table.rows.add(tableData);
-                            var currentPage = table.page();
-                            table.page(currentPage).draw(false);
-                        }
-                    },
-                    error: function (xhr, textStatus, errorThrown) {
-                        console.log(xhr.status);// 状态码
-                        console.log(xhr.readyState);// 状态
-                        console.log(textStatus);// 错误信息
-                        alert('返回值错误');
-                    }
-                });
-            }
+        function productIn(productCode){
+            $('#productCode').val(productCode);
+            $('#productRowindex').val(event.currentTarget.parentElement.parentElement.rowIndex);
         };
+        function productInModalCancel() {
+            $('#copiedProductCode').val("");
+            $('#productNum').val("");
+            $('#remark').val("");
+        }
+        function productInModalSubmit(){
+            var productCode=$("#productCode").val();
+            var productNum=$("#productNum").val();
+            var remark=$("#remark").val();
+            var authority=document.getElementById("authority").innerHTML;
+
+            var data = {
+                'productCode': productCode,
+                'productNum': productNum,
+                'remark': remark
+            };
+            console.log(data);
+
+            $.ajax({
+                url: "/product_in",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if (callback['ok']) {
+                        console.log(callback['ok']);
+                        var row=document.getElementById("product").rows[$('#productRowindex').val()];
+                        if(authority=='4') {
+                            row.cells[4].innerHTML=parseInt(row.cells[4].innerHTML)+parseInt(productNum);
+                        }else {
+                            row.cells[7].innerHTML=parseInt(row.cells[7].innerHTML)+parseInt(productNum);
+                        }
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
     </script>
 </body>
 </html>

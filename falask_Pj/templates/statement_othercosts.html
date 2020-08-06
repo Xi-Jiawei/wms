@@ -244,7 +244,7 @@
                                             {% if operationSum %}
                                                 <tr>
                                                     <td>合计</td>
-                                                    <td>{{ operationSum[0][0] }}</td>
+                                                    <td>{{ operationSum }}</td>
                                                     <td>-</td>
                                                 </tr>
                                             {% endif %}
@@ -301,9 +301,9 @@
                                                     <td>合计</td>
                                                     <td>-</td>
                                                     <td>-</td>
-                                                    <td>{{ aftersaleSum[0][0] }}</td>
-                                                    <td>{{ aftersaleSum[0][1] }}</td>
-                                                    <td>{{ aftersaleSum[0][2] }}</td>
+                                                    <td>{{ aftersaleSum[0] }}</td>
+                                                    <td>{{ aftersaleSum[1] }}</td>
+                                                    <td>{{ aftersaleSum[2] }}</td>
                                                     <td>-</td>
                                                     <td>-</td>
                                                 </tr>
@@ -479,10 +479,8 @@
                     if(!operationArr.length)
                         tbody.insertRow(i).innerHTML="<tr><td colspan='3' style='text-align: center'>No data available in table</td></tr>";
 
-                    if(operationSum) {
-                        var tfootRow = $('#operation tfoot tr td');
-                        tfootRow.eq(1).text(operationSum[0][0]);
-                    }
+                    var tfootRow = $('#operation tfoot tr td');
+                    tfootRow.eq(1).text(operationSum);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -524,12 +522,10 @@
                     if(!aftersaleArr.length)
                         tbody.insertRow(i).innerHTML="<tr><td colspan='8' style='text-align: center'>No data available in table</td></tr>";
 
-                    if(aftersaleSum) {
-                        var tfootRow = $('#aftersale tfoot tr td');
-                        tfootRow.eq(3).text(aftersaleSum[0][0]);
-                        tfootRow.eq(4).text(aftersaleSum[0][1]);
-                        tfootRow.eq(5).text(aftersaleSum[0][2]);
-                    }
+                    var tfootRow = $('#aftersale tfoot tr td');
+                    tfootRow.eq(3).text(aftersaleSum[0]);
+                    tfootRow.eq(4).text(aftersaleSum[1]);
+                    tfootRow.eq(5).text(aftersaleSum[2]);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {

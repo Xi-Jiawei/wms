@@ -237,7 +237,7 @@
                                                     <td>-</td>
                                                     <td>-</td>
                                                     <td>-</td>
-                                                    <td>{{ workerSalarySum[0][0] }}</td>
+                                                    <td>{{ workerSalarySum }}</td>
                                                 </tr>
                                             {% endif %}
                                             </tfoot>
@@ -343,7 +343,7 @@
                                                     <td>-</td>
                                                     <td>-</td>
                                                     <td>-</td>
-                                                    <td>{{ managerSalarySum[0][0] }}</td>
+                                                    <td>{{ managerSalarySum }}</td>
                                                 </tr>
                                             {% endif %}
                                             </tfoot>
@@ -448,7 +448,7 @@
 
                     if(salarySum) {
                         var tfootRow = $('#workerSalary tfoot tr td');
-                        tfootRow.eq(17).text(salarySum[0][0]);
+                        tfootRow.eq(17).text(salarySum);
                     }
                 }
             },
@@ -504,7 +504,7 @@
 
                     if(salarySum) {
                         var tfootRow = $('#managerSalary tfoot tr td');
-                        tfootRow.eq(19).text(salarySum[0][0]);
+                        tfootRow.eq(19).text(salarySum);
                     }
                 }
             },

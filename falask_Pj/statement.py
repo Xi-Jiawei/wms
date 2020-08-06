@@ -9,15 +9,60 @@ statement_app=Blueprint('statement',__name__)
 
 # xijiawei
 # 订单管理
-@statement_app.route('/statement', methods=['GET'])
+@statement_app.route('/statement', methods=['GET','POST'])
 def statement():
     if session.get('username'):
         if request.method == "POST":
-            print("")
+            data = request.get_json()
+            month = data['month']
+
+            thread = myThread(target=select_addReceivableSumByMonth, args=(month,))
+            revenue = thread.get_result()
+            thread = myThread(target=select_addPayableSumByMonth, args=(month,))
+            materialExpense = thread.get_result()
+            thread = myThread(target=select_workerSalarySumByMonth, args=(month,))
+            workerSalaryExpense = thread.get_result()
+            thread = myThread(target=select_managerSalarySumByMonth, args=(month,))
+            managerSalaryExpense = thread.get_result()
+            thread = myThread(target=select_supplementaryAddPayableSumByMonth, args=(month,))
+            supplementaryExpense = thread.get_result()
+            thread = myThread(target=select_operationSumByMonth, args=(month,))
+            operationExpense = thread.get_result()
+            thread = myThread(target=select_aftersaleSumByMonth, args=(month,))
+            aftersaleExpense = thread.get_result()[0]+thread.get_result()[1]+thread.get_result()[2]
+
+            # 损益
+            income = revenue - materialExpense - workerSalaryExpense - managerSalaryExpense - supplementaryExpense - operationExpense - aftersaleExpense
+            salaryExpense = workerSalaryExpense + managerSalaryExpense
+            otherExpense = supplementaryExpense + operationExpense + aftersaleExpense
+
+            incomeDetail=[month,revenue,materialExpense,salaryExpense,otherExpense,income]
+            return jsonify({'ok': True,'incomeDetail':incomeDetail})
         elif request.method=="GET":
             username = session['username']
             form = ProductForm()
-            return render_template('statement.html', form=form, username=username)
+
+            month = datetime.now().strftime('%Y-%m')
+            thread = myThread(target=select_addReceivableSumByMonth, args=(month,))
+            revenue = thread.get_result()
+            thread = myThread(target=select_addPayableSumByMonth, args=(month,))
+            materialExpense = thread.get_result()
+            thread = myThread(target=select_workerSalarySumByMonth, args=(month,))
+            workerSalaryExpense = thread.get_result()
+            thread = myThread(target=select_managerSalarySumByMonth, args=(month,))
+            managerSalaryExpense = thread.get_result()
+            thread = myThread(target=select_supplementaryAddPayableSumByMonth, args=(month,))
+            supplementaryExpense = thread.get_result()
+            thread = myThread(target=select_operationSumByMonth, args=(month,))
+            operationExpense = thread.get_result()
+            thread = myThread(target=select_aftersaleSumByMonth, args=(month,))
+            aftersaleExpense = thread.get_result()[0]+thread.get_result()[1]+thread.get_result()[2]
+
+            # 损益
+            income=revenue-materialExpense-workerSalaryExpense-managerSalaryExpense-supplementaryExpense-operationExpense-aftersaleExpense
+            salaryExpense = workerSalaryExpense + managerSalaryExpense
+            otherExpense = supplementaryExpense + operationExpense + aftersaleExpense
+            return render_template('statement.html', form=form, username=username, income=income, revenue=revenue, materialExpense=materialExpense, salaryExpense=salaryExpense, otherExpense=otherExpense, month=month)
     else:
         return render_template('access_fail.html')
 

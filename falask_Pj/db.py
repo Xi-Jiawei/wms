@@ -226,7 +226,7 @@ def delete_userByID(userid):
 # xijiawei
 # 展示所有成品
 def select_all_products():
-    sql = "select productCode,productType,client,price,profit,totalCost,remark,date_format(entryTime,'%Y-%m-%d %H:%i:%s.%f'),entryClerk from productInfo;"
+    sql = "select productCode,productType,client,price,profit,totalCost,inventoryNum,remark,date_format(entryTime,'%Y-%m-%d %H:%i:%s.%f'),entryClerk from productInfo;"
     lock.acquire()
     cur.execute(sql)
     result = cur.fetchall()
@@ -553,6 +553,20 @@ def copy_productInfo(productCode, newProductCode, newProductType):
         conn.close()
     # except:
     #     conn.rollback()
+    except Exception as e:
+        print("删除异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 成品入库
+def update_productInventoryNum(productCode, productNum, remark):
+    try:
+        lock.acquire()
+        # 执行SQL语句
+        cur.execute("update productInfo set inventoryNum=inventoryNum+'%d' where productCode='%s';"%(productNum, productCode))
+        # 提交到数据库执行
+        conn.commit()
+        lock.release()
     except Exception as e:
         print("删除异常：",e)
         conn.rollback()
@@ -1469,7 +1483,7 @@ def select_orderByCodeAndType(orderCode,productType):
 # 查询所有订单
 def select_all_orderGroupByProductType():
     try:
-        sql = "select clientCode, group_concat(productType), group_concat(remark) from orderGroupByProductType group by clientCode;"
+        sql = "select clientCode, group_concat(productType), group_concat(deliveryNum), group_concat(deliveredNum) from orderGroupByProductType where deliveryNum>0 group by clientCode;"
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
@@ -1483,7 +1497,7 @@ def select_all_orderGroupByProductType():
 # 查询所有订单
 def select_all_orderGroupByProductTypeByCode(clientCode):
     try:
-        sql = "select receivableReportGroupByProductType.productType,remainDeliveryNum,addDeliveryNum,deliveryNum,deliveredNum,inventoryNum,uint,price,receivable,receipt,receivableReportGroupByProductType.remark from receivableReportGroupByProductType,productInfo where clientCode='%s' and receivableReportGroupByProductType.productType=productInfo.productType;"%clientCode
+        sql = "select receivableReportGroupByProductType.productType,remainDeliveryNum,addDeliveryNum,deliveryNum,deliveredNum,inventoryNum,uint,price,receivable,receipt,receivableReportGroupByProductType.remark from receivableReportGroupByProductType,productInfo where clientCode='%s' and receivableReportGroupByProductType.productType=productInfo.productType and receivableReportGroupByProductType.deliveryNum>0;"%clientCode
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
@@ -1688,12 +1702,11 @@ def insert_delivery(deliveryCode, orderCode, productType, beforeDeliveryNum, sen
     try:
         lock.acquire()
         cur.execute("insert into delivery (deliveryCode, orderCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, clientCode, entryTime, entryClerk) values('%s','%s','%s','%d','%s','%d','%s','%s','%s','%s');"%(deliveryCode, orderCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, clientCode, entryTime, entryClerk))
-
-        # 更新订单及报表
+        cur.execute("insert into deliveryGroupByProductType (deliveryCode, clientCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, entryTime, entryClerk) values('%s','%s','%s','%d','%s','%d','%s','%s','%s');"%(deliveryCode, clientCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, entryTime, entryClerk))
         cur.execute("update orders set deliveredNum=deliveredNum+'%d' where orderCode='%s' and productType='%s';"%(sendNum, orderCode, productType))
         cur.execute("update orderGroupByProductType set deliveredNum=deliveredNum+'%d' where clientCode='%s' and productType='%s';"%(sendNum, clientCode, productType))
         cur.execute("update receivableReportGroupByProductType set deliveredNum=deliveredNum+'%d' where clientCode='%s' and productType='%s' and month='%s';"%(sendNum, clientCode, productType, sendDate[0:7]))
-        cur.execute("update receivableReportGroupByProductType set remainReceivable=remainReceivable-'%d',addDeliveryNum=addDeliveryNum-'%d' where clientCode='%s' and productType='%s' and month>'%s';"%(sendNum, sendNum, clientCode, productType, sendDate[0:7]))
+        cur.execute("update receivableReportGroupByProductType set remainReceivable=remainReceivable-'%d',deliveredNum=deliveryNum-'%d' where clientCode='%s' and productType='%s' and month>'%s';"%(sendNum, sendNum, clientCode, productType, sendDate[0:7]))
         cur.execute("update clients set client='%s', contact='%s', address='%s', telephone='%s' where clientCode='%s';" % (client, contact, address, telephone, clientCode))
         conn.commit()
         lock.release()
@@ -1709,9 +1722,10 @@ def insert_deliveryGroupByProductType(deliveryCode, clientCode, productType, bef
     try:
         lock.acquire()
         cur.execute("insert into deliveryGroupByProductType (deliveryCode, clientCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, entryTime, entryClerk) values('%s','%s','%s','%d','%s','%d','%s','%s','%s');"%(deliveryCode, clientCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, entryTime, entryClerk))
-        cur.execute("update clients set client='%s', contact='%s', address='%s', telephone='%s' where clientCode='%s';" % (client, contact, address, telephone, clientCode))
         cur.execute("update orderGroupByProductType set deliveredNum=deliveredNum+'%d' where clientCode='%s' and productType='%s';"%(sendNum,clientCode,productType))
         cur.execute("update receivableReportGroupByProductType set deliveredNum=deliveredNum+'%d' where clientCode='%s' and productType='%s' and month='%s';" % (sendNum, clientCode, productType,sendDate[0:7]))
+        cur.execute("update receivableReportGroupByProductType set remainDeliveryNum=remainDeliveryNum-'%d',deliveredNum=deliveryNum-'%d' where clientCode='%s' and productType='%s' and month>'%s';" % (sendNum, sendNum, clientCode, productType,sendDate[0:7]))
+        cur.execute("update clients set client='%s', contact='%s', address='%s', telephone='%s' where clientCode='%s';" % (client, contact, address, telephone, clientCode))
         conn.commit()
         lock.release()
         return
@@ -2020,11 +2034,37 @@ def update_workerSalary(month, staffid, name, position, workhours, overhours, re
         conn.rollback()
 
 # xijiawei
-# 查询所有订单
+# 根据id删除成员（暂不用）
 def delete_staffByID(staffid):
     try:
         lock.acquire()
         cur.execute("delete from staff where staffid='%d';"%staffid)
+        conn.commit()
+        lock.release()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 根据id删除成员（暂不用）
+def delete_workerSalaryByIDAndMonth(staffid, month):
+    try:
+        lock.acquire()
+        cur.execute("delete from workerSalary where staffid='%d';"%staffid)
+        cur.execute("delete from workerSalaryRecord where staffid='%d' and month='%s';"%(staffid,month))
+        conn.commit()
+        lock.release()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 根据id删除成员（暂不用）
+def delete_managerSalaryByIDAndMonth(staffid, month):
+    try:
+        lock.acquire()
+        cur.execute("delete from managerSalary where staffid='%d';"%staffid)
+        cur.execute("delete from managerSalaryRecord where staffid='%d' and month='%s';"%(staffid,month))
         conn.commit()
         lock.release()
     except Exception as e:
@@ -2109,9 +2149,12 @@ def select_workerSalarySumByMonth(month):
     try:
         lock.acquire()
         cur.execute("select round(sum(salaryExpense),2)  from workerSalaryRecord where month='%s';"%month)
-        result = cur.fetchall()
+        result = cur.fetchall()[0][0]
         lock.release()
-        return result
+        if not result:
+            return 0
+        else:
+            return result
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
@@ -2122,9 +2165,12 @@ def select_managerSalarySumByMonth(month):
     try:
         lock.acquire()
         cur.execute("select round(sum(salaryExpense),2)  from managerSalaryRecord where month='%s';" % month)
-        result = cur.fetchall()
+        result = cur.fetchall()[0][0]
         lock.release()
-        return result
+        if not result:
+            return 0
+        else:
+            return result
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
@@ -2358,9 +2404,12 @@ def select_operationSumByMonth(month):
     try:
         lock.acquire()
         cur.execute("select round(sum(cost),2) from operation where date_format(costDate,'%%Y-%%m')='%s';"%month)
-        result=cur.fetchall()
+        result = cur.fetchall()[0][0]
         lock.release()
-        return result
+        if not result:
+            return 0
+        else:
+            return result
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
@@ -2448,9 +2497,12 @@ def select_aftersaleSumByMonth(month):
     try:
         lock.acquire()
         cur.execute("select round(sum(laborCost),2), round(sum(materialCost),2), round(sum(otherCost),2) from aftersale where date_format(costDate,'%%Y-%%m')='%s';"%month)
-        result=cur.fetchall()
+        result = cur.fetchall()[0]
         lock.release()
-        return result
+        if not result[0]:
+            return [0,0,0]
+        else:
+            return result
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
@@ -2488,6 +2540,56 @@ def update_aftersale(costCode, costDate, productType, client, laborCost, materia
         cur.execute("update aftersale set costDate='%s', productType='%s', client='%s', laborCost='%f', materialCost='%f', otherCost='%f', trackNumber='%s', remark='%s', entryTime='%s', entryClerk='%s' where costCode='%s';" % (costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk, costCode))
         conn.commit()
         lock.release()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+##### 月度报表 #####
+
+# xijiawei
+# 查询所有订单
+def select_addReceivableSumByMonth(month):
+    try:
+        lock.acquire()
+        cur.execute("select round(sum(addReceivable),2) from receivableReport where month='%s';" % (month))
+        result = cur.fetchall()[0][0]
+        lock.release()
+        if not result:
+            return 0
+        else:
+            return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_addPayableSumByMonth(month):
+    try:
+        lock.acquire()
+        cur.execute("select round(sum(addPayable),2) from payableReport where month='%s';" % (month))
+        result = cur.fetchall()[0][0]
+        lock.release()
+        if not result:
+            return 0
+        else:
+            return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_supplementaryAddPayableSumByMonth(month):
+    try:
+        lock.acquire()
+        cur.execute("select round(sum(addPayable),2) from supplementaryPayableReport where month='%s';" % (month))
+        result = cur.fetchall()[0][0]
+        lock.release()
+        if not result:
+            return 0
+        else:
+            return result
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()

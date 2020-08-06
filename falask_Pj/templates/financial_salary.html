@@ -579,13 +579,17 @@
 	    var staffidArr=new Array();
         for(var i=length-1;i>=0;i--){
             var checktd=tbody.rows[i].cells[0].children[0];
-            if(checktd.checked)
-                staffidArr[j++]=tbody.rows[i].cells[2].innerHTML;
+            if(checktd.checked) {
+                staffidArr[j]=new Array();
+                staffidArr[j] = tbody.rows[i].cells[1].innerHTML; // month
+                staffidArr[j] = tbody.rows[i].cells[2].innerHTML; // staffid
+                j++;
+            }
         }
 	    var data={'staffidArr':staffidArr};
 
 	    $.ajax({
-            url: "/delete_salaries",
+            url: "/delete_workerSalaries",
             type: "POST",
             dataType: "json",
             //data:$(this).serialize(),
@@ -963,13 +967,17 @@
 	    var staffidArr=new Array();
         for(var i=length-1;i>=0;i--){
             var checktd=tbody.rows[i].cells[0].children[0];
-            if(checktd.checked)
-                staffidArr[j++]=tbody.rows[i].cells[2].innerHTML;
+            if(checktd.checked) {
+                staffidArr[j]=new Array();
+                staffidArr[j] = tbody.rows[i].cells[1].innerHTML; // month
+                staffidArr[j] = tbody.rows[i].cells[2].innerHTML; // staffid
+                j++;
+            }
         }
 	    var data={'staffidArr':staffidArr};
 
 	    $.ajax({
-            url: "/delete_salaries",
+            url: "/delete_managerSalaries",
             type: "POST",
             dataType: "json",
             //data:$(this).serialize(),

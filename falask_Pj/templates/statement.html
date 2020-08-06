@@ -100,49 +100,46 @@
                 <div class="col-md-12">
                     <div class="card" style="overflow: hidden">
                         <div class="card-body">
-                            <table id="bootstrap-data-table" class="table table-striped table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>物料编码</th>
-                                    <th>物料名称</th>
-                                    <th>物料型号规格</th>
-                                    <th>余库存数量</th>
-                                    <th>单位</th>
-                                    <th>单价</th>
-                                    <th>余库存金额</th>
-                                    <th>供货厂家</th>
-                                    <th>选择</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                    {% for i in materials %}
+                            <div class="row" style="position:relative;">
+                                <div class="col-xs-12" style="padding-left: 20px;width: 240px;">
+                                    <label class="control-label mb-1">选择月份</label>
+                                    <input type="month" id="month" name="month" class="form-control"
+                                            {% if month %}
+                                           value="{{ month }}"
+                                            {% endif %}
+                                    >
+                                </div>
+                            </div>
+
+                            <hr align="left" style="width: 100%;color: #987cb9;size: 3px">
+                            <!--<h3>供应商"<span id="clientHeader" style="color: #8a6d3b">"</span></h3>-->
+
+                            <div class="row" style="position:relative;width:100%;">
+                                <table id="statement" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>月份</th>
+                                        <th>销售总额</th>
+                                        <th>材料管理</th>
+                                        <th>工资费用</th>
+                                        <th>其他费用</th>
+                                        <th>盈亏</th>
+                                        <th>备注</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
                                         <tr>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[1] }}</td>
-                                            <td>{{ i[2] }}</td>
-                                            <td>{{ i[3] }}</td>
-                                            <td>{{ i[4] }}</td>
-                                            <td>{{ i[5] }}</td>
-                                            <td>{{ i[6] }}</td>
-                                            <td>{{ i[7] }}</td>
-                                            <td><input type='checkbox' name='checkbox' value='checkbox' onclick="checkboxClick('{{ i[0] }}','{{ i[1] }}','{{ i[2] }}','{{ i[4] }}','{{ i[5] }}','{{ i[7] }}')"/></td>
+                                            <td>{{ month }}</td>
+                                            <td>{{ revenue }}</td>
+                                            <td>{{ materialExpense }}</td>
+                                            <td>{{ salaryExpense }}</td>
+                                            <td>{{ otherExpense }}</td>
+                                            <td>{{ income }}</td>
+                                            <td></td>
                                         </tr>
-                                    {% endfor %}
-                                </tbody>
-                                <tfoot>
-                                <tr>
-                                        <td>余库存总金额</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                        <td>{{ inventoryMoneySum }}</td>
-                                        <td>-</td>
-                                        <td>-</td>
-                                </tr>
-                                </tfoot>
-                            </table>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -172,124 +169,38 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $('#bootstrap-data-table-export').DataTable();
+        $('#statement').DataTable();
     });
-
-    function checkboxClick(materialCode,materialName,materialType,unit,price,supplier) {
-        var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
-        console.log(table);
-        for(var i=1;i<table.rows.length;i++){
-            var chkOrder = table.rows[i].cells[8].firstChild;
-            //console.log(chkOrder);
-            chkOrder.checked=false;
-        }
-        //console.log(document.activeElement);
-        document.activeElement.checked=true;
-        selectedCheckbox=document.activeElement;
-
-        $('#materialCode').val(materialCode);
-        $('#materialName').val(materialName);
-        $('#materialType').val(materialType);
-        $('#unit').val(unit);
-        $('#price').val(price);
-        $('#supplier').val(supplier);
-        $('#documentTime').val(document.getElementById("nowTime").innerHTML);
-    };
-
-    $("#materialInOutForm").submit(function(e)
-    {
-        e.preventDefault();
-
-        console.log($('#documentTime').val());
-        //var reg = /((^((1[8-9]\d{2})|([2-9]\d{3}))([-\/\._])(10|12|0?[13578])([-\/\._])(3[01]|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))([-\/\._])(11|0?[469])([-\/\._])(30|[12][0-9]|0?[1-9])$)|(^((1[8-9]\d{2})|([2-9]\d{3}))([-\/\._])(0?2)([-\/\._])(2[0-8]|1[0-9]|0?[1-9])$)|(^([2468][048]00)([-\/\._])(0?2)([-\/\._])(29)$)|(^([3579][26]00)([-\/\._])(0?2)([-\/\._])(29)$)|(^([1][89][0][48])([-\/\._])(0?2)([-\/\._])(29)$)|(^([2-9][0-9][0][48])([-\/\._])(0?2)([-\/\._])(29)$)|(^([1][89][2468][048])([-\/\._])(0?2)([-\/\._])(29)$)|(^([2-9][0-9][2468][048])([-\/\._])(0?2)([-\/\._])(29)$)|(^([1][89][13579][26])([-\/\._])(0?2)([-\/\._])(29)$)|(^([2-9][0-9][13579][26])([-\/\._])(0?2)([-\/\._])(29)$))/ig;
-        //var reg=/^([1-2]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|30|31) (0\d|1\d|2[0-4]):(0\d|[1-5]\d):(0\d|[1-5]\d)$/;//"2020-01-01 19:00:00"
-        var reg=/^([1-2]\d{3})-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|30|31)$/;//"2020-01-01"
-        if(!reg.test($('#documentTime').val())) {
-            alert("请填写单据日期!");
-            return;
-        }
-        console.log($('#isInOrOut').val());
-        console.log($('#isInOrOut').val()!=="0"&&$('#isInOrOut').val()!=="1");
-        if($('#isInOrOut').val()!=="0"&&$('#isInOrOut').val()!=="1") {
-            alert("请选择出库还是入库!");
-            return;
-        }
-        if(!$.isNumeric($('#operateNum').val())){
-            alert("请输入操作数量!");
-            return;
-        }
-        if(!$.isNumeric($('#price').val())){
-            alert("请输入物料单价!");
-            return;
-        }
-
-        var data={
-            'materialCode':$("#materialCode").val(),
-            'materialName':$("#materialName").val(),
-            'materialType':$("#materialType").val(),
-            'operateNum':$('#operateNum').val(),
-            'unit':$("#unit").val(),
-            'price':$('#price').val(),
-            'supplier':$('#supplier').val(),
-            'documentTime':$('#documentTime').val(),
-            'isInOrOut':$('#isInOrOut').val()
+    $('#month').on("change", function () {
+        console.log("选择月份");
+        console.log(this);
+        console.log(this.value);
+        var data = {
+            'month': this.value
         };
 
         $.ajax({
-            url: "/material_inout",
+            url: "/statement",
             type: "POST",
             dataType: "json",
             //data:$(this).serialize(),
-            data:JSON.stringify(data),
+            data: JSON.stringify(data),
             contentType: 'application/json; charset=UTF-8',
             success: function (callback) {
                 console.log(callback);
-                //alert(callback['ok']);//不要用callback.valueOf('ok')
-                if(callback['ok']){
-                    console.log(callback['ok']);
 
-                    var realTable = $('#bootstrap-data-table').DataTable();
-                    //console.log(realTable);
-                    var rows=realTable.rows().data();
-                    //console.log(realTable.row(1).data());
-                    for(var i=0;i<rows.length;i++){
-                        //console.log(rows[i]);
-                        if(rows[i][0]==$("#materialCode").val()){
-                            rows[i][1]=$("#materialName").val();
-                            rows[i][2]=$("#materialType").val();
-                            rows[i][4]=$("#unit").val();
-                            rows[i][5]=$('#price').val();
-                            rows[i][7]=$('#supplier').val();
-                            if($('#isInOrOut').val()=='0') {
-                                rows[i][3] = parseInt(rows[i][3]) + parseInt($('#operateNum').val());
-                                //rows[i][6] = parseFloat(rows[i][6]) + parseInt($('#operateNum').val()) * parseFloat($('#price').val());
-                            }
-                            else if($('#isInOrOut').val()=='1') {
-                                rows[i][3] = parseInt(rows[i][3]) - parseInt($('#operateNum').val());
-                                //rows[i][6] = parseFloat(rows[i][6]) - parseInt($('#operateNum').val()) * parseFloat($('#price').val());
-                            }
-                            rows[i][6] = parseInt(rows[i][3]) * parseFloat($('#price').val());
-                            rows[i][8]="<input type='checkbox' name='checkbox' value='checkbox' onclick='checkboxClick(\""+rows[i][0]+"\",\""+rows[i][1]+"\",\""+rows[i][2]+"\",\""+rows[i][4]+"\",\""+rows[i][5]+"\",\""+rows[i][7]+"\")'/>";
-                        }
-                    }
-                    var currentPage = realTable.page();
-                    realTable.clear();
-                    realTable.rows.add(rows);
-                    realTable.page(currentPage).draw(false);
-
-                    /*清空还原表单内容*/
-                    $('#materialCode').val("");
-                    $('#materialName').val("");
-                    $('#materialType').val("");
-                    $('#operateNum').val("");
-                    $('#unit').val("");
-                    $('#price').val("");
-                    $('#supplier').val("");
-                    $('#documentTime').val("");
-                    $('#isInOrOut').val("-1");
+                if(callback['ok']) {
+                    var incomeDetail=callback['incomeDetail'];
+                    var row=document.getElementById("statement").children[1].rows[0];
+                    row.cells[0].innerHTML=incomeDetail[0];
+                    row.cells[1].innerHTML=incomeDetail[1];
+                    row.cells[2].innerHTML=incomeDetail[2];
+                    row.cells[3].innerHTML=incomeDetail[3];
+                    row.cells[4].innerHTML=incomeDetail[4];
+                    row.cells[5].innerHTML=incomeDetail[5];
                 }
             },
-            error: function(xhr, textStatus, errorThrown) {
+            error: function (xhr, textStatus, errorThrown) {
                 console.log(xhr.status);// 状态码
                 console.log(xhr.readyState);// 状态
                 console.log(textStatus);// 错误信息

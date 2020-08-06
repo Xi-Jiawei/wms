@@ -34,8 +34,9 @@ def show_products():
             product.append(i[4])
             product.append(i[5])
             product.append(i[6])
-            product.append(i[7][0:21])
-            product.append(i[8])
+            product.append(i[7])
+            product.append(i[8][0:21])
+            product.append(i[9])
         return render_template('products_show.html', authority=authority[1], products=products, username=username)
     else:
         return render_template('access_fail.html')
@@ -338,7 +339,7 @@ def copy_product():
         result = thread.get_result()
         products = []
         for i in result:
-            products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7][0:21], i[8]])
+            products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8][0:21], i[9]])
         return jsonify({'ok': True,'products':products})
     else:
         return jsonify({'ok': False})
@@ -358,7 +359,7 @@ def delete_products():
         result = thread.get_result()
         products = []
         for i in result:
-            products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7][0:21], i[8]])
+            products.append([i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8][0:21], i[9]])
         if request.method == "POST":
             data = request.get_json()
             productCodeArr = data['productCodeArr']  # 不要写成productCode=request.data["productcode"]
@@ -446,6 +447,20 @@ def search_material():
         else:
             return jsonify({'ok': True, 'materials': None})
     else: return jsonify({'ok': False})
+
+# xijiawei
+# 删除成品
+@product_app.route('/product_in', methods=['GET', 'POST'])
+def product_in():
+    if request.method == "POST":
+        data = request.get_json()
+        productCode = data['productCode']  # 不要写成productCode=request.data["productcode"]
+        productNum = int(data['productNum'])
+        remark = data['remark']
+        myThread(target=update_productInventoryNum, args=(productCode, productNum, remark,))
+        return jsonify({'ok': True})
+    else:
+        return jsonify({'ok': False})
 
 # # xijiawei
 # # 物料编码校验

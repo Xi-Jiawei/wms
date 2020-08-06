@@ -225,7 +225,8 @@
                                 <tr>
                                     <th>交易客户</th>
                                     <th>成品型号</th>
-                                    <th>备注</th>
+                                    <th>应出货数量</th>
+                                    <th>已出货数量</th>
                                     <th>出货</th>
                                 </tr>
                                 </thead>
@@ -235,6 +236,7 @@
                                         <td>{{ i[0] }}</td>
                                         <td>{{ i[1] }}</td>
                                         <td>{{ i[2] }}</td>
+                                        <td>{{ i[3] }}</td>
                                         <td><a onclick="deliverGet('{{ i[0] }}')"> 出货 </a></td>
                                     </tr>
                                 {% endfor %}
@@ -266,11 +268,11 @@
 <script src="/static/jquery/datatables-init.js"></script>
 
 <script type="text/javascript">
+    var tableTbodyHtml='';
     $(document).ready(function () {
         $('#orderGroupByProductType').DataTable();
 
         /*初始加载页面时给delever表格留空*/
-        var tableTbodyHtml='';
         for(var i=0;i<10;i++){
             tableTbodyHtml+='<tr valign="top" align="center">\n' +
                 '                                                        <td width="90px" class="billProductType" style="color:#2e2e2e;">&nbsp;</td>\n' +
@@ -351,6 +353,8 @@
                         }
                     }
                     $("#deliverRecord tbody").html(tableHtml);
+
+                    $('#deliver tbody').html(tableTbodyHtml);
 
                     $("#billDeliveryCode").text(callback['deliveryCode']);
                     $("#billClient").val(client[0][0]);
@@ -502,17 +506,6 @@
                 }
 
                 //更新delever表格
-                var tableTbodyHtml='';
-                for(var i=0;i<10;i++){
-                    tableTbodyHtml+='<tr valign="top" align="center">\n' +
-                        '                                                        <td width="90px" class="billProductType" style="color:#2e2e2e;">&nbsp;</td>\n' +
-                        '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;"></td>\n' +
-                        '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;"></td>\n' +
-                        '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;"></td>\n' +
-                        '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
-                        '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;"></td>\n' +
-                        '                                                    </tr>';
-                }
                 $('#deliver tbody').html(tableTbodyHtml);
                 console.log(document.getElementById("deliver"));
                 deliverTableRowsLength=0;

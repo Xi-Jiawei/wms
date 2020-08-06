@@ -267,8 +267,10 @@
                             '-',
                             '-',
                             receivablesOfProduct[i][4],
-                        ]).draw();
+                        ]);
                     }
+                    table.draw();
+
                     var tfootRow=$('#receivableTable tfoot tr td');
                     tfootRow.eq(3).text(receivable[0][2]);
                     tfootRow.eq(4).text(receivable[0][1]);
