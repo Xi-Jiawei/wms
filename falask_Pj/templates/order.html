@@ -285,7 +285,6 @@
                                     <th>交货日期</th>
                                     <th>订单状态</th>
                                     <th>备注</th>
-                                    <th>出货</th>
                                     <th style="width: 60px">编辑</th>
                                 </tr>
                                 </thead>
@@ -300,7 +299,6 @@
                                         <td>{{ i[4] }}</td>
                                         <td>{{ i[5] }}</td>
                                         <td>{{ i[6] }}</td>
-                                        <td><a onclick="deliverGet('{{ i[0] }}')"> 出货 </a></td>
                                         <td><a onclick="orderEdit('{{ i[0] }}','{{ i[1] }}','{{ i[2] }}')"> 修改 </a><a onclick="orderDelete('{{ i[0] }}')"> 删除 </a></td>
                                     </tr>
                                 {% endfor %}
@@ -519,7 +517,6 @@
                             deliveryDate,
                             0,
                             remarkStr,
-                            '<a onclick="deliverGet(\'' + formData[0]['value'] + '\')"> 出货 </a>',
                             '<a onclick="orderEdit(\'' + formData[0]['value'] + '\',\'' + formData[1]['value'] + '\',\'' + formData[2]['value'] + '\')"> 修改 </a><a onclick="orderDelete(\'' + formData[0]['value'] + '\')"> 删除 </a>'
                         ]).draw();
                         alert("成功生成订单");
@@ -556,7 +553,6 @@
                             deliveryDate,
                             0,
                             remarkStr,
-                            '<a onclick="deliverGet(\'' + formData[0]['value'] + '\')"> 出货 </a>',
                             '<a onclick="orderEdit(\'' + formData[0]['value'] + '\',\'' + formData[1]['value'] + '\',\'' + formData[2]['value'] + '\')"> 修改 </a><a onclick="orderDelete(\'' + formData[0]['value'] + '\')"> 删除 </a>'
                         ]);
                         console.log(table.row($('#rowindex').val()).node());

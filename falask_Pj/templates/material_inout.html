@@ -401,6 +401,10 @@
             alert("请输入物料单价!");
             return;
         }
+        if($('#supplier').val()==""){
+            alert("请输入供应商!");
+            return;
+        }
 
         var data={
             'materialCode':$("#materialCode").val(),

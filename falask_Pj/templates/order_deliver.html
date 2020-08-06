@@ -575,109 +575,111 @@
     });
     /*确认出货*/
     function deliverPost(){
-        var clientCode=$('#clientCode').val();
-        console.log(document.getElementById("deliver"));
-        var deliverProductArr=new Array(),i;
-        var tbody=document.getElementById("deliver").children[1];
-        for (i = 0; i < deliverTableRowsLength; i++) {
-            deliverProductArr[i]=new Array();
-            deliverProductArr[i][0]=tbody.rows[i].cells[0].innerHTML;
-            deliverProductArr[i][1]=tbody.rows[i].cells[1].innerHTML;
-            deliverProductArr[i][2]=parseInt(tbody.rows[i].cells[2].innerHTML);
-            deliverProductArr[i][3]=parseFloat(tbody.rows[i].cells[3].innerHTML).toFixed(2);
-            //deliverProductArr[i][4]=parseFloat(tbody.rows[i].cells[4].innerHTML);
-            deliverProductArr[i][4]=tbody.rows[i].cells[5].innerHTML;
-        }
-        var data = {
-            'deliveryCode': $('#billDeliveryCode').text(),
-            'sendDate': $('#billDate').text(),
-            'client': $('#billClient').val(),
-            'address': $('#billAddress').val(),
-            'contact': $('#billContact').val(),
-            'telephone': $('#billTelephone').val(),
-            'deliverProductArr': deliverProductArr,
-        };
-        console.log(data);
+        if(confirm("确定发货?")) {
+            var clientCode = $('#clientCode').val();
+            console.log(document.getElementById("deliver"));
+            var deliverProductArr = new Array(), i;
+            var tbody = document.getElementById("deliver").children[1];
+            for (i = 0; i < deliverTableRowsLength; i++) {
+                deliverProductArr[i] = new Array();
+                deliverProductArr[i][0] = tbody.rows[i].cells[0].innerHTML;
+                deliverProductArr[i][1] = tbody.rows[i].cells[1].innerHTML;
+                deliverProductArr[i][2] = parseInt(tbody.rows[i].cells[2].innerHTML);
+                deliverProductArr[i][3] = parseFloat(tbody.rows[i].cells[3].innerHTML).toFixed(2);
+                //deliverProductArr[i][4]=parseFloat(tbody.rows[i].cells[4].innerHTML);
+                deliverProductArr[i][4] = tbody.rows[i].cells[5].innerHTML;
+            }
+            var data = {
+                'deliveryCode': $('#billDeliveryCode').text(),
+                'sendDate': $('#billDate').text(),
+                'client': $('#billClient').val(),
+                'address': $('#billAddress').val(),
+                'contact': $('#billContact').val(),
+                'telephone': $('#billTelephone').val(),
+                'deliverProductArr': deliverProductArr,
+            };
+            console.log(data);
 
-        $.ajax({
-            url: "/deliverGroupByProductType/"+clientCode,
-            type: "POST",
-            dataType: "json",
-            //data:$(this).serialize(),
-            data: JSON.stringify(data),
-            contentType: 'application/json; charset=UTF-8',
-            success: function (callback) {
-                console.log(callback);
+            $.ajax({
+                url: "/deliverGroupByProductType/" + clientCode,
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data: JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
 
-                if(callback['ok']) {
-                    var productOfOrderArr=callback['productOfOrderArr']; // productType, deliveredNum, inventoryNum, deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark
-                    var table=document.getElementById("deliverRecord"); // row.cells: checkbox, productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark], "打印", uint, price
-                    for(i=1;i<table.rows.length;i++) {
-                        var checkbox = table.rows[i].cells[0].firstChild;
-                        if (checkbox.type = "CHECKBOX") {
-                            if (checkbox.checked) {
-                                var rowspan=table.rows[i].cells[0].getAttribute("rowspan");
-                                console.log(rowspan==1);
-                                rowspan=parseInt(rowspan); // 注意虽然js中变量是弱类型，但是这里rowspan实际上是字符串变量，要转化为整型，否则与数字相加时会直接作字符串拼接，而不是数字相加
+                    if (callback['ok']) {
+                        var productOfOrderArr = callback['productOfOrderArr']; // productType, deliveredNum, inventoryNum, deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark
+                        var table = document.getElementById("deliverRecord"); // row.cells: checkbox, productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark], "打印", uint, price
+                        for (i = 1; i < table.rows.length; i++) {
+                            var checkbox = table.rows[i].cells[0].firstChild;
+                            if (checkbox.type = "CHECKBOX") {
+                                if (checkbox.checked) {
+                                    var rowspan = table.rows[i].cells[0].getAttribute("rowspan");
+                                    console.log(rowspan == 1);
+                                    rowspan = parseInt(rowspan); // 注意虽然js中变量是弱类型，但是这里rowspan实际上是字符串变量，要转化为整型，否则与数字相加时会直接作字符串拼接，而不是数字相加
 
-                                var productType=table.rows[i].cells[1].innerHTML;
-                                console.log("productType: "+productType);
-                                for(var j=0;j<productOfOrderArr.length;j++) {
-                                    console.log("productOfOrderArr["+j+"][0]: "+productOfOrderArr[j][0]);
-                                    console.log(productType == productOfOrderArr[j][0]);
-                                    if (productType == productOfOrderArr[j][0]) {
-                                        var deliveryCode = table.rows[i].cells[7].innerHTML;
-                                        table.rows[i].cells[5].innerHTML = productOfOrderArr[j][1];
-                                        table.rows[i].cells[6].innerHTML = productOfOrderArr[j][2];
-                                        console.log("deliveryCode: "+deliveryCode);
-                                        console.log(deliveryCode == "-");
-                                        if (deliveryCode == "-") {
-                                            table.rows[i].cells[7].innerHTML = productOfOrderArr[j][3];
-                                            table.rows[i].cells[8].innerHTML = productOfOrderArr[j][4];
-                                            table.rows[i].cells[9].innerHTML = productOfOrderArr[j][5];
-                                            table.rows[i].cells[10].innerHTML = productOfOrderArr[j][6];
-                                            table.rows[i].cells[11].innerHTML = productOfOrderArr[j][7];
-                                            table.rows[i].cells[12].innerHTML = productOfOrderArr[j][8];
-                                            table.rows[i].cells[13].innerHTML = "<td><a onclick='deliverBillPrint(\""+ clientCode +"\",\""+productType+"\",\""+ productOfOrderArr[j][3] +"\")'> 打印 </a></td>";
-                                        } else {
-                                            console.log("rows.length: " + table.rows.length);
-                                            console.log("i: " + i + "; rowspan: " + rowspan);
-                                            console.log("i + rowspan: " + (i + rowspan));
-                                            table.insertRow(i + rowspan).innerHTML = "<tr><td style='display: none'>" + productOfOrderArr[j][3] + "</td>\n" +
-                                                "<td>" + productOfOrderArr[j][4] + "</td>\n" +
-                                                "<td>" + productOfOrderArr[j][5] + "</td>\n" +
-                                                "<td>" + productOfOrderArr[j][6] + "</td>\n" +
-                                                "<td>" + productOfOrderArr[j][7] + "</td>\n" +
-                                                "<td>" + productOfOrderArr[j][8] + "</td>\n" +
-                                                "<td><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + productType + "\",\"" + productOfOrderArr[j][3] + "\")'> 打印 </a></td></tr>";
+                                    var productType = table.rows[i].cells[1].innerHTML;
+                                    console.log("productType: " + productType);
+                                    for (var j = 0; j < productOfOrderArr.length; j++) {
+                                        console.log("productOfOrderArr[" + j + "][0]: " + productOfOrderArr[j][0]);
+                                        console.log(productType == productOfOrderArr[j][0]);
+                                        if (productType == productOfOrderArr[j][0]) {
+                                            var deliveryCode = table.rows[i].cells[7].innerHTML;
+                                            table.rows[i].cells[5].innerHTML = productOfOrderArr[j][1];
+                                            table.rows[i].cells[6].innerHTML = productOfOrderArr[j][2];
+                                            console.log("deliveryCode: " + deliveryCode);
+                                            console.log(deliveryCode == "-");
+                                            if (deliveryCode == "-") {
+                                                table.rows[i].cells[7].innerHTML = productOfOrderArr[j][3];
+                                                table.rows[i].cells[8].innerHTML = productOfOrderArr[j][4];
+                                                table.rows[i].cells[9].innerHTML = productOfOrderArr[j][5];
+                                                table.rows[i].cells[10].innerHTML = productOfOrderArr[j][6];
+                                                table.rows[i].cells[11].innerHTML = productOfOrderArr[j][7];
+                                                table.rows[i].cells[12].innerHTML = productOfOrderArr[j][8];
+                                                table.rows[i].cells[13].innerHTML = "<td><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + productType + "\",\"" + productOfOrderArr[j][3] + "\")'> 打印 </a></td>";
+                                            } else {
+                                                console.log("rows.length: " + table.rows.length);
+                                                console.log("i: " + i + "; rowspan: " + rowspan);
+                                                console.log("i + rowspan: " + (i + rowspan));
+                                                table.insertRow(i + rowspan).innerHTML = "<tr><td style='display: none'>" + productOfOrderArr[j][3] + "</td>\n" +
+                                                    "<td>" + productOfOrderArr[j][4] + "</td>\n" +
+                                                    "<td>" + productOfOrderArr[j][5] + "</td>\n" +
+                                                    "<td>" + productOfOrderArr[j][6] + "</td>\n" +
+                                                    "<td>" + productOfOrderArr[j][7] + "</td>\n" +
+                                                    "<td>" + productOfOrderArr[j][8] + "</td>\n" +
+                                                    "<td><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + productType + "\",\"" + productOfOrderArr[j][3] + "\")'> 打印 </a></td></tr>";
 
-                                            console.log("rowspan + 1: " + (rowspan + 1));
-                                            table.rows[i].cells[0].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[1].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[2].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[3].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[4].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[5].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[6].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[14].setAttribute("rowspan", rowspan + 1);
-                                            table.rows[i].cells[15].setAttribute("rowspan", rowspan + 1);
+                                                console.log("rowspan + 1: " + (rowspan + 1));
+                                                table.rows[i].cells[0].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[1].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[2].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[3].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[4].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[5].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[6].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[14].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[15].setAttribute("rowspan", rowspan + 1);
+                                            }
+                                            console.log(table);
+                                            break;
                                         }
-                                        console.log(table);
-                                        break;
                                     }
                                 }
                             }
                         }
                     }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
                 }
-            },
-            error: function (xhr, textStatus, errorThrown) {
-                console.log(xhr.status);// 状态码
-                console.log(xhr.readyState);// 状态
-                console.log(textStatus);// 错误信息
-                alert('返回值错误');
-            }
-        });
+            });
+        }
     }
     /*打印出货单*/
     function deliverPrint() {

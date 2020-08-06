@@ -581,8 +581,8 @@
             var checktd=tbody.rows[i].cells[0].children[0];
             if(checktd.checked) {
                 staffidArr[j]=new Array();
-                staffidArr[j] = tbody.rows[i].cells[1].innerHTML; // month
-                staffidArr[j] = tbody.rows[i].cells[2].innerHTML; // staffid
+                staffidArr[j][0] = tbody.rows[i].cells[1].innerHTML; // month
+                staffidArr[j][1] = tbody.rows[i].cells[2].innerHTML; // staffid
                 j++;
             }
         }
@@ -969,8 +969,8 @@
             var checktd=tbody.rows[i].cells[0].children[0];
             if(checktd.checked) {
                 staffidArr[j]=new Array();
-                staffidArr[j] = tbody.rows[i].cells[1].innerHTML; // month
-                staffidArr[j] = tbody.rows[i].cells[2].innerHTML; // staffid
+                staffidArr[j][0] = tbody.rows[i].cells[1].innerHTML; // month
+                staffidArr[j][1] = tbody.rows[i].cells[2].innerHTML; // staffid
                 j++;
             }
         }

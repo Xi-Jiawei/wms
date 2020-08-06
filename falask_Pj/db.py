@@ -143,17 +143,22 @@ def select_user_password(username):
 
 # xijiawei
 def select_user_authority(username):
-    sql = "select authority from users where username='%s';"%username
-    # print(sql)
-    lock.acquire()
-    cur.execute(sql)
-    result = cur.fetchall()
-    lock.release()
-    if result:
-        return result[0][0]
-    else:
-        return None
-    conn.close()
+    try:
+        sql = "select authority from users where username='%s';" % username
+        # print(sql)
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        if result:
+            return result[0][0]
+        else:
+            return None
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
 
 # xijiawei
 def insert_user(username, password, authority):
@@ -251,7 +256,7 @@ def select_productInfoByCode(productCode):
     conn = db.conn()
     cursor = conn.cursor()
     try:
-        sql = "select productType,client,uint,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk from productInfo where productCode='%s';" % (
+        sql = "select productType,client,unit,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk from productInfo where productCode='%s';" % (
             productCode)
         lock.acquire()
         cursor.execute(sql)
@@ -270,7 +275,7 @@ def select_productInfoByType(productType):
     conn = db.conn()
     cursor = conn.cursor()
     try:
-        sql = "select productCode,client,uint,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk from productInfo where productType='%s';" % (productType)
+        sql = "select productCode,client,unit,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk from productInfo where productType='%s';" % (productType)
         lock.acquire()
         cursor.execute(sql)
         result = cursor.fetchall()
@@ -708,7 +713,6 @@ def select_procurement():
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
@@ -725,8 +729,10 @@ def select_procurementByCode(procurementCode):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
-    except:
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
         conn.rollback()
 
 # xijiawei
@@ -753,8 +759,10 @@ def select_materialsOfProcurementByCode(procurementCode):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
-    except:
+    # except:
+    #     conn.rollback()
+    except Exception as e:
+        print("数据库操作异常：",e)
         conn.rollback()
 
 # xijiawei
@@ -796,7 +804,6 @@ def delete_procurementByCode(procurementCode, entryClerk):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
@@ -842,7 +849,6 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
@@ -882,7 +888,6 @@ def update_procurement(procurementCode,productCodeArr,productNumArr,client,remar
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
@@ -898,7 +903,6 @@ def select_all_materials():
     result=cur.fetchall()
     lock.release()
     return result
-    conn.close()
 
 # xijiawei
 # 查询物料余库存金额
@@ -909,7 +913,6 @@ def select_sum_materials():
     result = cur.fetchall()
     lock.release()
     return result
-    conn.close()
 
 # xijiawei
 # 根据物料编码查询物料信息
@@ -1454,7 +1457,7 @@ def select_concated_orders():
 # 查询所有订单
 def select_orderByCode(orderCode):
     try:
-        sql = "select client, address, contact, telephone, date_format(orderDate,'%%Y-%%m-%%d'), productType, deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), deliveredNum, uint, price, orders.receivable, orders.remark from orders,clients where orderCode='%s' and orders.clientCode=clients.clientCode;"%(orderCode)
+        sql = "select client, address, contact, telephone, date_format(orderDate,'%%Y-%%m-%%d'), productType, deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), deliveredNum, unit, price, orders.receivable, orders.remark from orders,clients where orderCode='%s' and orders.clientCode=clients.clientCode;"%(orderCode)
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
@@ -1497,7 +1500,7 @@ def select_all_orderGroupByProductType():
 # 查询所有订单
 def select_all_orderGroupByProductTypeByCode(clientCode):
     try:
-        sql = "select receivableReportGroupByProductType.productType,remainDeliveryNum,addDeliveryNum,deliveryNum,deliveredNum,inventoryNum,uint,price,receivable,receipt,receivableReportGroupByProductType.remark from receivableReportGroupByProductType,productInfo where clientCode='%s' and receivableReportGroupByProductType.productType=productInfo.productType and receivableReportGroupByProductType.deliveryNum>0;"%clientCode
+        sql = "select receivableReportGroupByProductType.productType,remainDeliveryNum,addDeliveryNum,deliveryNum,deliveredNum,inventoryNum,unit,price,receivable,receipt,receivableReportGroupByProductType.remark from receivableReportGroupByProductType,productInfo where clientCode='%s' and receivableReportGroupByProductType.productType=productInfo.productType and receivableReportGroupByProductType.deliveryNum>0;"%clientCode
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
@@ -1523,10 +1526,10 @@ def select_orderGroupByProductTypeByCode(clientCode, productType):
 
 # xijiawei
 # 查询所有订单
-def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, uint, price, receivable, remark, entryTime, entryClerk):
+def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, unit, price, receivable, remark, entryTime, entryClerk):
     try:
         lock.acquire()
-        cur.execute("insert into orders (orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, deliveredNum, uint, price, receivable, remark, entryTime, entryClerk) values('%s','%s','%s','%s','%d','%s','%d','%s','%f','%f','%s','%s','%s');"%(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, 0, uint, price, receivable, remark, entryTime, entryClerk))
+        cur.execute("insert into orders (orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, deliveredNum, unit, price, receivable, remark, entryTime, entryClerk) values('%s','%s','%s','%s','%d','%s','%d','%s','%f','%f','%s','%s','%s');"%(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, 0, unit, price, receivable, remark, entryTime, entryClerk))
 
         # 更新交易客户的应收款
         cur.execute("select clientCode from clients where clientCode='%s';"%clientCode)
@@ -1573,7 +1576,7 @@ def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, del
         if result:
             cur.execute("update orderGroupByProductType set price='%f', deliveryNum=deliveryNum+'%f', receivable=receivable+'%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s';" % (price, deliveryNum, receivable, remark, entryTime, entryClerk, clientCode, productType))
         else:
-            cur.execute("insert into orderGroupByProductType (clientCode, productType, uint, price, deliveryNum, deliveredNum, receivable, receipt, remark, entryTime, entryClerk) values ('%s','%s','%s','%f','%d','%d','%f','%f','%s','%s','%s');" % (clientCode, productType, uint, price, deliveryNum, 0, receivable, 0, remark, entryTime, entryClerk))
+            cur.execute("insert into orderGroupByProductType (clientCode, productType, unit, price, deliveryNum, deliveredNum, receivable, receipt, remark, entryTime, entryClerk) values ('%s','%s','%s','%f','%d','%d','%f','%f','%s','%s','%s');" % (clientCode, productType, unit, price, deliveryNum, 0, receivable, 0, remark, entryTime, entryClerk))
 
         # 更新receivableReportGroupByProductType
         cur.execute("select clientCode from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month='%s';"%(clientCode,productType,month))
@@ -1625,7 +1628,7 @@ def delete_order(orderCode):
 # 查询所有订单
 def select_deliveryByCode(deliveryCode):
     try:
-        sql = "select clients.client, clients.address, clients.contact, clients.telephone, orders.orderDate, orders.productType, deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), productInfo.uint, productInfo.price, date_format(sendDate,'%%Y-%%m-%%d'), sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark, delivery.entryClerk from delivery,orders,clients,productInfo where deliveryCode='%s' and delivery.orderCode=orders.orderCode and delivery.productType=orders.productType and delivery.clientCode=clients.clientCode and delivery.productType=productInfo.productType;"%(deliveryCode)
+        sql = "select clients.client, clients.address, clients.contact, clients.telephone, orders.orderDate, orders.productType, deliveryNum, date_format(deliveryDate,'%%Y-%%m-%%d'), productInfo.unit, productInfo.price, date_format(sendDate,'%%Y-%%m-%%d'), sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark, delivery.entryClerk from delivery,orders,clients,productInfo where deliveryCode='%s' and delivery.orderCode=orders.orderCode and delivery.productType=orders.productType and delivery.clientCode=clients.clientCode and delivery.productType=productInfo.productType;"%(deliveryCode)
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
@@ -1670,7 +1673,7 @@ def select_deliveryByOrderCodeAndProductType(orderCode,productType):
 # 查询所有订单
 def select_deliveryGroupByProductTypeByCode(deliveryCode):
     try:
-        sql = "select clients.client, clients.address, clients.contact, clients.telephone, date_format(d.sendDate,'%%Y-%%m-%%d'), d.productType, og.uint, og.price, sendNum, d.remark, d.entryClerk from deliveryGroupByProductType d,orderGroupByProductType og,clients where deliveryCode='%s' and d.clientCode=og.clientCode and d.productType=og.productType and d.clientCode=clients.clientCode;"%(deliveryCode)
+        sql = "select clients.client, clients.address, clients.contact, clients.telephone, date_format(d.sendDate,'%%Y-%%m-%%d'), d.productType, og.unit, og.price, sendNum, d.remark, d.entryClerk from deliveryGroupByProductType d,orderGroupByProductType og,clients where deliveryCode='%s' and d.clientCode=og.clientCode and d.productType=og.productType and d.clientCode=clients.clientCode;"%(deliveryCode)
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
