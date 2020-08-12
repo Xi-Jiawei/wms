@@ -1238,9 +1238,9 @@ def insert_materialInOut(documentNumber,documentTime,materialCode,isInOrOut,oper
             cur.execute("select supplierCode from payableReportGroupByMaterialCode where supplierCode='%s' and materialCode='%s' and month='%s';" % (supplierCode, materialCode, month))
             result = cur.fetchall()
             if result:
-                cur.execute("update payableReportGroupByMaterialCode set payable=payable+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s' and materialCode='%s' and month='%s';" % (payable, operateTime, operatorName, supplierCode, materialCode, month))
+                cur.execute("update payableReportGroupByMaterialCode set materialNum=materialNum+'%d', addPayable=addPayable+'%f', payable=payable+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s' and materialCode='%s' and month='%s';" % (operateNum, payable, payable, operateTime, operatorName, supplierCode, materialCode, month))
             else:
-                cur.execute("insert into payableReportGroupByMaterialCode (supplierCode, materialCode, month, payable, entryTime, entryClerk) value ('%s','%s','%s','%f','%s','%s');" % (supplierCode, materialCode, month, payable, operateTime, operatorName))
+                cur.execute("insert into payableReportGroupByMaterialCode (supplierCode, materialCode, month, materialNum, addPayable, payable, entryTime, entryClerk) value ('%s','%s','%s','%d','%f','%f','%s','%s');" % (supplierCode, materialCode, month, operateNum, payable, payable, operateTime, operatorName))
 
         # 执行SQL语句
         # 提交到数据库执行
@@ -1742,7 +1742,7 @@ def insert_deliveryGroupByProductType(deliveryCode, clientCode, productType, bef
 # 查询所有订单
 def select_all_clients():
     try:
-        sql = "select clientCode, receivable, receipt, receivable-receipt from clients;"
+        sql = "select clientCode, historyReceivable, receivable, receipt, receivable-receipt from clients;"
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
@@ -1862,7 +1862,36 @@ def insert_receiptsJournal(clientCode,receiptDate,beforeReceivable,receipt,remar
         lock.acquire()
         cur.execute("insert into receiptsJournal (clientCode,receiptDate,beforeReceivable,receipt,remark,entryTime,entryClerk) values('%s','%s','%f','%f','%s','%s','%s');"%(clientCode,receiptDate,beforeReceivable,receipt,remark,entryTime,entryClerk))
         cur.execute("update clients set receipt=receipt+'%f', entryTime='%s', entryClerk='%s' where clientCode='%s';" % (receipt, entryTime, entryClerk, clientCode))
-        cur.execute("update receivableReport set receipt=receipt+'%f', entryTime='%s', entryClerk='%s' where clientCode='%s' and month='%s';" % (receipt, entryTime, entryClerk, clientCode,receiptDate[0:7]))
+
+        # 更新订单报表
+        # cur.execute("update receivableReport set receipt=receipt+'%f', entryTime='%s', entryClerk='%s' where clientCode='%s' and month='%s';" % (receipt, entryTime, entryClerk, clientCode,receiptDate[0:7]))
+        month=entryTime[0:7]
+        cur.execute("select receipt from receivableReport where clientCode='%s' and month='%s';" % (clientCode, month))
+        result = cur.fetchall()
+        if result:
+            cur.execute("update receivableReport set receipt=receipt+'%f', entryTime='%s', entryClerk='%s' where clientCode='%s' and month='%s';" % (receipt, entryTime, entryClerk, clientCode, receiptDate[0:7]))
+        else:
+            cur.execute("select receivable-receipt from receivableReport where clientCode='%s' and month in (select max(month) from receivableReport where clientCode='%s' and month<'%s');" % (clientCode, clientCode, month))
+            result = cur.fetchall()
+            if result:
+                remainReceivable = result[0][0]
+            else:
+                remainReceivable = 0
+            cur.execute("insert into receivableReport (clientCode, month, remainReceivable, addReceivable, receivable, receipt, remark, entryTime, entryClerk) value ('%s','%s','%f','%f','%f','%f','%s','%s','%s');" % (clientCode, month, remainReceivable, 0, remainReceivable, receipt, remark, entryTime, entryClerk))
+
+        conn.commit()
+        lock.release()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def update_historyReceivable(clientCode,historyReceivable,entryTime,entryClerk):
+    try:
+        lock.acquire()
+        cur.execute("update receivableReport,clients set remainReceivable=remainReceivable-clients.historyReceivable+'%f', receivableReport.receivable=receivableReport.receivable-clients.historyReceivable+'%f', receivableReport.entryTime='%s', receivableReport.entryClerk='%s' where receivableReport.clientCode='%s' and receivableReport.clientCode=clients.clientCode;" % (historyReceivable, historyReceivable, entryTime, entryClerk, clientCode))
+        cur.execute("update clients set historyReceivable='%f', receivable=receivable-historyReceivable+'%f', entryTime='%s', entryClerk='%s' where clientCode='%s';" % (historyReceivable, historyReceivable, entryTime, entryClerk, clientCode))
         conn.commit()
         lock.release()
     except Exception as e:
@@ -1875,7 +1904,7 @@ def insert_receiptsJournal(clientCode,receiptDate,beforeReceivable,receipt,remar
 # 查询所有订单
 def select_all_suppliers():
     try:
-        sql = "select supplierCode,payable,payment,payable-payment from suppliers;"
+        sql = "select supplierCode,historyPayable,payable,payment,payable-payment from suppliers;"
         lock.acquire()
         cur.execute(sql)
         result = cur.fetchall()
@@ -1966,7 +1995,7 @@ def select_payableReportByCode(supplierCode,month):
 def select_payableReportGroupByMaterialCodeByCode(supplierCode,month):
     try:
         lock.acquire()
-        cur.execute("select materialCode,payable,remark from payableReportGroupByMaterialCode where supplierCode='%s' and month='%s';" % (supplierCode, month))
+        cur.execute("select payableReportGroupByMaterialCode.materialCode,materialType,materialNum,price,payable,payableReportGroupByMaterialCode.remark from payableReportGroupByMaterialCode,materialInfo where payableReportGroupByMaterialCode.supplierCode='%s' and month='%s' and payableReportGroupByMaterialCode.materialCode=materialInfo.materialCode;" % (supplierCode, month))
         result = cur.fetchall()
         lock.release()
         return result
@@ -1982,6 +2011,19 @@ def insert_paymentsJournal(supplierCode,paymentDate,beforePayable,payment,remark
         cur.execute("insert into paymentsJournal (supplierCode,paymentDate,beforePayable,payment,remark,entryTime,entryClerk) values('%s','%s','%f','%f','%s','%s','%s');"%(supplierCode,paymentDate,beforePayable,payment,remark,entryTime,entryClerk))
         cur.execute("update suppliers set payment=payment+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s';" % (payment, entryTime, entryClerk, supplierCode))
         cur.execute("update payableReport set payment=payment+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s' and month='%s';" % (payment, entryTime, entryClerk, supplierCode, paymentDate[0:7]))
+        conn.commit()
+        lock.release()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def update_historyPayable(supplierCode,historyPayable,entryTime,entryClerk):
+    try:
+        lock.acquire()
+        cur.execute("update payableReport,suppliers set remainPayable=remainPayable-suppliers.historyPayable+'%f', payableReport.payable=payableReport.payable-suppliers.historyPayable+'%f', payableReport.entryTime='%s', payableReport.entryClerk='%s' where payableReport.supplierCode='%s' and payableReport.supplierCode=suppliers.supplierCode;" % (historyPayable, historyPayable, entryTime, entryClerk, supplierCode))
+        cur.execute("update suppliers set historyPayable='%f', payable=payable-historyPayable+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s';" % (historyPayable, historyPayable, entryTime, entryClerk, supplierCode))
         conn.commit()
         lock.release()
     except Exception as e:

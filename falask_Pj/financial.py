@@ -23,9 +23,17 @@ def financial_receivable():
             clients = thread.get_result()
             receivables = []
             for i in clients:
+                receivable = []
                 thread = myThread(target=select_receivableReportByCode, args=(i[0], month,))
-                receivable = thread.get_result()
-                receivables.append(receivable[0])
+                result = thread.get_result()
+                receivable.append(result[0][0])
+                receivable.append(i[1]) # historyReceivable
+                receivable.append(result[0][1])
+                receivable.append(result[0][2])
+                receivable.append(result[0][3])
+                receivable.append(result[0][4])
+                receivable.append(result[0][5])
+                receivables.append(receivable)
             return render_template('financial_receivable.html', form=form, receivables=receivables, username=username)
     else:
         return render_template('access_fail.html')
@@ -54,6 +62,23 @@ def financial_receipts(clientCode):
     else:
         return render_template('access_fail.html')
 
+# xijiawei
+# 订单管理
+@financial_app.route('/financial_history_receivable', methods=['GET','POST'])
+def financial_history_receivable():
+    if session.get('username'):
+        username = session['username']
+        if request.method=="POST":
+            data = request.get_json()
+            clientCode = data['clientCode']  # 不要写成orderCode=request.data["orderCode"]
+            historyReceivable = float(data['historyReceivable'])
+            entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            entryClerk = username
+            myThread(target=update_historyReceivable, args=(clientCode,historyReceivable,entryTime,entryClerk,))
+            return jsonify({'ok': True})
+    else:
+        return render_template('access_fail.html')
+
 ##### 付款记账 #####
 
 # xijiawei
@@ -70,9 +95,17 @@ def financial_payable():
             suppliers = thread.get_result()
             payables = []
             for i in suppliers:
+                payable = []
                 thread = myThread(target=select_payableReportByCode, args=(i[0], month,))
-                payable = thread.get_result()
-                payables.append(payable[0])
+                result = thread.get_result()
+                payable.append(result[0][0])
+                payable.append(i[1]) # historyPayable
+                payable.append(result[0][1])
+                payable.append(result[0][2])
+                payable.append(result[0][3])
+                payable.append(result[0][4])
+                payable.append(result[0][5])
+                payables.append(payable)
             return render_template('financial_payable.html', form=form, username=username, payables=payables)
     else:
         return render_template('access_fail.html')
@@ -113,6 +146,23 @@ def search_supplier(filterStr):
             return jsonify({'ok': True,'suppliers':suppliers})
     else:
         return jsonify({'ok': False})
+
+# xijiawei
+# 订单管理
+@financial_app.route('/financial_history_payable', methods=['GET','POST'])
+def financial_history_payable():
+    if session.get('username'):
+        username = session['username']
+        if request.method=="POST":
+            data = request.get_json()
+            supplierCode = data['supplierCode']  # 不要写成orderCode=request.data["orderCode"]
+            historyPayable = float(data['historyPayable'])
+            entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            entryClerk = username
+            myThread(target=update_historyPayable, args=(supplierCode,historyPayable,entryTime,entryClerk,))
+            return jsonify({'ok': True})
+    else:
+        return render_template('access_fail.html')
 
 ##### 工资管理 #####
 

@@ -170,15 +170,53 @@
                                 </div><!-- /.modal -->
                             </div>
 
+                            <!--模态框-->
+                            <div class="modal fade" id="historyReceivableModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                                &times;
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">
+                                                设置历史结余应收金额
+                                            </h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">交易客户</label>
+                                                <div class="col-xs-12">
+                                                    <input id="clientCode2" type="text" readonly="readonly" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="row" style="padding-left: 10px;padding-right: 10px">
+                                                <label class="control-label mb-1" style="padding-left: 20px;">历史结余应收金额</label>
+                                                <div class="col-xs-12">
+                                                    <input id="historyReceivable" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal" onclick="historyReceivableModalCancel()">关闭
+                                            </button>
+                                            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="historyReceivableModalSubmit()">
+                                                确认
+                                            </button>
+                                        </div>
+                                    </div><!-- /.modal-content -->
+                                </div><!-- /.modal -->
+                            </div>
+
                             <div class="row" style="position:relative;width:100%;">
                                 <table id="receivableTable" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
                                         <th>交易客户</th>
-                                        <th>上月结余应付款</th>
-                                        <th>本月新增应付款</th>
-                                        <th>本月应付款</th>
-                                        <th>本月实付款</th>
+                                        <th style="display: none">历史结余应付款</th>
+                                        <th>上月结余应收款</th>
+                                        <th>本月新增应收款</th>
+                                        <th>本月应收款</th>
+                                        <th>本月实收款</th>
                                         <th>余款</th>
                                         <th>收款录入</th>
                                         <th>收款明细</th>
@@ -187,13 +225,14 @@
                                     <tbody>
                                     {% for i in receivables %}
                                         <tr>
-                                            <td>{{ i[0] }}</td>
-                                            <td>{{ i[1] }}</td>
+                                            <td><a data-toggle="modal" data-target="#historyReceivableModal" onclick="historyReceivableEnter('{{ i[0] }}','{{ i[1] }}')"> {{ i[0] }} </a></td>
+                                            <td style="display: none">{{ i[1] }}</td>
                                             <td>{{ i[2] }}</td>
                                             <td>{{ i[3] }}</td>
                                             <td>{{ i[4] }}</td>
-                                            <td>{{ i[3]-i[4] }}</td>
-                                            <td><a data-toggle="modal" data-target="#receiptModal" onclick="receiptEnter('{{ i[0] }}','{{ i[3]-i[4] }}')"> 收款录入 </a></td>
+                                            <td>{{ i[5] }}</td>
+                                            <td>{{ i[4]-i[5] }}</td>
+                                            <td><a data-toggle="modal" data-target="#receiptModal" onclick="receiptEnter('{{ i[0] }}','{{ i[4]-i[5] }}')"> 收款录入 </a></td>
                                             <td><a onclick="receiptsJournal('{{ i[0] }}')"> 收款明细 </a></td>
                                         </tr>
                                     {% endfor %}
@@ -265,8 +304,8 @@
 
                 if(callback['ok']) {
                     var row=document.getElementById("receivableTable").rows[$("#rowindex").val()];
-                    row.cells[4].textContent=(parseFloat(row.cells[4].textContent)+parseFloat($('#receipt').val())).toFixed(2);
-                    row.cells[5].textContent=(parseFloat(row.cells[5].textContent)-parseFloat($('#receipt').val())).toFixed(2);
+                    row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat($('#receipt').val())).toFixed(2);
+                    row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat($('#receipt').val())).toFixed(2);
 
                     $('#clientCode').val("");
                     $('#beforeReceivable').val("");
@@ -289,6 +328,57 @@
         $('#receiptDate').val("");
         $('#receipt').val("");
         $('#remark').val("");
+    }
+
+    function historyReceivableEnter(clientCode,historyReceivable){
+        console.log(clientCode);
+        $('#clientCode2').val(clientCode);
+        $('#historyReceivable').val(historyReceivable);
+
+        console.log(document.getElementById("receivableTable").rows[event.currentTarget.parentElement.parentElement.rowIndex]);
+        var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
+        $('#rowindex').val(rowindex);
+    }
+    function historyReceivableModalSubmit() {
+        var historyReceivable=parseFloat($('#historyReceivable').val());
+        var data = {
+            'clientCode': $('#clientCode2').val(),
+            'historyReceivable': historyReceivable,
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/financial_history_receivable",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var row=document.getElementById("receivableTable").rows[$("#rowindex").val()];
+                    var beforeHistoryReceivable=parseFloat(row.cells[1].textContent);
+                    row.cells[2].textContent=(parseFloat(row.cells[2].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
+                    row.cells[4].textContent=(parseFloat(row.cells[4].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
+                    row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
+
+                    $('#clientCode2').val("");
+                    $('#historyReceivable').val("");
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+    function historyReceivableModalCancel() {
+        $('#clientCode2').val("");
+        $('#historyReceivable').val("");
     }
 
     function receiptsJournal(clientCode) {

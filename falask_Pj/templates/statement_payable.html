@@ -135,9 +135,12 @@
                                 <table id="payableTable" class="table table-striped table-bordered">
                                     <thead>
                                     <tr>
+                                        <th>物料编码</th>
                                         <th>物料型号</th>
-                                        <th>上月结余应付款</th>
+                                        <th>数量</th>
+                                        <th>单价</th>
                                         <th>本月新增应付款</th>
+                                        <th>上月结余应付款</th>
                                         <th>本月应付款</th>
                                         <th>本月实付款</th>
                                         <th>未付余款</th>
@@ -148,12 +151,14 @@
                                     {% for i in payablesOfMaterial %}
                                         <tr>
                                             <td>{{ i[0] }}</td>
-                                            <td>-</td>
-                                            <td>-</td>
                                             <td>{{ i[1] }}</td>
-                                            <td>-</td>
-                                            <td>-</td>
                                             <td>{{ i[2] }}</td>
+                                            <td>{{ i[3] }}</td>
+                                            <td>{{ i[4] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>{{ i[5] }}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -161,8 +166,11 @@
                                     <tr>
                                         {% if payable %}
                                         <td>合计</td>
-                                        <td>{{ payable[0][1] }}</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
                                         <td>{{ payable[0][2] }}</td>
+                                        <td>{{ payable[0][1] }}</td>
                                         <td>{{ payable[0][3] }}</td>
                                         <td>{{ payable[0][4] }}</td>
                                         <td>{{ payable[0][3]-payable[0][4] }}</td>
@@ -171,7 +179,10 @@
                                         <td>合计</td>
                                         <td>-</td>
                                         <td>-</td>
+                                        <td>-</td>
                                         <td>0</td>
+                                        <td>-</td>
+                                        <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
@@ -222,10 +233,10 @@
             var length = table.rows({filter: 'applied'}).nodes().length;
             var payableSum=0;
             for (var i = 0; i < length; i++) {
-                payableSum += parseFloat(data[i][3]);
+                payableSum += parseFloat(data[i][4]);
             }
 
-            $("#payableTable tfoot tr td").eq(3).text(payableSum.toFixed(2));
+            $("#payableTable tfoot tr td").eq(4).text(payableSum.toFixed(2));
         });
     });
     $("#searchForm").submit(function(e) {
@@ -255,22 +266,25 @@
                     for (var i = 0; i < payablesOfMaterial.length; i++) {
                         table.row.add([
                             payablesOfMaterial[i][0],
-                            '-',
-                            '-',
                             payablesOfMaterial[i][1],
+                            payablesOfMaterial[i][2],
+                            payablesOfMaterial[i][3],
+                            payablesOfMaterial[i][4],
                             '-',
                             '-',
-                            payablesOfMaterial[i][2]
+                            '-',
+                            '-',
+                            payablesOfMaterial[i][5]
                         ]);
                     }
                     table.draw();
                     var tfootRow=$('#payableTable tfoot tr td');
-                    tfootRow.eq(1).text(payable[0][1]);
-                    tfootRow.eq(2).text(payable[0][2]);
-                    tfootRow.eq(3).text(payable[0][3]);
-                    tfootRow.eq(4).text(payable[0][4]);
-                    tfootRow.eq(5).text(payable[0][3]-payable[0][4]);
-                    tfootRow.eq(6).text(payable[0][5]);
+                    tfootRow.eq(4).text(payable[0][2]);
+                    tfootRow.eq(5).text(payable[0][1]);
+                    tfootRow.eq(6).text(payable[0][3]);
+                    tfootRow.eq(7).text(payable[0][4]);
+                    tfootRow.eq(8).text(payable[0][3]-payable[0][4]);
+                    tfootRow.eq(9).text(payable[0][5]);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {

@@ -71,6 +71,7 @@ def statement():
 @statement_app.route('/statement_receivable', methods=['GET','POST'])
 def statement_receivable():
     if session.get('username'):
+        username = session['username']
         if request.method == "POST":
             data = request.get_json()
             clientCode = data['clientCode']
@@ -81,7 +82,6 @@ def statement_receivable():
             receivablesOfProduct = thread.get_result()
             return jsonify({'ok': True,'receivable':receivable,'receivablesOfProduct':receivablesOfProduct})
         elif request.method=="GET":
-            username = session['username']
             form = ProductForm()
             month = datetime.now().strftime('%Y-%m')
             return render_template('statement_receivable_detail.html', form=form, username=username, month=month)
