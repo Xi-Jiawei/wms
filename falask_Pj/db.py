@@ -1498,7 +1498,7 @@ def select_all_orderGroupByProductType():
 
 # xijiawei
 # 查询所有订单
-def select_all_orderGroupByProductTypeByCode(clientCode):
+def select_orderGroupByProductTypeByCode(clientCode):
     try:
         sql = "select orderGroupByProductType.productType,orderGroupByProductType.unit,orderGroupByProductType.price,inventoryNum from orderGroupByProductType,productInfo where clientCode='%s' and orderGroupByProductType.productType=productInfo.productType;"%(clientCode)
         lock.acquire()
@@ -1533,7 +1533,7 @@ def select_receivableReportGroupByProductTypeByClientCodeAndProductType(clientCo
 
 # xijiawei
 # 查询所有订单
-def select_orderGroupByProductTypeByCode(clientCode, productType):
+def select_orderGroupByProductTypeByClientCodeAndProductType(clientCode, productType):
     try:
         lock.acquire()
         cur.execute("select deliveryNum-deliveredNum,deliveredNum,p.inventoryNum from orderGroupByProductType orders, productInfo p where orders.clientCode='%s' and orders.productType='%s' and orders.productType=p.productType;" % (clientCode, productType))

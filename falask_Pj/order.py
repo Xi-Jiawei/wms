@@ -254,7 +254,7 @@ def deliverGroupByProductType(clientCode):
                 sendNum = product[2]
                 price = product[3]
                 remark = product[4]
-                thread = myThread(target=select_orderGroupByProductTypeByCode, args=(clientCode, productType,))
+                thread = myThread(target=select_orderGroupByProductTypeByClientCodeAndProductType, args=(clientCode, productType,))
                 productInfo = thread.get_result()
                 beforeDeliveryNum = productInfo[0][0]
                 beforeDeliveredNum = productInfo[0][1]
@@ -282,7 +282,7 @@ def deliverGroupByProductType(clientCode):
             deliveryCode = "D" + datetime.now().strftime('%Y%m%d%H%M%S%f')[0:16]  # 使用时间戳生成唯一代号
             thread = myThread(target=select_clientByCode, args=(clientCode,))
             clientInfo = thread.get_result()
-            thread = myThread(target=select_all_orderGroupByProductTypeByCode, args=(clientCode,))
+            thread = myThread(target=select_orderGroupByProductTypeByCode, args=(clientCode,))
             productOfOrderArr = thread.get_result()
             products = []
             for i in productOfOrderArr:
