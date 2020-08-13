@@ -160,6 +160,7 @@
                                             <td>-</td>
                                             <td>-</td>
                                             <td>-</td>
+                                            <td>-</td>
                                             <td>{{ i[6] }}</td>
                                         </tr>
                                     {% endfor %}
@@ -172,12 +173,12 @@
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
-                                        <td>{{ payable[0][2] }}</td>
-                                        <td>{{ payable[0][1] }}</td>
-                                        <td>{{ payable[0][3] }}</td>
-                                        <td>{{ payable[0][4] }}</td>
-                                        <td>{{ payable[0][3]-payable[0][4] }}</td>
-                                        <td>{{ payable[0][5] }}</td>
+                                        <td>{{ payable[1] }}</td>
+                                        <td>{{ payable[0] }}</td>
+                                        <td>{{ payable[2] }}</td>
+                                        <td>{{ payable[3] }}</td>
+                                        <td>{{ payable[2]-payable[3] }}</td>
+                                        <td>-</td>
                                         {% else %}
                                         <td>合计</td>
                                         <td>-</td>
@@ -240,7 +241,10 @@
                 payableSum += parseFloat(data[i][5]);
             }
 
-            $("#payableTable tfoot tr td").eq(5).text(payableSum.toFixed(2));
+            var tfoot=$("#payableTable tfoot tr td");
+            tfoot.eq(5).text(payableSum.toFixed(2));
+            tfoot.eq(7).text((payableSum+parseFloat(tfoot.eq(6).text())).toFixed(2));
+            tfoot.eq(9).text((parseFloat(tfoot.eq(7).text())-parseFloat(tfoot.eq(8).text())).toFixed(2));
         });
     });
     $("#searchForm").submit(function(e) {

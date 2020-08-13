@@ -185,12 +185,12 @@
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
-                                        <td>{{ receivable[0][2] }}</td>
-                                        <td>{{ receivable[0][1] }}</td>
-                                        <td>{{ receivable[0][3] }}</td>
-                                        <td>{{ receivable[0][4] }}</td>
-                                        <td>{{ receivable[0][3]-receivable[0][4] }}</td>
-                                        <td>{{ receivable[0][5] }}</td>
+                                        <td>{{ receivable[1] }}</td>
+                                        <td>{{ receivable[0] }}</td>
+                                        <td>{{ receivable[2] }}</td>
+                                        <td>{{ receivable[3] }}</td>
+                                        <td>{{ receivable[2]-receivable[3] }}</td>
+                                        <td>-</td>
                                         {% else %}
                                         <td>合计</td>
                                         <td>-</td>
@@ -247,12 +247,17 @@
 
             var data = table.rows({filter: 'applied'}).data();
             var length = table.rows({filter: 'applied'}).nodes().length;
-            var payableSum=0;
+            var receivableSum=0;
             for (var i = 0; i < length; i++) {
-                payableSum += parseFloat(data[i][4]);
+                console.log(data[i][4]);
+                receivableSum += parseFloat(data[i][4]);
             }
+            console.log(receivableSum);
 
-            $("#payableTable tfoot tr td").eq(4).text(payableSum.toFixed(2));
+            var tfoot=$("#receivableTable tfoot tr td");
+            tfoot.eq(4).text(receivableSum.toFixed(2));
+            tfoot.eq(6).text((receivableSum+parseFloat(tfoot.eq(5).text())).toFixed(2));
+            tfoot.eq(8).text((parseFloat(tfoot.eq(6).text())-parseFloat(tfoot.eq(7).text())).toFixed(2));
         });
     });
     $("#searchForm").submit(function(e) {

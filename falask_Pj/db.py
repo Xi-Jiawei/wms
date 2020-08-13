@@ -1990,13 +1990,26 @@ def select_receivableReportByCode(clientCode,month):
 
 # xijiawei
 # 查询所有订单
-def select_receivableReportGroupByProductTypeByCode(supplierCode,month):
+def select_receivableReportGroupByProductTypeByCode(clientCode,month):
     try:
         lock.acquire()
         # （旧）
-        # cur.execute("select r.productType, r.addDeliveryNum, p.price, r.addReceivable, r.remark from receivableReportGroupByProductType r,productInfo p where clientCode='%s' and month='%s' and r.productType=p.productType;" % (supplierCode, month))
+        # cur.execute("select r.productType, r.addDeliveryNum, p.price, r.addReceivable, r.remark from receivableReportGroupByProductType r,productInfo p where clientCode='%s' and month='%s' and r.productType=p.productType;" % (clientCode, month))
         # （新）
-        cur.execute("select clientCode, productType, deliveredNum, price, addReceivable, remark from receivableReportGroupByProductType where clientCode='%s' and month='%s';" % (supplierCode, month))
+        cur.execute("select clientCode, productType, deliveredNum, price, addReceivable, remark from receivableReportGroupByProductType where clientCode='%s' and month='%s';" % (clientCode, month))
+        result = cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_all_receivableReportGroupByProductType(month):
+    try:
+        lock.acquire()
+        cur.execute("select clientCode, productType, deliveredNum, price, addReceivable, remark from receivableReportGroupByProductType where month='%s';" % (month))
         result = cur.fetchall()
         lock.release()
         return result
@@ -2145,6 +2158,19 @@ def select_payableReportGroupByMaterialCodeByCode(supplierCode,month):
     try:
         lock.acquire()
         cur.execute("select payableReportGroupByMaterialCode.supplierCode,payableReportGroupByMaterialCode.materialCode,materialType,materialNum,price,payable,payableReportGroupByMaterialCode.remark from payableReportGroupByMaterialCode,materialInfo where payableReportGroupByMaterialCode.supplierCode='%s' and month='%s' and payableReportGroupByMaterialCode.materialCode=materialInfo.materialCode;" % (supplierCode, month))
+        result = cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_all_payableReportGroupByMaterialCode(month):
+    try:
+        lock.acquire()
+        cur.execute("select payableReportGroupByMaterialCode.supplierCode,payableReportGroupByMaterialCode.materialCode,materialType,materialNum,price,payable,payableReportGroupByMaterialCode.remark from payableReportGroupByMaterialCode,materialInfo where month='%s' and payableReportGroupByMaterialCode.materialCode=materialInfo.materialCode;" % (month))
         result = cur.fetchall()
         lock.release()
         return result

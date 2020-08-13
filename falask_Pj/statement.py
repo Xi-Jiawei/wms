@@ -84,7 +84,23 @@ def statement_receivable():
         elif request.method=="GET":
             form = ProductForm()
             month = datetime.now().strftime('%Y-%m')
-            return render_template('statement_receivable_detail.html', form=form, username=username, month=month)
+            thread = myThread(target=select_all_clients, args=())
+            clients = thread.get_result()
+            remainReceivableSum = 0
+            addReceivableSum = 0
+            receivableSum = 0
+            receiptSum = 0
+            for client in clients:
+                thread = myThread(target=select_receivableReportByCode, args=(client[0], month,))
+                receivable = thread.get_result()
+                remainReceivableSum += receivable[0][1]
+                addReceivableSum += receivable[0][2]
+                receivableSum += receivable[0][3]
+                receiptSum += receivable[0][4]
+            receivable=[remainReceivableSum,addReceivableSum,receivableSum,receiptSum]
+            thread = myThread(target=select_all_receivableReportGroupByProductType, args=(month,)) # productType, addDeliveryNum, price, addReceivable, receivable, remark
+            receivablesOfProduct = thread.get_result()
+            return render_template('statement_receivable_detail.html', form=form, username=username, month=month, receivablesOfProduct=receivablesOfProduct, receivable=receivable)
     else:
         return render_template('access_fail.html')
 
@@ -106,7 +122,23 @@ def statement_payable():
             username = session['username']
             form = ProductForm()
             month = datetime.now().strftime('%Y-%m')
-            return render_template('statement_payable.html', form=form, username=username, month=month)
+            thread = myThread(target=select_all_suppliers, args=())
+            suppliers = thread.get_result()
+            remainPayableSum = 0
+            addPayableSum = 0
+            payableSum = 0
+            paymentSum = 0
+            for supplier in suppliers:
+                thread = myThread(target=select_payableReportByCode, args=(supplier[0], month,))
+                payable = thread.get_result()
+                remainPayableSum += payable[0][1]
+                addPayableSum += payable[0][2]
+                payableSum += payable[0][3]
+                paymentSum += payable[0][4]
+            payable=[remainPayableSum,addPayableSum,payableSum,paymentSum]
+            thread = myThread(target=select_all_payableReportGroupByMaterialCode, args=(month,)) # productType, addDeliveryNum, price, addReceivable, receivable, remark
+            payablesOfMaterial = thread.get_result()
+            return render_template('statement_payable.html', form=form, username=username, month=month, payablesOfMaterial=payablesOfMaterial, payable=payable)
     else:
         return render_template('access_fail.html')
 
