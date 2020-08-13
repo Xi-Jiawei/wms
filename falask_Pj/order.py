@@ -69,13 +69,13 @@ def edit_order(orderCode):
             # 插入新订单
             for product in productOfOrderArr:
                 productType = product[0]
-                uint = product[1]
+                unit = product[1]
                 deliveryNum = product[2]
                 price = product[3]
                 receivable = product[4]
                 deliveryDate = product[5]
                 remark = product[6]
-                myThread(target=insert_order, args=(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, uint, price, receivable, remark, entryTime, entryClerk,))
+                myThread(target=insert_order, args=(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, unit, price, receivable, remark, entryTime, entryClerk,))
             return jsonify({'ok': True})
         elif request.method=="GET":
             thread = myThread(target=select_orderByCode, args=(orderCode,)) # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, deliveredNum, uint, price, receivable, remark
@@ -130,7 +130,7 @@ def deliver(orderCode):
                 productInfo = thread.get_result()
                 beforeDeliveryNum = productInfo[0][0]
                 inventoryNum = productInfo[0][1]
-                myThread(target=insert_delivery, args=(deliveryCode, orderCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, client, client, address, contact, telephone, entryTime, entryClerk,))
+                myThread(target=insert_delivery, args=(deliveryCode, orderCode, productType, beforeDeliveryNum, sendDate, sendNum, price, remark, client, client, address, contact, telephone, entryTime, entryClerk,))
 
                 # 返回刷新数据
                 productDeliverRecord=[]
@@ -259,7 +259,7 @@ def deliverGroupByProductType(clientCode):
                 beforeDeliveryNum = productInfo[0][0]
                 beforeDeliveredNum = productInfo[0][1]
                 beforeInventoryNum = productInfo[0][2]
-                myThread(target=insert_deliveryGroupByProductType, args=(deliveryCode, clientCode, productType, beforeDeliveryNum, sendDate, sendNum, remark, client, address, contact, telephone, entryTime, entryClerk,))
+                myThread(target=insert_deliveryGroupByProductType, args=(deliveryCode, clientCode, productType, beforeDeliveryNum, sendDate, sendNum, price, remark, client, address, contact, telephone, entryTime, entryClerk,))
 
                 # 返回刷新数据
                 productDeliverRecord = []
@@ -277,6 +277,8 @@ def deliverGroupByProductType(clientCode):
         elif request.method=="GET":
             username = session['username']
             form = ProductForm()
+            nowTime = datetime.now().strftime('%Y-%m-%d')
+            month = nowTime[0:7]
             deliveryCode = "D" + datetime.now().strftime('%Y%m%d%H%M%S%f')[0:16]  # 使用时间戳生成唯一代号
             thread = myThread(target=select_clientByCode, args=(clientCode,))
             clientInfo = thread.get_result()
@@ -285,20 +287,31 @@ def deliverGroupByProductType(clientCode):
             products = []
             for i in productOfOrderArr:
                 product = []
+                # product.append(i[0])  # productType
+                # product.append(i[1])  # remainDeliveryNum
+                # product.append(i[2])  # addDeliveryNum
+                # product.append(i[3])  # deliveryNum
+                # product.append(i[4])  # deliveredNum
+                # product.append(i[5]) # inventoryNum
+                # product.append(i[6])  # uint
+                # product.append(i[7])  # price
+
+                thread = myThread(target=select_receivableReportGroupByProductTypeByClientCodeAndProductType, args=(clientCode, i[0], month,))
+                result = thread.get_result()
                 product.append(i[0])  # productType
-                product.append(i[1])  # remainDeliveryNum
-                product.append(i[2])  # addDeliveryNum
-                product.append(i[3])  # deliveryNum
-                product.append(i[4])  # deliveredNum
-                product.append(i[5]) # inventoryNum
-                product.append(i[6])  # uint
-                product.append(i[7])  # price
-                thread = myThread(target=select_deliveryGroupByProductTypeByClientCodeAndProductType, args=(clientCode, i[0],))  # deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark
+                product.append(result[0][0])  # remainDeliveryNum
+                product.append(result[0][1])  # addDeliveryNum
+                product.append(result[0][2])  # deliveryNum
+                product.append(result[0][3])  # deliveredNum
+                product.append(i[3]) # inventoryNum
+                product.append(i[1])  # uint
+                product.append(i[2])  # price
+
+                thread = myThread(target=select_deliveryGroupByProductTypeByClientCodeAndProductType, args=(clientCode, i[0], month,))  # deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark
                 deliverRecord = thread.get_result()
                 product.append(deliverRecord)
                 # productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark]
                 products.append(product)
-            nowTime = datetime.now().strftime('%Y-%m-%d')
             return jsonify({'ok': True, 'deliveryCode': deliveryCode, 'client': clientInfo, 'productOfOrderArr': products, 'nowTime': nowTime, 'entryClerk': username})
     else:
         return render_template('access_fail.html')
@@ -313,6 +326,55 @@ def print_deliveryGroupByProductType(deliveryCode):
             thread = myThread(target=select_deliveryGroupByProductTypeByCode, args=(deliveryCode,))  # client, address, contact, telephone, sendDate, productType, uint, price, sendNum, delivery.remark, delivery.entryClerk
             deliverRecord = thread.get_result()
             return jsonify({'ok': True,'productOfDeliverArr':deliverRecord})
+    else:
+        return jsonify({'ok': False})
+
+# xijiawei
+# 查询客户出货记录
+@order_app.route('/deliveryGroupByProductTypeGroupByDeliveryCode/<clientCode>', methods=['GET','POST'])
+def deliveryGroupByProductTypeGroupByDeliveryCode(clientCode):
+    if session.get('username'):
+        username = session['username']
+        if request.method=="GET":
+            username = session['username']
+            form = ProductForm()
+            thread = myThread(target=select_clientByCode, args=(clientCode,))
+            clientInfo = thread.get_result()
+            thread = myThread(target=select_deliveryGroupByProductTypeByClientCode, args=(clientCode,))
+            deliveryRecordOfOrderArr = thread.get_result()
+            deliveries = []
+            delivery = []
+            product = []
+            deliveryCode = ''
+            for i in deliveryRecordOfOrderArr:
+                if not deliveryCode==i[0]:
+                    deliveryCode = i[0]
+                    delivery = []
+                    product = []
+                    delivery.append(i[0])
+                    delivery.append(i[1])
+                    product.append([i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9]])
+                    delivery.append(product)
+                    deliveries.append(delivery)
+                else:
+                    product.append([i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9]])
+            nowTime = datetime.now().strftime('%Y-%m-%d')
+            return jsonify({'ok': True, 'client': clientInfo, 'deliveries': deliveries, 'nowTime': nowTime, 'entryClerk': username})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 删除订单
+@order_app.route('/delete_deliveryGroupByProductTypes', methods=['POST'])
+def delete_deliveryGroupByProductTypes():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            deliveryCodeArr = data['deliveryCodeArr']  # 不要写成orderCode=request.data["orderCode"]
+            for deliveryCode in deliveryCodeArr:
+                myThread(target=delete_deliveryGroupByProductType, args=(deliveryCode,))
+            return jsonify({'ok': True})
     else:
         return jsonify({'ok': False})
 

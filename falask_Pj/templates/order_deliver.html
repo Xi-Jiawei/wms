@@ -96,14 +96,40 @@
             <div class="row">
                 <div class="col-md-12">
 
+
+                    <div id="deliverRecordDialog" class="card" style="overflow: hidden;display: none">
+                        <button type="button" class="close" onclick="deliverRecordDialogClose()">&times;</button>
+                        <div class="card-body">
+                            <table id="deliverRecord" class="table table-striped table-bordered">
+                                <caption><h3 id="deliverRecordHeader">订单<span style="color: #8a6d3b"></span>出货记录</h3></caption>
+                                <thead>
+                                <tr>
+                                    <td>出货单号</td>
+                                    <td>出货日期</td>
+                                    <td>成品型号</td>
+                                    <td>单位</td>
+                                    <td>出货数量</td>
+                                    <td>单价</td>
+                                    <td>金额</td>
+                                    <td>备注</td>
+                                    <td>打印</td>
+                                    <td>编辑</td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!--订单出货窗口-->
                     <div id="deliverDialog" class="card" style="overflow: hidden;display: none">
                         <input style="display: none" id="clientCode"/>
 
-                        <button type="button" class="close" onclick="dlgClose()">&times;</button>
+                        <button type="button" class="close" onclick="deliverDialogClose()">&times;</button>
                         <div class="card-body">
-                            <table id="deliverRecord" class="table table-striped table-bordered">
-                                <caption><h3 id="deliverRecordHeader">订单<span style="color: #8a6d3b"></span>出货记录</h3></caption>
+                            <table id="deliverOrder" class="table table-striped table-bordered">
+                                <caption><h3 id="deliverOrderHeader">订单<span style="color: #8a6d3b"></span></h3></caption>
                                 <thead>
                                 <tr>
                                     <td width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAllProduct()"/></td>
@@ -118,7 +144,6 @@
                                     <td>出货前结余应出货</td>
                                     <td>剩余应出货</td>
                                     <td>备注</td>
-                                    <td>打印</td>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -127,19 +152,22 @@
 
                             <form id="deliverForm" action="#" method="post" novalidate="novalidate">
 
-                                <div class="col-xs-12" style="position:relative;width: 200px;float:right;right:16px;top:10px;">
-                                    <div class="col-xs-12" style="position:absolute;width: 100px;right: 166px;">
-                                        <button type="button" class="btn btn-default" style="width: 100px" onclick="deliverPost()">确认出货</button>
+                                <div class="col-xs-12" style="position:relative;width: 870px; left:26px; top:10px;">
+                                    <div class="col-xs-12" style="width: 20%;padding-left: 3%;">
+                                        <button type="button" class="btn btn-default" style="width: 100%" onclick="deliverRecord()">出货记录</button>
                                     </div>
-                                    <div class="col-xs-12" style="position:absolute;width: 100px;right: 46px;">
-                                        <button type="button" class="btn btn-default" style="width: 100px" onclick="deliverPrint()">打印出货单</button>
+                                    <div class="col-xs-12" style="width: 60%;padding-left: 43%;">
+                                        <button type="button" class="btn btn-default" style="width: 100%" onclick="deliverPost()">确认出货</button>
+                                    </div>
+                                    <div class="col-xs-12" style="width: 20%;padding-left: 3%;">
+                                        <button type="button" class="btn btn-default" style="width: 100%" onclick="deliverPrint()">打印出货单</button>
                                     </div>
                                 </div>
 
                                 <!-- 发票 -->
                                 <div id="bill_frame" style="position: relative;width: 870px; height: 690px; background-color: #f5f5f5; opacity:1; left:26px; margin-left:26px; top:60px; margin-top:0; bottom: 10px;margin-bottom: 10px;box-shadow: darkgrey 1px 1px 10px 1px;">
                                     <div class="bill_box">
-                                        <div style="width:320px; text-align: center; left:230px;margin-left:230px;top:0;margin-top: 0;">
+                                        <div style="width:400px; text-align: center; left:200px;margin-left:200px;top:0;margin-top: 0;">
                                             <h3 id="billHeader" contenteditable="true" style="font-size: 24px;">嘉兴市永琪电子科技有限公司</h3>
                                         </div>
                                         <div  style="width:139px; text-align: center; left:312px;margin-left:312px;top:10px;margin-top: 10px;">
@@ -287,7 +315,7 @@
     });
     var deliverTableRowsLength;
     function deliverGet(clientCode){
-        $('#deliverRecordHeader').val("订单\""+clientCode+"\"出货记录");
+        $('#deliverOrderHeader').val("订单\""+clientCode+"\"出货记录");
         $('#clientCode').val(clientCode);
         deliverTableRowsLength=0;
 
@@ -305,7 +333,7 @@
                     for(var i=0;i<productOfOrderArr.length;i++){
                         var rowTemplate;
                         if(productOfOrderArr[i][8].length) {
-                            rowTemplate = "<tr><td rowspan=" + productOfOrderArr[i][8].length + "><input class='deliverRecordCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            rowTemplate = "<tr><td rowspan=" + productOfOrderArr[i][8].length + "><input class='deliverOrderCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                                 "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][0] + "</td>\n" +
                                 "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][1] + "</td>\n" +
                                 "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][2] + "</td>\n" +
@@ -318,7 +346,6 @@
                                 "<td>" + productOfOrderArr[i][8][0][3] + "</td>\n" +
                                 "<td>" + productOfOrderArr[i][8][0][4] + "</td>\n" +
                                 "<td>" + productOfOrderArr[i][8][0][5] + "</td>\n" +
-                                "<td><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + productOfOrderArr[i][0] + "\",\"" + productOfOrderArr[i][8][0][0] + "\")'> 打印 </a></td>\n" +
                                 "<td rowspan=" + productOfOrderArr[i][8].length + " style='display: none'>" + productOfOrderArr[i][6] + "</td>\n" +
                                 "<td rowspan=" + productOfOrderArr[i][8].length + " style='display: none'>" + productOfOrderArr[i][7] + "</td></tr>";
                             tableHtml += rowTemplate;
@@ -328,12 +355,11 @@
                                     "<td>" + productOfOrderArr[i][8][j][2] + "</td>\n" +
                                     "<td>" + productOfOrderArr[i][8][j][3] + "</td>\n" +
                                     "<td>" + productOfOrderArr[i][8][j][4] + "</td>\n" +
-                                    "<td>" + productOfOrderArr[i][8][j][5] + "</td>\n" +
-                                    "<td><a onclick='deliverBillPrint(\""+ clientCode +"\",\""+productOfOrderArr[i][0]+"\",\""+ productOfOrderArr[i][8][j][0] +"\")'> 打印 </a></td></tr>";
+                                    "<td>" + productOfOrderArr[i][8][j][5] + "</td></tr>";
                                 tableHtml += rowTemplate;
                             }
                         } else {
-                            rowTemplate = "<tr><td rowspan=1><input class='deliverRecordCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            rowTemplate = "<tr><td rowspan=1><input class='deliverOrderCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                                 "<td rowspan=1>" + productOfOrderArr[i][0] + "</td>\n" +
                                 "<td rowspan=1>" + productOfOrderArr[i][1] + "</td>\n" +
                                 "<td rowspan=1>" + productOfOrderArr[i][2] + "</td>\n" +
@@ -346,13 +372,12 @@
                                 "<td>-</td>\n" +
                                 "<td>-</td>\n" +
                                 "<td>-</td>\n" +
-                                "<td>-</td>\n" +
                                 "<td rowspan=1 style='display: none'>" + productOfOrderArr[i][6] + "</td>\n" +
                                 "<td rowspan=1 style='display: none'>" + productOfOrderArr[i][7] + "</td></tr>";
                             tableHtml += rowTemplate;
                         }
                     }
-                    $("#deliverRecord tbody").html(tableHtml);
+                    $("#deliverOrder tbody").html(tableHtml);
 
                     $('#deliver tbody').html(tableTbodyHtml);
 
@@ -376,13 +401,12 @@
         $('#mainDialog').hide();
         $('#deliverDialog').show();
     }
-    function dlgClose(){
-        $('#orderEditDialog').hide();
+    function deliverDialogClose(){
         $('#deliverDialog').hide();
         $('#mainDialog').show();
     }
     /*勾选触发事件，并更新delever表格*/
-    $("#deliverRecord").on("change",".deliverRecordCheckbox", function () {
+    $("#deliverOrder").on("change",".deliverOrderCheckbox", function () {
         console.log("勾选");
         console.log(this);
         console.log(this.parentElement.parentElement);
@@ -390,23 +414,23 @@
         console.log(this.parentElement.parentElement.children[1].textContent);
         var productType=this.parentElement.parentElement.children[1].textContent;
 
-        // deliverRecord.row.cells: checkbox, productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark], "打印", uint, price
+        // deliverOrder.row.cells: checkbox, productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark], "打印", uint, price
         console.log(document.getElementById("deliver"));
         var table=document.getElementById("deliver");
         if(this.checked){
             if(deliverTableRowsLength<10){
                 console.log(table.rows[deliverTableRowsLength+1]);
                 table.rows[deliverTableRowsLength+1].cells[0].textContent=this.parentElement.parentElement.children[1].textContent;
-                table.rows[deliverTableRowsLength+1].cells[1].textContent=this.parentElement.parentElement.children[14].textContent;
-                table.rows[deliverTableRowsLength+1].cells[3].textContent=this.parentElement.parentElement.children[15].textContent;
+                table.rows[deliverTableRowsLength+1].cells[1].textContent=this.parentElement.parentElement.children[13].textContent;
+                table.rows[deliverTableRowsLength+1].cells[3].textContent=this.parentElement.parentElement.children[14].textContent;
 
                 table.rows[deliverTableRowsLength+1].cells[2].setAttribute("contenteditable","true");
                 table.rows[deliverTableRowsLength+1].cells[5].setAttribute("contenteditable","true");
             }else {
                 var rowHtml='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[1].textContent+'</td>\n' +
-                    '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[14].textContent+'</td>\n' +
+                    '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[13].textContent+'</td>\n' +
                     '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true"></td>\n' +
-                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[15].textContent+'</td>\n' +
+                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[14].textContent+'</td>\n' +
                     '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
                     '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true"></td></tr>';
                 //方式一：此方式添加行会出问题，行会添加到tfoot
@@ -479,17 +503,17 @@
                             //更新delever表格
                             if(deliverTableRowsLength<10){
                                 deliverTable.rows[deliverTableRowsLength+1].cells[0].textContent=table.rows[i].cells[1].textContent;
-                                deliverTable.rows[deliverTableRowsLength+1].cells[1].textContent=table.rows[i].cells[14].textContent;
-                                deliverTable.rows[deliverTableRowsLength+1].cells[3].textContent=table.rows[i].cells[15].textContent;
+                                deliverTable.rows[deliverTableRowsLength+1].cells[1].textContent=table.rows[i].cells[13].textContent;
+                                deliverTable.rows[deliverTableRowsLength+1].cells[3].textContent=table.rows[i].cells[14].textContent;
 
                                 deliverTable.rows[deliverTableRowsLength+1].cells[2].setAttribute("contenteditable","true");
                                 deliverTable.rows[deliverTableRowsLength+1].cells[5].setAttribute("contenteditable","true");
                             }else {
                                 var row=deliverTable.insertRow(deliverTableRowsLength+1);
                                 row.outerHTML='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+table.rows[i].cells[1].textContent+'</td>\n' +
-                                    '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+table.rows[i].cells[14].textContent+'</td>\n' +
+                                    '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+table.rows[i].cells[13].textContent+'</td>\n' +
                                     '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true"></td>\n' +
-                                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+table.rows[i].cells[15].textContent+'</td>\n' +
+                                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+table.rows[i].cells[14].textContent+'</td>\n' +
                                     '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
                                     '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true"></td></tr>';
                             }
@@ -585,7 +609,7 @@
                 deliverProductArr[i][0] = tbody.rows[i].cells[0].innerHTML;
                 deliverProductArr[i][1] = tbody.rows[i].cells[1].innerHTML;
                 deliverProductArr[i][2] = parseInt(tbody.rows[i].cells[2].innerHTML);
-                deliverProductArr[i][3] = parseFloat(tbody.rows[i].cells[3].innerHTML).toFixed(2);
+                deliverProductArr[i][3] = parseFloat(tbody.rows[i].cells[3].innerHTML);
                 //deliverProductArr[i][4]=parseFloat(tbody.rows[i].cells[4].innerHTML);
                 deliverProductArr[i][4] = tbody.rows[i].cells[5].innerHTML;
             }
@@ -612,7 +636,7 @@
 
                     if (callback['ok']) {
                         var productOfOrderArr = callback['productOfOrderArr']; // productType, deliveredNum, inventoryNum, deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark
-                        var table = document.getElementById("deliverRecord"); // row.cells: checkbox, productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark], "打印", uint, price
+                        var table = document.getElementById("deliverOrder"); // row.cells: checkbox, productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark], "打印", uint, price
                         for (i = 1; i < table.rows.length; i++) {
                             var checkbox = table.rows[i].cells[0].firstChild;
                             if (checkbox.type = "CHECKBOX") {
@@ -639,7 +663,6 @@
                                                 table.rows[i].cells[10].innerHTML = productOfOrderArr[j][6];
                                                 table.rows[i].cells[11].innerHTML = productOfOrderArr[j][7];
                                                 table.rows[i].cells[12].innerHTML = productOfOrderArr[j][8];
-                                                table.rows[i].cells[13].innerHTML = "<td><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + productType + "\",\"" + productOfOrderArr[j][3] + "\")'> 打印 </a></td>";
                                             } else {
                                                 console.log("rows.length: " + table.rows.length);
                                                 console.log("i: " + i + "; rowspan: " + rowspan);
@@ -649,8 +672,7 @@
                                                     "<td>" + productOfOrderArr[j][5] + "</td>\n" +
                                                     "<td>" + productOfOrderArr[j][6] + "</td>\n" +
                                                     "<td>" + productOfOrderArr[j][7] + "</td>\n" +
-                                                    "<td>" + productOfOrderArr[j][8] + "</td>\n" +
-                                                    "<td><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + productType + "\",\"" + productOfOrderArr[j][3] + "\")'> 打印 </a></td></tr>";
+                                                    "<td>" + productOfOrderArr[j][8] + "</td></tr>";
 
                                                 console.log("rowspan + 1: " + (rowspan + 1));
                                                 table.rows[i].cells[0].setAttribute("rowspan", rowspan + 1);
@@ -660,8 +682,8 @@
                                                 table.rows[i].cells[4].setAttribute("rowspan", rowspan + 1);
                                                 table.rows[i].cells[5].setAttribute("rowspan", rowspan + 1);
                                                 table.rows[i].cells[6].setAttribute("rowspan", rowspan + 1);
+                                                table.rows[i].cells[13].setAttribute("rowspan", rowspan + 1);
                                                 table.rows[i].cells[14].setAttribute("rowspan", rowspan + 1);
-                                                table.rows[i].cells[15].setAttribute("rowspan", rowspan + 1);
                                             }
                                             console.log(table);
                                             break;
@@ -861,6 +883,172 @@
             }
         });
     }
+    function deliverRecord(){
+        var clientCode=$("#clientCode").val();
+        $('#deliverRecordHeader').val("订单\""+clientCode+"\"出货记录");
+
+        $.ajax({
+            url: "/deliveryGroupByProductTypeGroupByDeliveryCode/"+clientCode,
+            type: "GET",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var client=callback['client'];
+                    var deliveries=callback['deliveries']; // productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark]
+                    var tableHtml = "";
+                    for(var i=0;i<deliveries.length;i++){
+                        var rowTemplate;
+                        rowTemplate = "<tr><td rowspan=" + deliveries[i][2].length + ">" + deliveries[i][0] + "</td>\n" +
+                            "<td rowspan=" + deliveries[i][2].length + ">" + deliveries[i][1] + "</td>\n" +
+                            "<td>" + deliveries[i][2][0][0] + "</td>\n" +
+                            "<td>" + deliveries[i][2][0][1] + "</td>\n" +
+                            "<td>" + deliveries[i][2][0][2] + "</td>\n" +
+                            "<td>" + deliveries[i][2][0][3] + "</td>\n" +
+                            "<td>" + deliveries[i][2][0][4] + "</td>\n" +
+                            "<td>" + deliveries[i][2][0][7] + "</td>\n" +
+                            "<td rowspan=" + deliveries[i][2].length + "><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + deliveries[i][2][0][0] + "\",\"" + deliveries[i][0] + "\")'> 打印 </a></td>\n" +
+                            "<td rowspan=" + deliveries[i][2].length + "><a onclick='deliverRecordDelete(\"" + deliveries[i][0] + "\")'> 删除 </a></td></tr>";
+                        tableHtml += rowTemplate;
+                        for(var j=1;j<deliveries[i][2].length;j++) {
+                            rowTemplate = "<tr><td>" + deliveries[i][2][j][0] + "</td>\n" +
+                                "<td>" + deliveries[i][2][j][1] + "</td>\n" +
+                                "<td>" + deliveries[i][2][j][2] + "</td>\n" +
+                                "<td>" + deliveries[i][2][j][3] + "</td>\n" +
+                                "<td>" + deliveries[i][2][j][4] + "</td>\n" +
+                                "<td>" + deliveries[i][2][j][7] + "</td></tr>";
+                            tableHtml += rowTemplate;
+                        }
+                    }
+                    $("#deliverRecord tbody").html(tableHtml);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+
+        $('#deliverDialog').hide();
+        $('#deliverRecordDialog').show();
+    }
+    function deliverRecordDialogClose(){
+        var clientCode=$('#clientCode').val();
+        deliverTableRowsLength=0;
+
+        $.ajax({
+            url: "/deliverGroupByProductType/"+clientCode,
+            type: "GET",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var client=callback['client'];
+                    var productOfOrderArr=callback['productOfOrderArr']; // productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark]
+                    var tableHtml = "";
+                    for(var i=0;i<productOfOrderArr.length;i++){
+                        var rowTemplate;
+                        if(productOfOrderArr[i][8].length) {
+                            rowTemplate = "<tr><td rowspan=" + productOfOrderArr[i][8].length + "><input class='deliverOrderCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][0] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][1] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][2] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][3] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][4] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + ">" + productOfOrderArr[i][5] + "</td>\n" +
+                                "<td style='display: none'>" + productOfOrderArr[i][8][0][0] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][8][0][1] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][8][0][2] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][8][0][3] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][8][0][4] + "</td>\n" +
+                                "<td>" + productOfOrderArr[i][8][0][5] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + " style='display: none'>" + productOfOrderArr[i][6] + "</td>\n" +
+                                "<td rowspan=" + productOfOrderArr[i][8].length + " style='display: none'>" + productOfOrderArr[i][7] + "</td></tr>";
+                            tableHtml += rowTemplate;
+                            for(var j=1;j<productOfOrderArr[i][8].length;j++) {
+                                rowTemplate = "<tr><td style='display: none'>" + productOfOrderArr[i][8][j][0] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][8][j][1] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][8][j][2] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][8][j][3] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][8][j][4] + "</td>\n" +
+                                    "<td>" + productOfOrderArr[i][8][j][5] + "</td></tr>";
+                                tableHtml += rowTemplate;
+                            }
+                        } else {
+                            rowTemplate = "<tr><td rowspan=1><input class='deliverOrderCheckbox' type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][0] + "</td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][1] + "</td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][2] + "</td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][3] + "</td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][4] + "</td>\n" +
+                                "<td rowspan=1>" + productOfOrderArr[i][5] + "</td>\n" +
+                                "<td style='display: none'>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td>-</td>\n" +
+                                "<td rowspan=1 style='display: none'>" + productOfOrderArr[i][6] + "</td>\n" +
+                                "<td rowspan=1 style='display: none'>" + productOfOrderArr[i][7] + "</td></tr>";
+                            tableHtml += rowTemplate;
+                        }
+                    }
+                    $("#deliverOrder tbody").html(tableHtml);
+                    $('#deliver tbody').html(tableTbodyHtml);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+
+        $('#deliverRecordDialog').hide();
+        $('#deliverDialog').show();
+    }
+    function deliverRecordDelete(deliveryCode){
+        var rowindex=parseInt(event.currentTarget.parentElement.parentElement.rowIndex);
+        var rowspan=parseInt(event.currentTarget.parentElement.getAttribute("rowspan"));
+        $('#rowindex').val(rowindex);
+
+        if(confirm("确定删除该订单?")){
+            var deliveryCodeArr=new Array();
+            deliveryCodeArr[0]=deliveryCode;
+            var data={"deliveryCodeArr":deliveryCodeArr}
+
+            $.ajax({
+                url: "/delete_deliveryGroupByProductTypes",
+                type: "POST",
+                dataType: "json",
+                //data:$(this).serialize(),
+                data:JSON.stringify(data),
+                contentType: 'application/json; charset=UTF-8',
+                success: function (callback) {
+                    console.log(callback);
+                    //alert(callback['ok']);//不要用callback.valueOf('ok')
+                    if(callback['ok']){
+                        var table = document.getElementById("deliverRecord");
+                        console.log("rowindex: "+rowindex);
+                        console.log("rowspan: "+rowspan);
+                        for(var i=rowspan-1;i>=0;i--)
+                            table.deleteRow(rowindex + i);
+                    }
+                },
+                error: function(xhr, textStatus, errorThrown) {
+                    console.log(xhr.status);// 状态码
+                    console.log(xhr.readyState);// 状态
+                    console.log(textStatus);// 错误信息
+                    alert('返回值错误');
+                }
+            });
+        }
+    };
 </script>
 
 

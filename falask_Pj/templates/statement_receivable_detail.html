@@ -133,6 +133,7 @@
 
                             <div class="row" style="position:relative;width:100%;">
                                 <table id="receivableTable" class="table table-striped table-bordered">
+                                    <!--（旧）
                                     <thead>
                                     <tr>
                                         <th>成品型号</th>
@@ -145,33 +146,63 @@
                                         <th>未收余款</th>
                                         <th>备注</th>
                                     </tr>
+                                    </thead>-->
+                                    <!--（新）-->
+                                    <thead>
+                                    <tr>
+                                        <th>交易客户</th>
+                                        <th>成品型号</th>
+                                        <th>本月已发货</th>
+                                        <th>单价</th>
+                                        <th>本月新增应收款</th>
+                                        <th>上月结余应收款</th>
+                                        <th>本月应收款</th>
+                                        <th>本月实收款</th>
+                                        <th>未收余款</th>
+                                        <th>备注</th>
+                                    </tr>
                                     </thead>
                                     <tbody>
-                                    {% for i in receivable %}
+                                    {% for i in receivablesOfProduct %}
                                         <tr>
                                             <td>{{ i[0] }}</td>
                                             <td>{{ i[1] }}</td>
                                             <td>{{ i[2] }}</td>
                                             <td>{{ i[3] }}</td>
                                             <td>{{ i[4] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
                                             <td>{{ i[5] }}</td>
-                                            <td>{{ i[6] }}</td>
-                                            <td>{{ i[7] }}</td>
-                                            <td>{{ i[8] }}</td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
                                     <tfoot>
                                     <tr>
+                                        {% if receivable %}
                                         <td>合计</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
+                                        <td>{{ receivable[0][2] }}</td>
+                                        <td>{{ receivable[0][1] }}</td>
+                                        <td>{{ receivable[0][3] }}</td>
+                                        <td>{{ receivable[0][4] }}</td>
+                                        <td>{{ receivable[0][3]-receivable[0][4] }}</td>
+                                        <td>{{ receivable[0][5] }}</td>
+                                        {% else %}
+                                        <td>合计</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>-</td>
+                                        <td>0</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
                                         <td>-</td>
+                                        {% endif %}
                                     </tr>
                                     </tfoot>
                                 </table>
@@ -218,10 +249,10 @@
             var length = table.rows({filter: 'applied'}).nodes().length;
             var payableSum=0;
             for (var i = 0; i < length; i++) {
-                payableSum += parseFloat(data[i][3]);
+                payableSum += parseFloat(data[i][4]);
             }
 
-            $("#payableTable tfoot tr td").eq(3).text(payableSum.toFixed(2));
+            $("#payableTable tfoot tr td").eq(4).text(payableSum.toFixed(2));
         });
     });
     $("#searchForm").submit(function(e) {
@@ -262,22 +293,23 @@
                             receivablesOfProduct[i][1],
                             receivablesOfProduct[i][2],
                             receivablesOfProduct[i][3],
-                            '-',
-                            '-',
-                            '-',
-                            '-',
                             receivablesOfProduct[i][4],
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            receivablesOfProduct[i][5],
                         ]);
                     }
                     table.draw();
 
                     var tfootRow=$('#receivableTable tfoot tr td');
-                    tfootRow.eq(3).text(receivable[0][2]);
-                    tfootRow.eq(4).text(receivable[0][1]);
-                    tfootRow.eq(5).text(receivable[0][3]);
-                    tfootRow.eq(6).text(receivable[0][4]);
-                    tfootRow.eq(7).text(receivable[0][3]-receivable[0][4]);
-                    tfootRow.eq(8).text(receivable[0][5]);
+                    tfootRow.eq(4).text(receivable[0][2]);
+                    tfootRow.eq(5).text(receivable[0][1]);
+                    tfootRow.eq(6).text(receivable[0][3]);
+                    tfootRow.eq(7).text(receivable[0][4]);
+                    tfootRow.eq(8).text(receivable[0][3]-receivable[0][4]);
+                    tfootRow.eq(9).text(receivable[0][5]);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
