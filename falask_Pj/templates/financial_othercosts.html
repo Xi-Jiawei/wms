@@ -341,22 +341,45 @@
                                                     <th style="width: 60px">编辑</th>
                                                 </tr>
                                                 </thead>
+                                                <!--（删减）
                                                 <tbody>
                                                 {% if supplementarySuppliers %}
-                                                {% for i in supplementarySuppliers %}
-                                                <tr>
-                                                    <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
-                                                    <td>{{ i[0] }}</td>
-                                                    <td>{{ i[1] }}</td>
-                                                    <td>{{ i[2] }}</td>
-                                                    <td>{{ i[3] }}</td>
-                                                    <td>{{ i[4] }}</td>
-                                                    <td>{{ i[3]-i[4] }}</td>
-                                                    <td>{{ i[5] }}</td>
-                                                    <td><a data-toggle="modal" data-target="#paymentModal" onclick='paymentModal("{{ i[0] }}","{{ i[3]-i[4] }}")'> 付款 </a></td>
-                                                    <th style="width: 60px"><a onclick='editSupplementary("{{ i[0] }}")'> 编辑 </a><a onclick='deleteSupplementary("{{ i[0] }}")'> 删除 </a></th>
-                                                </tr>
-                                                {% endfor %}
+                                                    {% for i in supplementarySuppliers %}
+                                                        <tr>
+                                                            <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
+                                                            <td>{{ i[0] }}</td>
+                                                            <td>{{ i[1] }}</td>
+                                                            <td>{{ i[2] }}</td>
+                                                            <td>{{ i[3] }}</td>
+                                                            <td>{{ i[4] }}</td>
+                                                            <td>{{ i[3]-i[4] }}</td>
+                                                            <td>{{ i[5] }}</td>
+                                                            <td><a data-toggle="modal" data-target="#paymentModal" onclick='paymentModal("{{ i[0] }}","{{ i[3]-i[4] }}")'> 付款 </a></td>
+                                                            <th style="width: 60px"><a onclick='editSupplementary("{{ i[0] }}")'> 编辑 </a><a onclick='deleteSupplementary("{{ i[0] }}")'> 删除 </a></th>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+                                                {% if supplementarySuppliers.__len__()==0 %}
+                                                    <tr><td colspan='9' style='text-align: center'>No data available in table</td></tr>
+                                                {% endif %}
+                                                </tbody>-->
+                                                <!--（删减）-->
+                                                <tbody>
+                                                {% if supplementarySuppliers %}
+                                                    {% for i in supplementarySuppliers %}
+                                                        <tr>
+                                                            <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
+                                                            <td>{{ i[0] }}</td>
+                                                            <td>{{ i[1] }}</td>
+                                                            <td>{{ i[2] }}</td>
+                                                            <td>{{ i[3] }}</td>
+                                                            <td>{{ i[4] }}</td>
+                                                            <td>{{ i[3]-i[4] }}</td>
+                                                            <td>{{ i[5] }}</td>
+                                                            <td><a data-toggle="modal" data-target="#paymentModal" onclick='paymentModal("{{ i[0] }}","{{ i[3]-i[4] }}")'> 付款 </a></td>
+                                                            <th style="width: 60px"><a onclick='editSupplementary("{{ i[0] }}")'> 编辑 </a></th>
+                                                        </tr>
+                                                    {% endfor %}
                                                 {% endif %}
                                                 {% if supplementarySuppliers.__len__()==0 %}
                                                     <tr><td colspan='9' style='text-align: center'>No data available in table</td></tr>
@@ -501,6 +524,7 @@
                                             </div>
                                         </div>-->
                                         <table id="operation" class="table table-striped table-bordered" style="position:relative;">
+                                            {#（删减）
                                             <thead>
                                             <tr>
                                                 <th><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
@@ -542,6 +566,48 @@
                                                     <td>-</td>
                                                     <td>0</td>
                                                     <td>-</td>
+                                                    <td>-</td>
+                                                </tr>
+                                            {% endif %}
+                                            </tfoot>#}
+                                            <!--（删减）-->
+                                            <thead>
+                                            <tr>
+                                                <th><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                <th style='display:none'>费用编码</th>
+                                                <th>日期</th>
+                                                <th>金额</th>
+                                                <th>备注</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if operations %}
+                                                {% for i in operations %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></td>
+                                                        <td style='display:none'>{{ i[0] }}</td>
+                                                        <td>{{ i[1] }}</td>
+                                                        <td class="cost">{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </tbody>
+                                            <tfoot>
+                                            {% if operationSum %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>{{ operationSum }}</td>
+                                                    <td>-</td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>0</td>
                                                     <td>-</td>
                                                 </tr>
                                             {% endif %}
@@ -619,6 +685,7 @@
                                             </div>
                                         </div>-->
                                         <table id="aftersale" class="table table-striped table-bordered" style="position:relative;">
+                                            {#（未删减）
                                             <thead>
                                             <tr>
                                                 <th><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
@@ -679,6 +746,68 @@
                                                     <td>0</td>
                                                     <td>0</td>
                                                     <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                </tr>
+                                            {% endif %}
+                                            </tfoot>#}
+                                            <!--（删减）-->
+                                            <thead>
+                                            <tr>
+                                                <th><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></th>
+                                                <th style='display:none'>费用编码</th>
+                                                <th>日期</th>
+                                                <th>型号</th>
+                                                <th>客户</th>
+                                                <th>人工成本</th>
+                                                <th>材料费用</th>
+                                                <th>其他费用</th>
+                                                <th>快递单号</th>
+                                                <th>备注</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% if aftersales %}
+                                                {% for i in aftersales %}
+                                                    <tr>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></td>
+                                                        <td style='display:none'>{{ i[0] }}</td>
+                                                        <td>{{ i[1] }}</td>
+                                                        <td>{{ i[2] }}</td>
+                                                        <td>{{ i[3] }}</td>
+                                                        <td class="cost">{{ i[4] }}</td>
+                                                        <td class="cost">{{ i[5] }}</td>
+                                                        <td class="cost">{{ i[6] }}</td>
+                                                        <td>{{ i[7] }}</td>
+                                                        <td>{{ i[8] }}</td>
+                                                    </tr>
+                                                {% endfor %}
+                                            {% endif %}
+                                            </tbody>
+                                            <tfoot>
+                                            {% if aftersaleSum %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>{{ aftersaleSum[0] }}</td>
+                                                    <td>{{ aftersaleSum[1] }}</td>
+                                                    <td>{{ aftersaleSum[2] }}</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
                                                     <td>-</td>
                                                     <td>-</td>
                                                 </tr>
@@ -886,6 +1015,19 @@
                         var payables = callback['payables']; // supplierCode,remainPayable,addPayable,payable,payment,remark
                         var supplementaryPayableSum = callback['supplementaryPayableSum'];
                         $('#supplementary tbody').html("");
+                        <!--（未删减）-->
+                        /*for (var i = 0; i < payables.length; i++)
+                            tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                                "<td>" + payables[i][0] + "</td>\n" +
+                                "<td>" + payables[i][1].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][2].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][3].toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][4].toFixed(2) + "</td>\n" +
+                                "<td>" + (payables[i][3] - payables[i][4]).toFixed(2) + "</td>\n" +
+                                "<td>" + payables[i][5] + "</td>\n" +
+                                "<td><a data-toggle='modal' data-target='#paymentModal' onclick='paymentModal(\"" + payables[i][0] + "\",\"" + (payables[i][3] - payables[i][4]) + "\")'> 付款 </a></td></tr>" +
+                                "<td><a onclick='editSupplementary(\"" + payables[i][0] + "\")'> 编辑 </a><a onclick='deleteSupplementary(\"" + payables[i][0] + "\")'> 删除 </a></td></tr>";*/
+                        <!--（删减）-->
                         for (var i = 0; i < payables.length; i++)
                             tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                                 "<td>" + payables[i][0] + "</td>\n" +
@@ -896,7 +1038,7 @@
                                 "<td>" + (payables[i][3] - payables[i][4]).toFixed(2) + "</td>\n" +
                                 "<td>" + payables[i][5] + "</td>\n" +
                                 "<td><a data-toggle='modal' data-target='#paymentModal' onclick='paymentModal(\"" + payables[i][0] + "\",\"" + (payables[i][3] - payables[i][4]) + "\")'> 付款 </a></td></tr>" +
-                                "<td><a onclick='editSupplementary(\"" + payables[i][0] + "\")'> 编辑 </a><a onclick='deleteSupplementary(\"" + payables[i][0] + "\")'> 删除 </a></td></tr>";
+                                "<td><a onclick='editSupplementary(\"" + payables[i][0] + "\")'> 编辑 </a></td></tr>";
 
                         tfoot.rows[0].cells[1].textContent=supplementaryPayableSum[0].toFixed(2);
                         tfoot.rows[0].cells[2].textContent=supplementaryPayableSum[1].toFixed(2);
@@ -1228,13 +1370,22 @@
                     var operationArr=callback['operationArr'];
                     $('#operation tbody').html("");
                     var tbody=document.getElementById("operation").children[1];
+                    <!--（未删减）-->
+                    //for(var i=0;i<operationArr.length;i++) {
+                    //    tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    //        "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                    //        "<td>" + operationArr[i][1] + "</td>\n" +
+                    //        "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                    //        "<td>" + operationArr[i][3] + "</td>\n" +
+                    //        "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    //}
+                    <!--（删减）-->
                     for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
-                            "<td>" + operationArr[i][3] + "</td>\n" +
-                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1253,7 +1404,8 @@
     });*/
 	function addOperationRow() {
 	    var tbody=document.getElementById("operation").children[1];
-	    if(tbody.rows[0].cells.length>1)
+	    <!--（未删减）-->
+	    /*if(tbody.rows[0].cells.length>1)
             tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                 "<td style='display:none'></td>\n" +
                 "<td contenteditable='true'>"+today+"</td>\n" +
@@ -1266,7 +1418,20 @@
                 "<td contenteditable='true'>"+today+"</td>\n" +
                 "<td contenteditable='true' class='cost'></td>\n" +
                 "<td contenteditable='true'></td>\n" +
-                "<td></td></tr>";
+                "<td></td></tr>";*/
+	    <!--（删减）-->
+	    if(tbody.rows[0].cells.length>1)
+            tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                "<td style='display:none'></td>\n" +
+                "<td contenteditable='true'>"+today+"</td>\n" +
+                "<td contenteditable='true' class='cost'></td>\n" +
+                "<td contenteditable='true'></td></tr>";
+	    else
+            tbody.rows[0].innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                "<td style='display:none'></td>\n" +
+                "<td contenteditable='true'>"+today+"</td>\n" +
+                "<td contenteditable='true' class='cost'></td>\n" +
+                "<td contenteditable='true'></td></tr>";
 
         operationAddRowCount++;
 
@@ -1316,13 +1481,22 @@
                     var operationArr=callback['operationArr'];
                     $('#operation tbody').html("");
                     console.log(rows);
-                    for(var i=0;i<operationArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
                             "<td>" + operationArr[i][3] + "</td>\n" +
                             "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<operationArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                            "<td>" + operationArr[i][1] + "</td>\n" +
+                            "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1373,13 +1547,22 @@
                     var operationArr=callback['operationArr'];
                     $('#operation tbody').html("");
                     var tbody=document.getElementById("operation").children[1];
+                    <!--（未删减）-->
+                    //for(var i=0;i<operationArr.length;i++) {
+                    //    tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    //        "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                    //        "<td>" + operationArr[i][1] + "</td>\n" +
+                    //        "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                    //        "<td>" + operationArr[i][3] + "</td>\n" +
+                    //        "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    //}
+                    <!--（删减）-->
                     for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
-                            "<td>" + operationArr[i][3] + "</td>\n" +
-                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
 
                     $('#operationButtonToolbar').hide();
@@ -1541,13 +1724,22 @@
                     var table=document.getElementById("operation");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
-                    for(var i=0;i<operationArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
                             "<td>" + operationArr[i][3] + "</td>\n" +
                             "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<operationArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                            "<td>" + operationArr[i][1] + "</td>\n" +
+                            "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1587,13 +1779,22 @@
                     var table=document.getElementById("operation");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
-                    for(var i=0;i<operationArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
                             "<td>" + operationArr[i][3] + "</td>\n" +
                             "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<operationArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                            "<td>" + operationArr[i][1] + "</td>\n" +
+                            "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1663,13 +1864,22 @@
                     var operationSum=callback['operationSum'];
                     var operationSelects=callback['operationSelects'];
                     $('#operation tbody').html("");
-                    for(var i=0;i<operationArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
                             "<td>" + operationArr[i][3] + "</td>\n" +
                             "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<operationArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                            "<td>" + operationArr[i][1] + "</td>\n" +
+                            "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1719,13 +1929,22 @@
                     var table=document.getElementById("operation");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
+                    <!--（未删减）-->
+                    //for(var i=0;i<operationArr.length;i++) {
+                    //    tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    //        "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                    //        "<td>" + operationArr[i][1] + "</td>\n" +
+                    //        "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                    //        "<td>" + operationArr[i][3] + "</td>\n" +
+                    //        "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    //}
+                    <!--（删减）-->
                     for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
-                            "<td>" + operationArr[i][3] + "</td>\n" +
-                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1766,13 +1985,22 @@
                     var table=document.getElementById("operation");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
+                    <!--（未删减）-->
+                    //for(var i=0;i<operationArr.length;i++) {
+                    //    tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    //        "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                    //        "<td>" + operationArr[i][1] + "</td>\n" +
+                    //        "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                    //        "<td>" + operationArr[i][3] + "</td>\n" +
+                    //        "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    //}
+                    <!--（删减）-->
                     for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
-                            "<td>" + operationArr[i][3] + "</td>\n" +
-                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1813,13 +2041,22 @@
                     var table=document.getElementById("operation");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
+                    <!--（删减）-->
+                    //for(var i=0;i<operationArr.length;i++) {
+                    //    tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    //        "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                    //        "<td>" + operationArr[i][1] + "</td>\n" +
+                    //        "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                    //        "<td>" + operationArr[i][3] + "</td>\n" +
+                    //        "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    //}
+                    <!--（删减）-->
                     for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
-                            "<td>" + operationArr[i][3] + "</td>\n" +
-                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1889,13 +2126,22 @@
                     var operationSum=callback['operationSum'];
                     var operationSelects=callback['operationSelects'];
                     $('#operation tbody').html("");
+                    <!--（未删减）-->
+                    //for(var i=0;i<operationArr.length;i++) {
+                    //    tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    //        "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
+                    //        "<td>" + operationArr[i][1] + "</td>\n" +
+                    //        "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
+                    //        "<td>" + operationArr[i][3] + "</td>\n" +
+                    //        "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    //}
+                    <!--（删减）-->
                     for(var i=0;i<operationArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + operationArr[i][0] + "</td>\n" +
                             "<td>" + operationArr[i][1] + "</td>\n" +
                             "<td class='cost'>" + operationArr[i][2].toFixed(2) + "</td>\n" +
-                            "<td>" + operationArr[i][3] + "</td>\n" +
-                            "<td><a onclick='setOperationRowEditable()'> 编辑 </a><a onclick='deleteOperation(\"" + operationArr[i][0] + "\")'> 删除 </a></td></tr>";
+                            "<td>" + operationArr[i][3] + "</td></tr>";
                     }
                     if(operationArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='6' style='text-align: center'>No data available in table</td></tr>";
@@ -1948,7 +2194,8 @@
                     var table=document.getElementById("aftersale");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
-                    for(var i=0;i<aftersaleArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<aftersaleArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
                             "<td>" + aftersaleArr[i][1] + "</td>\n" +
@@ -1960,6 +2207,19 @@
                             "<td>" + aftersaleArr[i][7] + "</td>\n" +
                             "<td>" + aftersaleArr[i][8] + "</td>\n" +
                             "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td></tr>";
                     }
                     if(aftersaleArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='11' style='text-align: center'>No data available in table</td></tr>";
@@ -1981,7 +2241,8 @@
     });
 	function addAftersaleRow() {
 	    var tbody=document.getElementById("aftersale").children[1];
-	    if(tbody.rows[0].cells.length>1)
+	    <!--（未删减）-->
+	    /*if(tbody.rows[0].cells.length>1)
 	        tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
             "<td style='display:none'></td>\n" +
             "<td contenteditable='true'>"+today+"</td>\n" +
@@ -2003,7 +2264,29 @@
             "<td contenteditable='true' class='cost'></td>\n" +
             "<td contenteditable='true'></td>\n" +
             "<td contenteditable='true'></td>\n" +
-            "<td></td></tr>";
+            "<td></td></tr>";*/
+        <!--（删减）-->
+	    if(tbody.rows[0].cells.length>1)
+	        tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+            "<td style='display:none'></td>\n" +
+            "<td contenteditable='true'>"+today+"</td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true' class='cost'></td>\n" +
+            "<td contenteditable='true' class='cost'></td>\n" +
+            "<td contenteditable='true' class='cost'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td></tr>";
+        else tbody.rows[0].innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+            "<td style='display:none'></td>\n" +
+            "<td contenteditable='true'>"+today+"</td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true' class='cost'></td>\n" +
+            "<td contenteditable='true' class='cost'></td>\n" +
+            "<td contenteditable='true' class='cost'></td>\n" +
+            "<td contenteditable='true'></td>\n" +
+            "<td contenteditable='true'></td></tr>";
 
         aftersaleAddRowCount++;
 
@@ -2067,7 +2350,8 @@
                     var aftersaleArr=callback['aftersaleArr']; // costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark
                     var aftersaleSum=callback['aftersaleSum'];
                     $('#aftersale tbody').html("");
-                    for(var i=0;i<aftersaleArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<aftersaleArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
                             "<td>" + aftersaleArr[i][1] + "</td>\n" +
@@ -2079,6 +2363,19 @@
                             "<td>" + aftersaleArr[i][7] + "</td>\n" +
                             "<td>" + aftersaleArr[i][8] + "</td>\n" +
                             "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td></tr>";
                     }
                     if(aftersaleArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='11' style='text-align: center'>No data available in table</td></tr>";
@@ -2142,6 +2439,21 @@
                     var aftersaleArr=callback['aftersaleArr'];
                     $('#aftersale tbody').html("");
                     var tbody=document.getElementById("aftersale").children[1];
+                    <!--（未删减）-->
+                    //for(var i=0;i<aftersaleArr.length;i++) {
+                    //    tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    //        "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                    //        "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                    //        "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                    //        "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                    //        "<td class='cost'>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                    //        "<td class='cost'>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                    //        "<td class='cost'>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                    //        "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                    //        "<td>" + aftersaleArr[i][8] + "</td>\n" +
+                    //        "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    //}
+                    <!--（删减）-->
                     for(var i=0;i<aftersaleArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
@@ -2152,8 +2464,7 @@
                             "<td class='cost'>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
                             "<td class='cost'>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
                             "<td>" + aftersaleArr[i][7] + "</td>\n" +
-                            "<td>" + aftersaleArr[i][8] + "</td>\n" +
-                            "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                            "<td>" + aftersaleArr[i][8] + "</td></tr>";
                     }
 
                     $('#aftersaleButtonToolbar').hide();
@@ -2333,7 +2644,8 @@
                     var table=document.getElementById("aftersale");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
-                    for(var i=0;i<aftersaleArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<aftersaleArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
                             "<td>" + aftersaleArr[i][1] + "</td>\n" +
@@ -2345,6 +2657,19 @@
                             "<td>" + aftersaleArr[i][7] + "</td>\n" +
                             "<td>" + aftersaleArr[i][8] + "</td>\n" +
                             "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td></tr>";
                     }
                     if(aftersaleArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='11' style='text-align: center'>No data available in table</td></tr>";
@@ -2387,7 +2712,8 @@
                     var table=document.getElementById("aftersale");
                     var tbody=table.children[1];
                     var tfoot=table.children[2];
-                    for(var i=0;i<aftersaleArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<aftersaleArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
                             "<td>" + aftersaleArr[i][1] + "</td>\n" +
@@ -2399,6 +2725,19 @@
                             "<td>" + aftersaleArr[i][7] + "</td>\n" +
                             "<td>" + aftersaleArr[i][8] + "</td>\n" +
                             "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td></tr>";
                     }
                     if(aftersaleArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='11' style='text-align: center'>No data available in table</td></tr>";
@@ -2477,7 +2816,8 @@
                     var aftersaleArr=callback['aftersaleArr']; // costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark
                     var aftersaleSum=callback['aftersaleSum'];
                     $('#aftersale tbody').html("");
-                    for(var i=0;i<aftersaleArr.length;i++) {
+                    <!--（未删减）-->
+                    /*for(var i=0;i<aftersaleArr.length;i++) {
                         tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
                             "<td>" + aftersaleArr[i][1] + "</td>\n" +
@@ -2489,6 +2829,19 @@
                             "<td>" + aftersaleArr[i][7] + "</td>\n" +
                             "<td>" + aftersaleArr[i][8] + "</td>\n" +
                             "<td><a onclick='setAftersaleRowEditable()'> 编辑 </a><a onclick='deleteAftersale(\"" + aftersaleArr[i][0] + "\")'> 删除 </a></td></tr>";
+                    }*/
+                    <!--（删减）-->
+                    for(var i=0;i<aftersaleArr.length;i++) {
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td style='display:none'>" + aftersaleArr[i][0] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][1] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][2] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][3] + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][4].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][5].toFixed(2) + "</td>\n" +
+                            "<td class='cost'>" + aftersaleArr[i][6].toFixed(2) + "</td>\n" +
+                            "<td>" + aftersaleArr[i][7] + "</td>\n" +
+                            "<td>" + aftersaleArr[i][8] + "</td></tr>";
                     }
                     if(aftersaleArr.length==0)
                         tbody.insertRow(0).innerHTML = "<tr><td colspan='11' style='text-align: center'>No data available in table</td></tr>";

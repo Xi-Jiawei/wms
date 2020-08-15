@@ -1440,12 +1440,14 @@ def delete_materialInOutByDocNum(documentNumber):
 
         # 更新供应商的应付款
         if isInOrOut == 0:
+            cur.execute(("select price from materialInfo where materialCode='%s';") % materialCode)
+            price = cur.fetchall()[0][0]
             payableDelta = -operateNum * price
-            month = documentTime[0:7]
+            month = documentTime.strftime('%Y-%m')
             cur.execute("update suppliers set payable=payable+'%f' where supplierCode='%s';" % (payableDelta, supplierCode))
             cur.execute("update payableReport set addPayable=addPayable+'%f',payable=payable+'%f' where supplierCode='%s' and month='%s';" % (payableDelta, payableDelta, supplierCode, month)) # 更新该月的addPayable
             cur.execute("update payableReport set remainPayable=remainPayable+'%f',payable=payable+'%f' where supplierCode='%s' and month>'%s';" % (payableDelta, payableDelta, supplierCode,month)) # 更新该月以后月份的remainPayable
-            cur.execute("update payableReportGroupByMaterialCode set payable=payable+'%f' where supplierCode='%s' and materialCode='%s' and month='%s';" % (payableDelta, supplierCode, materialCode, month))
+            cur.execute("update payableReportGroupByMaterialCode set materialNum=materialNum-'%d', payable=payable+'%f' where supplierCode='%s' and materialCode='%s' and month='%s';" % (operateNum, payableDelta, supplierCode, materialCode, month))
 
         # 提交到数据库执行
         conn.commit()
@@ -1662,7 +1664,7 @@ def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, del
         cur.execute("select clientCode from clients where clientCode='%s';"%clientCode)
         result = cur.fetchall()
         if not result:
-            cur.execute("insert into clients (clientCode, client, entryTime, entryClerk) values ('%s','%s','%s','%s')" % (clientCode, clientCode, entryTime, entryClerk))
+            cur.execute("insert into clients (clientCode, client, entryTime, entryClerk) values ('%s','%s','%s','%s');" % (clientCode, clientCode, entryTime, entryClerk))
         # 更新orderGroupByProductType
         cur.execute("select clientCode from orderGroupByProductType where clientCode='%s' and productType='%s';"%(clientCode,productType))
         result = cur.fetchall()
@@ -2003,7 +2005,8 @@ def select_receivableReportByCode(clientCode,month):
             if remainReceivableResult:
                 remainReceivable = remainReceivableResult[0][0]
             else:
-                remainReceivable = 0
+                cur.execute("select historyReceivable from clients where clientCode='%s';" % (clientCode))
+                remainReceivable = cur.fetchall()[0][0]
             result=[[clientCode,remainReceivable,0,remainReceivable,0,'']]
         lock.release()
         return result
@@ -2167,7 +2170,8 @@ def select_payableReportByCode(supplierCode,month):
             if remainPayableResult:
                 remainPayable = remainPayableResult[0][0]
             else:
-                remainPayable = 0
+                cur.execute("select historyPayable from suppliers where supplierCode='%s';" % (supplierCode))
+                remainPayable = cur.fetchall()[0][0]
             result=[[supplierCode,remainPayable,0,remainPayable,0,'']]
         lock.release()
         return result

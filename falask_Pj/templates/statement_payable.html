@@ -101,6 +101,7 @@
                     <div class="card" style="overflow: hidden">
                         <div class="card-body">
 
+                            <!--（未删减）
                             <div class="row" style="position:relative;">
                                 <form id="searchForm" method="post" novalidate="novalidate">
                                     <div class="col-xs-12" style="width: 240px;">
@@ -124,6 +125,19 @@
                                     </div>
                                     <div class="col-xs-12" style="padding-left: 20px;padding-top:27px;width: 240px;">
                                         <button type="submit" id="search" name="search" class="btn btn-default" style="width: 240px;">查询</button>
+                                    </div>
+                                </form>
+                            </div>-->
+                            <!--（删减）-->
+                            <div class="row" style="position:relative;">
+                                <form id="searchForm" method="post" novalidate="novalidate">
+                                    <div class="col-xs-12" style="width: 240px;">
+                                        <label class="control-label mb-1">选择月份</label>
+                                        <input type="month" id="month" name="month" class="form-control"
+                                               {% if month %}
+                                                value="{{ month }}"
+                                               {% endif %}
+                                        >
                                     </div>
                                 </form>
                             </div>
@@ -288,12 +302,11 @@
                     }
                     table.draw();
                     var tfootRow=$('#payableTable tfoot tr td');
-                    tfootRow.eq(5).text(payable[0][2]);
-                    tfootRow.eq(6).text(payable[0][1]);
-                    tfootRow.eq(7).text(payable[0][3]);
-                    tfootRow.eq(8).text(payable[0][4]);
-                    tfootRow.eq(9).text(payable[0][3]-payable[0][4]);
-                    tfootRow.eq(10).text(payable[0][5]);
+                    tfootRow.eq(5).text(payable[1]);
+                    tfootRow.eq(6).text(payable[0]);
+                    tfootRow.eq(7).text(payable[2]);
+                    tfootRow.eq(8).text(payable[3]);
+                    tfootRow.eq(9).text(payable[2]-payable[3]);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -328,6 +341,60 @@
                 console.log(xhr.readyState);// 状态
                 console.log(textStatus);// 错误信息
                 //alert('返回值错误');
+            }
+        });
+    });
+    $('#month').on("change", function () {
+        var data = {
+            'supplierCode':'',
+            'month': $('#month').val()
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/statement_payable",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var payable=callback['payable'];
+                    var payablesOfMaterial=callback['payablesOfMaterial'];
+                    var table=$('#payableTable').DataTable();
+                    table.clear();
+                    for (var i = 0; i < payablesOfMaterial.length; i++) {
+                        table.row.add([
+                            payablesOfMaterial[i][0],
+                            payablesOfMaterial[i][1],
+                            payablesOfMaterial[i][2],
+                            payablesOfMaterial[i][3],
+                            payablesOfMaterial[i][4],
+                            payablesOfMaterial[i][5],
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            payablesOfMaterial[i][6]
+                        ]);
+                    }
+                    table.draw();
+                    var tfootRow=$('#payableTable tfoot tr td');
+                    tfootRow.eq(5).text(payable[1]);
+                    tfootRow.eq(6).text(payable[0]);
+                    tfootRow.eq(7).text(payable[2]);
+                    tfootRow.eq(8).text(payable[3]);
+                    tfootRow.eq(9).text(payable[2]-payable[3]);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
             }
         });
     });

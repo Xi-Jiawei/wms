@@ -145,6 +145,7 @@
                                 </div>
                                 <div id="item">
                                     <div class="tab" style="position:relative;margin-top: 20px;">
+                                        <!--（未删减）
                                         <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
                                             <form id="searchForm" method="post" novalidate="novalidate">
                                                 <div class="col-xs-12" style="position:relative;width: 20%;">
@@ -166,6 +167,19 @@
                                                 </div>
                                                 <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 22%;">
                                                     <button type="submit" id="search" name="search" class="btn btn-default" style="width: 100%;">查询</button>
+                                                </div>
+                                            </form>
+                                        </div>-->
+                                        <!--（删减）-->
+                                        <div class="row" style="position:relative;width:100%;height: 80px;margin-top: 20px;">
+                                            <form id="searchForm" method="post" novalidate="novalidate">
+                                                <div class="col-xs-12" style="padding-left: 3%; width: 22%;">
+                                                    <label class="control-label mb-1">选择月份</label>
+                                                    <input type="month" id="supplementaryMonth" name="month" class="form-control"
+                                                            {% if month %}
+                                                           value="{{ month }}"
+                                                            {% endif %}
+                                                    />
                                                 </div>
                                             </form>
                                         </div>
@@ -216,8 +230,8 @@
                                                     <td>-</td>
                                                     <td>-</td>
                                                     <td>-</td>
-                                                    <td>{{ supplementaryPayableSum[0] }}</td>
                                                     <td>{{ supplementaryPayableSum[1] }}</td>
+                                                    <td>{{ supplementaryPayableSum[0] }}</td>
                                                     <td>{{ supplementaryPayableSum[2] }}</td>
                                                     <td>{{ supplementaryPayableSum[3] }}</td>
                                                     <td>{{ supplementaryPayableSum[2]-supplementaryPayableSum[3] }}</td>
@@ -495,12 +509,11 @@
                         tbody.insertRow(i).innerHTML="<tr><td colspan='11' style='text-align: center'>No data available in table</td></tr>";
 
                     var tfootRow=$('#supplementary tfoot tr td');
-                    tfootRow.eq(5).text(payable[0][2]);
-                    tfootRow.eq(6).text(payable[0][1]);
-                    tfootRow.eq(7).text(payable[0][3]);
-                    tfootRow.eq(8).text(payable[0][4]);
-                    tfootRow.eq(9).text(payable[0][3]-payable[0][4]);
-                    tfootRow.eq(10).text(payable[0][5]);
+                    tfootRow.eq(5).text(payable[1]);
+                    tfootRow.eq(6).text(payable[0]);
+                    tfootRow.eq(7).text(payable[2]);
+                    tfootRow.eq(8).text(payable[3]);
+                    tfootRow.eq(9).text(payable[2]-payable[3]);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -535,6 +548,60 @@
                 console.log(xhr.readyState);// 状态
                 console.log(textStatus);// 错误信息
                 //alert('返回值错误');
+            }
+        });
+    });
+    $('#supplementaryMonth').on("change", function () {
+        var data = {
+            'supplierCode':'',
+            'month': $('#supplementaryMonth').val()
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/statement_supplementary_payable",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var payable=callback['payable']; // supplierCode,remainPayable,addPayable,payable,payment,remark
+                    var supplementaryArr=callback['supplementaryArr']; // supplierCode,date_format(inDate,'%%Y-%%m-%%d'),supplementaryCode,inNum,price,remark
+                    var tbody=document.getElementById("supplementary").children[1];
+                    $('#supplementary tbody').html("");
+                    for (var i = 0; i < supplementaryArr.length; i++) {
+                        tbody.insertRow(i).innerHTML="<tr><td>"+supplementaryArr[i][0]+"</td>\n" +
+                            "                                                <td>"+supplementaryArr[i][1]+"</td>\n" +
+                            "                                                <td>"+supplementaryArr[i][2]+"</td>\n" +
+                            "                                                <td>"+supplementaryArr[i][3]+"</td>\n" +
+                            "                                                <td>"+supplementaryArr[i][4].toFixed(2)+"</td>\n" +
+                            "                                                <td>"+(supplementaryArr[i][3]*supplementaryArr[i][4]).toFixed(2)+"</td>\n" +
+                            "                                                <td>-</td>\n" +
+                            "                                                <td>-</td>\n" +
+                            "                                                <td>-</td>\n" +
+                            "                                                <td>-</td>\n" +
+                            "                                                <td>"+supplementaryArr[i][5]+"</td></tr>";
+                    }
+                    if(!supplementaryArr.length)
+                        tbody.insertRow(i).innerHTML="<tr><td colspan='11' style='text-align: center'>No data available in table</td></tr>";
+
+                    var tfootRow=$('#supplementary tfoot tr td');
+                    tfootRow.eq(5).text(payable[1]);
+                    tfootRow.eq(6).text(payable[0]);
+                    tfootRow.eq(7).text(payable[2]);
+                    tfootRow.eq(8).text(payable[3]);
+                    tfootRow.eq(9).text(payable[2]-payable[3]);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
             }
         });
     });

@@ -101,6 +101,7 @@
                     <div class="card" style="overflow: hidden">
                         <div class="card-body">
 
+                            <!--（删减）
                             <div class="row" style="position:relative;">
                                 <form id="searchForm" method="post" novalidate="novalidate">
                                     <div class="col-xs-12" style="width: 240px;">
@@ -124,6 +125,19 @@
                                     </div>
                                     <div class="col-xs-12" style="padding-left: 20px;padding-top:27px;width: 240px;">
                                         <button type="submit" id="search" name="search" class="btn btn-default" style="width: 240px;">查询</button>
+                                    </div>
+                                </form>
+                            </div>-->
+                            <!--（删减）-->
+                            <div class="row" style="position:relative;">
+                                <form id="searchForm" method="post" novalidate="novalidate">
+                                    <div class="col-xs-12" style="width: 240px;">
+                                        <label class="control-label mb-1">选择月份</label>
+                                        <input type="month" id="month" name="month" class="form-control"
+                                               {% if month %}
+                                                value="{{ month }}"
+                                               {% endif %}
+                                        >
                                     </div>
                                 </form>
                             </div>
@@ -309,12 +323,11 @@
                     table.draw();
 
                     var tfootRow=$('#receivableTable tfoot tr td');
-                    tfootRow.eq(4).text(receivable[0][2]);
-                    tfootRow.eq(5).text(receivable[0][1]);
-                    tfootRow.eq(6).text(receivable[0][3]);
-                    tfootRow.eq(7).text(receivable[0][4]);
-                    tfootRow.eq(8).text(receivable[0][3]-receivable[0][4]);
-                    tfootRow.eq(9).text(receivable[0][5]);
+                    tfootRow.eq(4).text(receivable[1]);
+                    tfootRow.eq(5).text(receivable[0]);
+                    tfootRow.eq(6).text(receivable[2]);
+                    tfootRow.eq(7).text(receivable[3]);
+                    tfootRow.eq(8).text(receivable[2]-receivable[3]);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -349,6 +362,68 @@
                 console.log(xhr.readyState);// 状态
                 console.log(textStatus);// 错误信息
                 //alert('返回值错误');
+            }
+        });
+    });
+    $('#month').on("change", function () {
+        var data = {
+            'clientCode':'',
+            'month': $('#month').val()
+        };
+        console.log(data);
+
+        $.ajax({
+            url: "/statement_receivable",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var receivable=callback['receivable']; //clientCode,remainReceivable,addReceivable,receivable,receipt,remark
+                    var receivablesOfProduct=callback['receivablesOfProduct']
+                    //var tbody=document.getElementById("receivableTable").children[1];
+                    var table=$('#receivableTable').DataTable();
+                    table.clear();
+                    for (var i=0;i<receivablesOfProduct.length;i++) {
+                        /*tbody.insertRow(i+1).innerHTML="<tr><td>"+clientCode+"</td>\n" +
+                            "                                    <td>"+receivables[i][0]+"</td>\n" +
+                            "                                    <td>"+receivables[i][1]+"</td>\n" +
+                            "                                    <td>"+receivables[i][2]+"</td>\n" +
+                            "                                    <td>"+receivables[i][3]+"</td>\n" +
+                            "                                    <td>"+(receivables[i][2]-receivables[i][3])+"</td>\n" +
+                            "                                    <td>"+receivables[i][4]+"</td></tr>";*/
+                        table.row.add([
+                            receivablesOfProduct[i][0],
+                            receivablesOfProduct[i][1],
+                            receivablesOfProduct[i][2],
+                            receivablesOfProduct[i][3],
+                            receivablesOfProduct[i][4],
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            receivablesOfProduct[i][5],
+                        ]);
+                    }
+                    table.draw();
+
+                    var tfootRow=$('#receivableTable tfoot tr td');
+                    tfootRow.eq(4).text(receivable[1]);
+                    tfootRow.eq(5).text(receivable[0]);
+                    tfootRow.eq(6).text(receivable[2]);
+                    tfootRow.eq(7).text(receivable[3]);
+                    tfootRow.eq(8).text(receivable[2]-receivable[3]);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
             }
         });
     });
