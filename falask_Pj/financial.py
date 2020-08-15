@@ -43,7 +43,7 @@ def financial_receivable():
                 addReceivableSum += result[0][2]
                 receivableSum += result[0][3]
                 receiptSum += result[0][4]
-            sum = [remainReceivableSum, addReceivableSum, receivableSum, receiptSum]
+            sum = [round(remainReceivableSum,2), round(addReceivableSum,2), round(receivableSum,2), round(receiptSum,2)]
             return render_template('financial_receivable.html', form=form, receivables=receivables, sum=sum, username=username)
     else:
         return render_template('access_fail.html')
@@ -125,7 +125,7 @@ def financial_payable():
                 addPayableSum += result[0][2]
                 payableSum += result[0][3]
                 paymentSum += result[0][4]
-            sum = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+            sum = [round(remainPayableSum,2), round(addPayableSum,2), round(payableSum,2), round(paymentSum,2)]
             return render_template('financial_payable.html', form=form, username=username, sum=sum, payables=payables)
     else:
         return render_template('access_fail.html')
@@ -448,7 +448,7 @@ def financial_othercosts():
                 addPayableSum += payable[0][2]
                 payableSum += payable[0][3]
                 paymentSum += payable[0][4]
-            supplementaryPayableSum = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+            supplementaryPayableSum = [round(remainPayableSum,2), round(addPayableSum,2), round(payableSum,2), round(paymentSum,2)]
 
             thread = myThread(target=select_operationSelect, args=())
             operationSelects = thread.get_result()

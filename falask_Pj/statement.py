@@ -62,7 +62,7 @@ def statement():
             income=revenue-materialExpense-workerSalaryExpense-managerSalaryExpense-supplementaryExpense-operationExpense-aftersaleExpense
             salaryExpense = workerSalaryExpense + managerSalaryExpense
             otherExpense = supplementaryExpense + operationExpense + aftersaleExpense
-            return render_template('statement.html', form=form, username=username, income=income, revenue=revenue, materialExpense=materialExpense, salaryExpense=salaryExpense, otherExpense=otherExpense, month=month)
+            return render_template('statement.html', form=form, username=username, income=round(income,2), revenue=round(revenue,2), materialExpense=round(materialExpense,2), salaryExpense=round(salaryExpense,2), otherExpense=round(otherExpense,2), month=month)
     else:
         return render_template('access_fail.html')
 
@@ -90,14 +90,13 @@ def statement_receivable():
                     addReceivableSum += receivable[0][2]
                     receivableSum += receivable[0][3]
                     receiptSum += receivable[0][4]
-                receivable = [remainReceivableSum, addReceivableSum, receivableSum, receiptSum]
+                receivable=[round(remainReceivableSum,2),round(addReceivableSum,2),round(receivableSum,2),round(receiptSum,2)]
                 thread = myThread(target=select_all_receivableReportGroupByProductType, args=(month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
                 receivablesOfProduct = thread.get_result()
             else:
                 thread = myThread(target=select_receivableReportByCode, args=(clientCode, month,))
                 receivable = thread.get_result()
-                thread = myThread(target=select_receivableReportGroupByProductTypeByCode, args=(
-                clientCode, month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
+                thread = myThread(target=select_receivableReportGroupByProductTypeByCode, args=(clientCode, month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
                 receivablesOfProduct = thread.get_result()
             return jsonify({'ok': True,'receivable':receivable,'receivablesOfProduct':receivablesOfProduct})
         elif request.method=="GET":
@@ -116,7 +115,7 @@ def statement_receivable():
                 addReceivableSum += receivable[0][2]
                 receivableSum += receivable[0][3]
                 receiptSum += receivable[0][4]
-            receivable=[remainReceivableSum,addReceivableSum,receivableSum,receiptSum]
+            receivable=[round(remainReceivableSum,2),round(addReceivableSum,2),round(receivableSum,2),round(receiptSum,2)]
             thread = myThread(target=select_all_receivableReportGroupByProductType, args=(month,)) # productType, addDeliveryNum, price, addReceivable, receivable, remark
             receivablesOfProduct = thread.get_result()
             return render_template('statement_receivable_detail.html', form=form, username=username, month=month, receivablesOfProduct=receivablesOfProduct, receivable=receivable)
@@ -146,7 +145,7 @@ def statement_payable():
                     addPayableSum += payable[0][2]
                     payableSum += payable[0][3]
                     paymentSum += payable[0][4]
-                payable = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+                payable = [round(remainPayableSum,2), round(addPayableSum,2), round(payableSum,2), round(paymentSum,2)]
                 thread = myThread(target=select_all_payableReportGroupByMaterialCode, args=(month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
                 payablesOfMaterial = thread.get_result()
             else:
@@ -172,7 +171,7 @@ def statement_payable():
                 addPayableSum += payable[0][2]
                 payableSum += payable[0][3]
                 paymentSum += payable[0][4]
-            payable=[remainPayableSum,addPayableSum,payableSum,paymentSum]
+            payable = [round(remainPayableSum,2), round(addPayableSum,2), round(payableSum,2), round(paymentSum,2)]
             thread = myThread(target=select_all_payableReportGroupByMaterialCode, args=(month,)) # productType, addDeliveryNum, price, addReceivable, receivable, remark
             payablesOfMaterial = thread.get_result()
             return render_template('statement_payable.html', form=form, username=username, month=month, payablesOfMaterial=payablesOfMaterial, payable=payable)
@@ -270,7 +269,7 @@ def statement_othercosts():
                 addPayableSum += payable[0][2]
                 payableSum += payable[0][3]
                 paymentSum += payable[0][4]
-            supplementaryPayableSum=[remainPayableSum,addPayableSum,payableSum,paymentSum]
+            supplementaryPayableSum=[round(remainPayableSum,2),round(addPayableSum,2),round(payableSum,2),round(paymentSum,2)]
             thread = myThread(target=select_all_supplementary, args=(month,))
             supplementaryPayables = thread.get_result()
 
@@ -312,7 +311,7 @@ def statement_supplementary_payable():
                     addPayableSum += payable[0][2]
                     payableSum += payable[0][3]
                     paymentSum += payable[0][4]
-                payable = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+                payable = [round(remainPayableSum,2),round(addPayableSum,2),round(payableSum,2),round(paymentSum,2)]
                 thread = myThread(target=select_all_supplementary, args=(month,))
                 supplementaryArr = thread.get_result()
             else:
