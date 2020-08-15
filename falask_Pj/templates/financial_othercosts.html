@@ -548,6 +548,11 @@
                                                     </tr>
                                                 {% endfor %}
                                             {% endif %}
+                                            {% if operations.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='4' style='text-align: center'>No data available in table</td>
+                                                </tr>
+                                            {% endif %}
                                             </tbody>
                                             <tfoot>
                                             {% if operationSum %}
@@ -591,6 +596,11 @@
                                                         <td>{{ i[3] }}</td>
                                                     </tr>
                                                 {% endfor %}
+                                            {% endif %}
+                                            {% if operations.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='4' style='text-align: center'>No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>
@@ -719,6 +729,11 @@
                                                     </tr>
                                                 {% endfor %}
                                             {% endif %}
+                                            {% if aftersales.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='9' style='text-align: center'>No data available in table</td>
+                                                </tr>
+                                            {% endif %}
                                             </tbody>
                                             <tfoot>
                                             {% if aftersaleSum %}
@@ -782,6 +797,11 @@
                                                         <td>{{ i[8] }}</td>
                                                     </tr>
                                                 {% endfor %}
+                                            {% endif %}
+                                            {% if aftersales.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='9' style='text-align: center'>No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>
@@ -2860,6 +2880,62 @@
                 alert('返回值错误');
             }
         });
+    }
+
+    function checkAll() {
+        var mckeckbox=document.activeElement;
+        var table=document.activeElement.parentElement.parentElement.parentElement.parentElement;
+        console.log(mckeckbox);
+        console.log(table);
+        console.log(table.rows);
+        console.log(table.label);
+        console.log(table.tagName);
+        console.log(mckeckbox.checked);
+        if(table.tagName=="TABLE"){
+            if(mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type = "CHECKBOX"){
+                            chkOrder.checked=true;
+                            //chkOrder.setAttribute("checked", true);
+                        }
+                    }
+                }
+            }else if(!mckeckbox.checked){
+                for(var i=1;i<table.rows.length;i++){
+                    var chkOrder = table.rows[i].cells[0].firstChild;
+                    if(chkOrder){
+                        if(chkOrder.type == "checkbox"){
+                            chkOrder.checked=false;
+                            //chkOrder.setAttribute("checked", false);
+                        }
+                    }
+                }
+            }
+        }
+
+        /*var table=$(this).closest('table');
+        console.log($(this));
+        console.log(table);
+        console.log(table.eq(0));
+        //console.log(trArr);
+        var trArr = table.children("tbody")[0].children("tr");
+        if($(this).checked)
+        for (var i=0;i<trArr.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+            if(tdArr.eq(0).find("input").type=="checkbox"){
+                tdArr.eq(0).find("input").checked=true;
+            }
+        }
+        else {
+        if($(this).checked)
+        for (var i=0;i<trArr.length;i++) {
+            var tdArr = trList.eq(i).find("td");
+            if(tdArr.eq(0).find("input").type=="checkbox"){
+                tdArr.eq(0).find("input").checked=false;
+            }
+        }}*/
     }
 </script>
 </body>

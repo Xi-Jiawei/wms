@@ -311,11 +311,11 @@
                                                         <td>{{ i[3] }}</td>
                                                     </tr>
                                                 {% endfor %}
-                                                {% if operations.__len__()==0 %}
-                                                    <tr>
-                                                        <td colspan='3' style='text-align: center'>No data available in table</td>
-                                                    </tr>
-                                                {% endif %}
+                                            {% endif %}
+                                            {% if operations.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='3' style='text-align: center'>No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>
@@ -323,6 +323,12 @@
                                                 <tr>
                                                     <td>合计</td>
                                                     <td>{{ operationSum }}</td>
+                                                    <td>-</td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td>0</td>
                                                     <td>-</td>
                                                 </tr>
                                             {% endif %}
@@ -386,11 +392,11 @@
                                                         <td>{{ i[8] }}</td>
                                                     </tr>
                                                 {% endfor %}
-                                                {% if aftersales.__len__()==0 %}
-                                                    <tr>
-                                                        <td colspan='8' style='text-align: center'>No data available in table</td>
-                                                    </tr>
-                                                {% endif %}
+                                            {% endif %}
+                                            {% if aftersales.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='8' style='text-align: center'>No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>

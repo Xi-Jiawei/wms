@@ -389,10 +389,15 @@
                                                         <td class='dues'>{{ i[14] }}</td>
                                                         <td>{{ i[15] }}</td>
                                                         <td>{{ i[16] }}</td>
-                                                        <td>{{ i[17] }}</td>
+                                                        <td class="socialSecurityOfEnterprise">{{ i[17] }}</td>
                                                         <td>{{ i[18] }}</td>
                                                     </tr>
                                                 {% endfor %}
+                                            {% endif %}
+                                            {% if workerSalary.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan="20" style="text-align: center">No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>
@@ -527,10 +532,15 @@
                                                         <td class='dues'>{{ i[16] }}</td>
                                                         <td>{{ i[17] }}</td>
                                                         <td>{{ i[18] }}</td>
-                                                        <td>{{ i[19] }}</td>
+                                                        <td class="socialSecurityOfEnterprise">{{ i[19] }}</td>
                                                         <td>{{ i[20] }}</td>
                                                     </tr>
                                                 {% endfor %}
+                                            {% endif %}
+                                            {% if managerSalary.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan="22" style="text-align: center">No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>
@@ -724,6 +734,8 @@
                         if(checktd.checked)
                             tbody.deleteRow(i);
                     }
+                    if(tbody.rows.length==0)
+                        tbody.insertRow(0).innerHTML = "<tr><td colspan='20' style='text-align: center'>No data available in table</td></tr>";
 
                     tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)-workhours;
                     tfoot.rows[0].cells[6].textContent = parseInt(tfoot.rows[0].cells[6].textContent)-overhours;
@@ -795,7 +807,8 @@
                     var table=document.getElementById("workerSalary");
                     var tbody = table.children[1];
                     var tfoot = table.children[2];
-                    tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    if(tbody.rows[0].cells.length>1)
+                        tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td>" + month + "</td>\n" +
                             "<td style='display:none'>" + staffid + "</td>\n" +
                             "<td>" + name + "</td>\n" +
@@ -813,7 +826,28 @@
                             "<td class='dues'>0</td>\n" +
                             "<td>" + (tax+socialSecurityOfPersonal) + "</td>\n" +
                             "<td>" + (timewage+piecewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
-                            "<td>" + socialSecurityOfEnterprise + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + socialSecurityOfEnterprise + "</td>\n" +
+                            "<td>" + (timewage+piecewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
+                    else
+                        tbody.rows[0].innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + month + "</td>\n" +
+                            "<td style='display:none'>" + staffid + "</td>\n" +
+                            "<td>" + name + "</td>\n" +
+                            "<td>" + position + "</td>\n" +
+                            "<td class='hour'>" + workhours + "</td>\n" +
+                            "<td class='hour'>" + overhours + "</td>\n" +
+                            "<td class='payablewage'>" + timewage + "</td>\n" +
+                            "<td class='payablewage'>" + piecewage + "</td>\n" +
+                            "<td class='payablewage'>" + workagewage + "</td>\n" +
+                            "<td class='payablewage'>" + subsidy + "</td>\n" +
+                            "<td class='payablewage'>" + amerce + "</td>\n" +
+                            "<td>" + (timewage+piecewage+workagewage+subsidy-amerce) + "</td>\n" +
+                            "<td class='dues'>" + tax + "</td>\n" +
+                            "<td class='dues'>" + socialSecurityOfPersonal + "</td>\n" +
+                            "<td class='dues'>0</td>\n" +
+                            "<td>" + (tax+socialSecurityOfPersonal) + "</td>\n" +
+                            "<td>" + (timewage+piecewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + socialSecurityOfEnterprise + "</td>\n" +
                             "<td>" + (timewage+piecewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
 
                     tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)+workhours;
@@ -953,8 +987,11 @@
                             "<td class='dues'>" + salaryArr[i][14] + "</td>\n" +
                             "<td>" + salaryArr[i][15] + "</td>\n" +
                             "<td>" + salaryArr[i][16] + "</td>\n" +
-                            "<td>" + salaryArr[i][17] + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + salaryArr[i][17] + "</td>\n" +
                             "<td>" + salaryArr[i][18] + "</td></tr>";
+
+                    if(salaryArr.length==0)
+                        tbody.insertRow(0).innerHTML = "<tr><td colspan='20' style='text-align: center'>No data available in table</td></tr>";
 
                     if(workerSalarySum[1]) {
                         tfoot.rows[0].cells[5].textContent = workerSalarySum[1];
@@ -1040,7 +1077,7 @@
                             "<td class='dues'>" + salaries[i][14] + "</td>\n" +
                             "<td>" + salaries[i][15] + "</td>\n" +
                             "<td>" + salaries[i][16] + "</td>\n" +
-                            "<td>" + salaries[i][17] + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + salaries[i][17] + "</td>\n" +
                             "<td>" + salaries[i][18] + "</td></tr>";
 
                     if(!salaries.length)
@@ -1116,7 +1153,7 @@
     });
 	workerSalaryTable.on("input", '.dues', function () {
         var row=this.parentElement;
-        var tax=0, socialSecurityOfPersonal=0, otherdues=0, payablewage, totaldues;
+        var tax=0, socialSecurityOfPersonal=0, otherdues=0, payablewage, totaldues, socialSecurityOfEnterprise;
         if($.isNumeric(row.cells[13].textContent))
             tax=parseFloat(row.cells[13].textContent);
         if($.isNumeric(row.cells[14].textContent))
@@ -1142,10 +1179,24 @@
                 sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
         }
         tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
-        tfoot.rows[0].cells[12].textContent=(parseFloat(tfoot.rows[0].cells[7].textContent)+parseFloat(tfoot.rows[0].cells[8].textContent)+parseFloat(tfoot.rows[0].cells[9].textContent)+parseFloat(tfoot.rows[0].cells[10].textContent)-parseFloat(tfoot.rows[0].cells[11].textContent)).toFixed(2);
+        tfoot.rows[0].cells[16].textContent=(parseFloat(tfoot.rows[0].cells[13].textContent)+parseFloat(tfoot.rows[0].cells[14].textContent)+parseFloat(tfoot.rows[0].cells[15].textContent)).toFixed(2);
         tfoot.rows[0].cells[17].textContent=(parseFloat(tfoot.rows[0].cells[12].textContent)-parseFloat(tfoot.rows[0].cells[16].textContent)).toFixed(2);
-        tfoot.rows[0].cells[19].textContent=(parseFloat(tfoot.rows[0].cells[12].textContent)+parseFloat(tfoot.rows[0].cells[18].textContent)).toFixed(2);
     });
+	workerSalaryTable.on("input", '.socialSecurityOfEnterprise', function () {
+        var table=document.getElementById("workerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        tbody.rows[rowindex].cells[19].textContent=(parseFloat(tbody.rows[rowindex].cells[12].textContent)+parseFloat(this.textContent)).toFixed(2);
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+        tfoot.rows[0].cells[19].textContent=(parseFloat(tfoot.rows[0].cells[12].textContent)+parseFloat(tfoot.rows[0].cells[18].textContent)).toFixed(2);
+	});
 	workerSalaryTable.on("input", '.hour', function () {
         var table=document.getElementById("workerSalary");
         var tbody = table.children[1];
@@ -1234,6 +1285,8 @@
                         if(checktd.checked)
                             tbody.deleteRow(i);
                     }
+                    if(tbody.rows.length==0)
+                        tbody.insertRow(0).innerHTML = "<tr><td colspan='22' style='text-align: center'>No data available in table</td></tr>";
 
                     tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)-workhours;
                     tfoot.rows[0].cells[6].textContent = parseInt(tfoot.rows[0].cells[6].textContent)-overhours;
@@ -1311,7 +1364,8 @@
                     var table=document.getElementById("managerSalary");
                     var tbody = table.children[1];
                     var tfoot = table.children[2];
-                    tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                    if(tbody.rows[0].cells.length>1)
+                        tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td>" + month + "</td>\n" +
                             "<td style='display:none'>" + staffid + "</td>\n" +
                             "<td>" + name + "</td>\n" +
@@ -1331,7 +1385,30 @@
                             "<td class='dues'>0</td>\n" +
                             "<td>" + (tax+socialSecurityOfPersonal) + "</td>\n" +
                             "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
-                            "<td>" + socialSecurityOfEnterprise + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + socialSecurityOfEnterprise + "</td>\n" +
+                            "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
+                    else
+                        tbody.rows[0].innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + month + "</td>\n" +
+                            "<td style='display:none'>" + staffid + "</td>\n" +
+                            "<td>" + name + "</td>\n" +
+                            "<td>" + position + "</td>\n" +
+                            "<td class='hour'>" + workhours + "</td>\n" +
+                            "<td class='hour'>" + overhours + "</td>\n" +
+                            "<td class='payablewage'>" + basewage + "</td>\n" +
+                            "<td class='payablewage'>" + jobwage + "</td>\n" +
+                            "<td class='payablewage'>" + overtimewage + "</td>\n" +
+                            "<td class='payablewage'>" + performancewage + "</td>\n" +
+                            "<td class='payablewage'>" + workagewage + "</td>\n" +
+                            "<td class='payablewage'>" + subsidy + "</td>\n" +
+                            "<td class='payablewage'>" + amerce + "</td>\n" +
+                            "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce) + "</td>\n" +
+                            "<td class='dues'>" + tax + "</td>\n" +
+                            "<td class='dues'>" + socialSecurityOfPersonal + "</td>\n" +
+                            "<td class='dues'>0</td>\n" +
+                            "<td>" + (tax+socialSecurityOfPersonal) + "</td>\n" +
+                            "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + socialSecurityOfEnterprise + "</td>\n" +
                             "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
 
                     tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)+workhours;
@@ -1479,8 +1556,11 @@
                             "<td class='dues'>" + salaryArr[i][16] + "</td>\n" +
                             "<td>" + salaryArr[i][17] + "</td>\n" +
                             "<td>" + salaryArr[i][18] + "</td>\n" +
-                            "<td>" + salaryArr[i][19] + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + salaryArr[i][19] + "</td>\n" +
                             "<td>" + salaryArr[i][20] + "</td></tr>";
+
+                    if(salaryArr.length==0)
+                        tbody.insertRow(0).innerHTML = "<tr><td colspan='22' style='text-align: center'>No data available in table</td></tr>";
 
                     if(managerSalarySum[1]) {
                         tfoot.rows[0].cells[5].textContent = managerSalarySum[1];
@@ -1572,7 +1652,7 @@
                             "<td class='dues'>" + salaries[i][16] + "</td>\n" +
                             "<td>" + salaries[i][17] + "</td>\n" +
                             "<td>" + salaries[i][18] + "</td>\n" +
-                            "<td>" + salaries[i][19] + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + salaries[i][19] + "</td>\n" +
                             "<td>" + salaries[i][20] + "</td></tr>";
 
                     if(!salaries.length)
@@ -1654,7 +1734,7 @@
     });
 	managerSalaryTable.on("input", '.dues', function () {
         var row=this.parentElement;
-        var tax=0, socialSecurityOfPersonal=0, otherdues=0, payablewage, totaldues;
+        var tax=0, socialSecurityOfPersonal=0, otherdues=0, payablewage, totaldues, socialSecurityOfEnterprise;
         if($.isNumeric(row.cells[15].textContent))
             tax=parseFloat(row.cells[15].textContent);
         if($.isNumeric(row.cells[16].textContent))
@@ -1680,10 +1760,24 @@
                 sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
         }
         tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
-        tfoot.rows[0].cells[14].textContent=(parseFloat(tfoot.rows[0].cells[7].textContent)+parseFloat(tfoot.rows[0].cells[8].textContent)+parseFloat(tfoot.rows[0].cells[9].textContent)+parseFloat(tfoot.rows[0].cells[10].textContent)+parseFloat(tfoot.rows[0].cells[11].textContent)+parseFloat(tfoot.rows[0].cells[12].textContent)-parseFloat(tfoot.rows[0].cells[13].textContent)).toFixed(2);
+        tfoot.rows[0].cells[18].textContent=(parseFloat(tfoot.rows[0].cells[15].textContent)+parseFloat(tfoot.rows[0].cells[16].textContent)+parseFloat(tfoot.rows[0].cells[17].textContent)).toFixed(2);
         tfoot.rows[0].cells[19].textContent=(parseFloat(tfoot.rows[0].cells[14].textContent)-parseFloat(tfoot.rows[0].cells[18].textContent)).toFixed(2);
-        tfoot.rows[0].cells[21].textContent=(parseFloat(tfoot.rows[0].cells[14].textContent)+parseFloat(tfoot.rows[0].cells[20].textContent)).toFixed(2);
     });
+	managerSalaryTable.on("input", '.socialSecurityOfEnterprise', function () {
+        var table=document.getElementById("managerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        tbody.rows[rowindex].cells[21].textContent=(parseFloat(tbody.rows[rowindex].cells[14].textContent)+parseFloat(this.textContent)).toFixed(2);
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+        tfoot.rows[0].cells[21].textContent=(parseFloat(tfoot.rows[0].cells[14].textContent)+parseFloat(tfoot.rows[0].cells[20].textContent)).toFixed(2);
+	});
 	managerSalaryTable.on("input", '.hour', function () {
         var table=document.getElementById("managerSalary");
         var tbody = table.children[1];

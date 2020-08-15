@@ -207,12 +207,11 @@
                                                         <td>{{ i[18] }}</td>
                                                     </tr>
                                                 {% endfor %}
-
-                                                {% if workerSalary.__len__()==0 %}
-                                                    <tr>
-                                                        <td colspan='19' style='text-align: center'>No data available in table</td>
-                                                    </tr>
-                                                {% endif %}
+                                            {% endif %}
+                                            {% if workerSalary.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='19' style='text-align: center'>No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>
@@ -310,11 +309,11 @@
                                                         <td>{{ i[20] }}</td>
                                                     </tr>
                                                 {% endfor %}
-                                                {% if managerSalary.__len__()==0 %}
-                                                    <tr>
-                                                        <td colspan='21' style='text-align: center'>No data available in table</td>
-                                                    </tr>
-                                                {% endif %}
+                                            {% endif %}
+                                            {% if managerSalary.__len__()==0 %}
+                                                <tr>
+                                                    <td colspan='21' style='text-align: center'>No data available in table</td>
+                                                </tr>
                                             {% endif %}
                                             </tbody>
                                             <tfoot>

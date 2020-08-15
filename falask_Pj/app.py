@@ -32,15 +32,21 @@ app.config['SECRET_KEY'] = os.urandom(24)  # 设置为24位的字符,每次运�
 # cc管理员
 @app.route('/admin')
 def index_adm():
-    personName = session['username']
-    return render_template('adm_index.html',personName=personName)
+    if session.get('username'):
+        personName = session['username']
+        return render_template('adm_index.html', personName=personName)
+    else:
+        return render_template('access_fail.html')
 
 # cc 操作员
 @app.route('/oprator')
 def index_operator():
-    personName = session['username']
-    Authority = session['authority']
-    return render_template('operator_index.html',Authority=Authority,personName=personName)
+    if session.get('username'):
+        personName = session['username']
+        Authority = session['authority']
+        return render_template('operator_index.html', Authority=Authority, personName=personName)
+    else:
+        return render_template('access_fail.html')
 
 # cc 登陆
 @app.route('/', methods=['GET', 'POST'])
@@ -96,7 +102,10 @@ def out():
 # cc 管理员 人员管理
 @app.route('/person_management',methods=['GET', 'POST'])
 def person_management():
-    return render_template('person_management.html')
+    if session.get('username'):
+        return render_template('person_management.html')
+    else:
+        return render_template('access_fail.html')
 
 # cc 查看人员管理的数字映射权限
 def person_authority(auth):
@@ -127,111 +136,126 @@ def show_all_users():
 # cc 人员管理_查看人员
 @app.route('/show_users',methods=['GET', 'POST'])
 def show_users():
-    username = session['username']
-    users = show_all_users()
-    return render_template('person_management_show.html', users=users, username=username)
+    if session.get('username'):
+        username = session['username']
+        users = show_all_users()
+        return render_template('person_management_show.html', users=users, username=username)
+    else:
+        return render_template('access_fail.html')
 
 # cc 人员管理_增加人员
 @app.route('/add_user',methods=['GET', 'POST'])
 def add_user():
-    form = UserForm()
-    if request.method == "POST":
-        # username=request.form["username"]
-        # authority = form.data['materialAuth'] + form.data['productAuth'] + form.data['procurementAuth']
-        data = request.get_json()
-        username = data["username"]
-        authority = data['materialAuth'] + data['productAuth'] + data['procurementAuth']
-        # result = select_user(username)
-        thread = myThread(target=select_user, args=(username,))
-        result = thread.get_result()
-        if result:
-            return jsonify({'ok': False})
-        else:
-            # insert_user(username, '88888888', authority)
-            myThread(target=insert_user, args=(username, '88888888', authority,))
-            return jsonify({'ok': True})
-    elif request.method == "GET":
-        return render_template('add_person.html',form=form)
+    if session.get('username'):
+        form = UserForm()
+        if request.method == "POST":
+            # username=request.form["username"]
+            # authority = form.data['materialAuth'] + form.data['productAuth'] + form.data['procurementAuth']
+            data = request.get_json()
+            username = data["username"]
+            authority = data['materialAuth'] + data['productAuth'] + data['procurementAuth']
+            # result = select_user(username)
+            thread = myThread(target=select_user, args=(username,))
+            result = thread.get_result()
+            if result:
+                return jsonify({'ok': False})
+            else:
+                # insert_user(username, '88888888', authority)
+                myThread(target=insert_user, args=(username, '88888888', authority,))
+                return jsonify({'ok': True})
+        elif request.method == "GET":
+            return render_template('add_person.html', form=form)
+    else:
+        return render_template('access_fail.html')
 
 # cc 人员管理_删除人员
 @app.route('/delete_user',methods=['GET', 'POST'])
 def delete_user():
-    form = UserForm()
-    if request.method == "POST":
-        userid = form.data['userid']
-        # delete_userByID(userid)
-        myThread(target=delete_userByID, args=(userid,))
-        delete_message = "删除成功"
-        users = show_all_users()
-        # choices = select_all_users_for_selector()
-        thread = myThread(target=select_all_users_for_selector, args=())
-        choices = thread.get_result()
-        form.userid.choices = choices
-        return render_template('delete_person.html', delete_message=delete_message, form=form, users=users)
-    elif request.method == "GET":
-        users = show_all_users()
-        # choices = select_all_users_for_selector()
-        thread = myThread(target=select_all_users_for_selector, args=())
-        choices = thread.get_result()
-        form.userid.choices = choices
-        return render_template('delete_person.html', form=form, users=users)
+    if session.get('username'):
+        form = UserForm()
+        if request.method == "POST":
+            userid = form.data['userid']
+            # delete_userByID(userid)
+            myThread(target=delete_userByID, args=(userid,))
+            delete_message = "删除成功"
+            users = show_all_users()
+            # choices = select_all_users_for_selector()
+            thread = myThread(target=select_all_users_for_selector, args=())
+            choices = thread.get_result()
+            form.userid.choices = choices
+            return render_template('delete_person.html', delete_message=delete_message, form=form, users=users)
+        elif request.method == "GET":
+            users = show_all_users()
+            # choices = select_all_users_for_selector()
+            thread = myThread(target=select_all_users_for_selector, args=())
+            choices = thread.get_result()
+            form.userid.choices = choices
+            return render_template('delete_person.html', form=form, users=users)
+    else:
+        return render_template('access_fail.html')
 
 # cc 人员管理_权限管理
 @app.route('/change_authority',methods=['GET', 'POST'])
 def change_authority():
-    form = UserForm()
-    if request.method == "POST":
-        userid = form.data['userid']
-        authority = form.data['materialAuth'] + form.data['productAuth'] + form.data['procurementAuth']
-        # update_user_authority(userid, authority)
-        myThread(target=update_user_authority, args=(userid, authority,))
-        change_message = "修改成功"
-        users = show_all_users()
-        # choices = select_all_users_for_selector()
-        thread = myThread(target=select_all_users_for_selector, args=())
-        choices = thread.get_result()
-        form.userid.choices = choices
-        return render_template('change_person.html', change_message=change_message, form=form, users=users)
-    elif request.method == "GET":
-        users = show_all_users()
-        # choices = select_all_users_for_selector()
-        thread = myThread(target=select_all_users_for_selector, args=())
-        choices = thread.get_result()
-        form.userid.choices = choices
-        return render_template('change_person.html', form=form, users=users)
+    if session.get('username'):
+        form = UserForm()
+        if request.method == "POST":
+            userid = form.data['userid']
+            authority = form.data['materialAuth'] + form.data['productAuth'] + form.data['procurementAuth']
+            # update_user_authority(userid, authority)
+            myThread(target=update_user_authority, args=(userid, authority,))
+            change_message = "修改成功"
+            users = show_all_users()
+            # choices = select_all_users_for_selector()
+            thread = myThread(target=select_all_users_for_selector, args=())
+            choices = thread.get_result()
+            form.userid.choices = choices
+            return render_template('change_person.html', change_message=change_message, form=form, users=users)
+        elif request.method == "GET":
+            users = show_all_users()
+            # choices = select_all_users_for_selector()
+            thread = myThread(target=select_all_users_for_selector, args=())
+            choices = thread.get_result()
+            form.userid.choices = choices
+            return render_template('change_person.html', form=form, users=users)
+    else:
+        return render_template('access_fail.html')
 
 # cc 修改密码
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
-    print("修改界面", session['username'])
-    # sql 修改数据库中的密码
-    # fun_changepassword(user)
-    if request.method == "POST":
-        username = session['username']
-        # password = select_user_password(username)
-        thread = myThread(target=select_user_password, args=(username,))
-        password = thread.get_result()
-        oldpassword = request.form["oldpassword"]
-        newpassword = request.form["newpassword"]
-        renewpassword = request.form["renewpassword"]
-        if oldpassword!=password:
-            message = "旧密码有误，请重新输入"
-            print("旧密码有误，请重新输入")
-            return render_template('changepassword.html', message=message)
-        else:
-            if newpassword != renewpassword:
-                message = "两次密码不一致，请重新输入"
-                print("两次密码不一致，请重新输入")
+    if session.get('username'):
+        print("修改界面", session['username'])
+        # sql 修改数据库中的密码
+        # fun_changepassword(user)
+        if request.method == "POST":
+            username = session['username']
+            # password = select_user_password(username)
+            thread = myThread(target=select_user_password, args=(username,))
+            password = thread.get_result()
+            oldpassword = request.form["oldpassword"]
+            newpassword = request.form["newpassword"]
+            renewpassword = request.form["renewpassword"]
+            if oldpassword != password:
+                message = "旧密码有误，请重新输入"
+                print("旧密码有误，请重新输入")
                 return render_template('changepassword.html', message=message)
             else:
-                # update_user_password(username, newpassword)
-                myThread(target=update_user_password, args=(username, newpassword,))
-                message = "密码修改成功，请重新登陆"
-                # session.pop(user.name)
-                session.clear()
-                return redirect(url_for("user_login"))  # 跳到主页
+                if newpassword != renewpassword:
+                    message = "两次密码不一致，请重新输入"
+                    print("两次密码不一致，请重新输入")
+                    return render_template('changepassword.html', message=message)
+                else:
+                    # update_user_password(username, newpassword)
+                    myThread(target=update_user_password, args=(username, newpassword,))
+                    message = "密码修改成功，请重新登陆"
+                    # session.pop(user.name)
+                    session.clear()
+                    return redirect(url_for("user_login"))  # 跳到主页
+        else:
+            return render_template('changepassword.html')
     else:
-        return render_template('changepassword.html')
+        return render_template('access_fail.html')
 
 # xijiawei
 # 添加“material.py”蓝本
