@@ -391,6 +391,29 @@ def select_otherCostsByCode(productCode):
         conn.rollback()
 
 # xijiawei
+# 模糊查询物料信息
+def select_productInfoByFilter(filterStr):
+    conn=db.conn()
+    cursor=conn.cursor()
+    try:
+        cursor.execute("select productType from productInfo where productCode like '%%%s%%';" % (filterStr))
+        result = cursor.fetchall()
+        if result:
+            conn.close()
+            return result
+        cursor.execute("select productType from productInfo where productType like '%%%s%%';" % (filterStr))
+        result = cursor.fetchall()
+        if result:
+            conn.close()
+            return result
+        conn.close()
+        return None
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+        conn.close()
+
+# xijiawei
 # 插入成品
 def insert_productInfo(productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk):
     sql = "insert into productInfo (productCode,productType,client,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk)value('%s','%s','%s','%f','%f','%f','%f','%f','%f','%f','%f','%f','%s','%s','%s');" \
@@ -2368,11 +2391,11 @@ def select_managerSalaryByMonth(month):
 def select_workerSalarySumByMonth(month):
     try:
         lock.acquire()
-        cur.execute("select round(sum(salaryExpense),2)  from workerSalaryRecord where month='%s';"%month)
-        result = cur.fetchall()[0][0]
+        cur.execute("select month, round(sum(workhours),2), round(sum(overhours),2), round(sum(timewage),2), round(sum(piecewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from workerSalaryRecord, performance where month='%s' and workerSalaryRecord.staffid=performance.staffid;"%month)
+        result = cur.fetchall()
         lock.release()
-        if not result:
-            return 0
+        if not result[0][1]:
+            return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         else:
             return result
     except Exception as e:
@@ -2384,11 +2407,11 @@ def select_workerSalarySumByMonth(month):
 def select_managerSalarySumByMonth(month):
     try:
         lock.acquire()
-        cur.execute("select round(sum(salaryExpense),2)  from managerSalaryRecord where month='%s';" % month)
-        result = cur.fetchall()[0][0]
+        cur.execute("select month, round(sum(workhours),2), round(sum(overhours),2), round(sum(basewage),2), round(sum(jobwage),2), round(sum(overtimewage),2), round(sum(performancewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from managerSalaryRecord, performance where month='%s' and managerSalaryRecord.staffid=performance.staffid;" % month)
+        result = cur.fetchall()
         lock.release()
-        if not result:
-            return 0
+        if not result[0][1]:
+            return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         else:
             return result
     except Exception as e:
@@ -2399,7 +2422,7 @@ def select_managerSalarySumByMonth(month):
 
 # xijiawei
 # 查询所有订单
-def select_supplementarySuppliers():
+def select_all_supplementarySuppliers():
     try:
         lock.acquire()
         cur.execute("select supplierCode from supplementarySuppliers;")
@@ -2441,6 +2464,19 @@ def select_supplementaryByCode(supplierCode):
     try:
         lock.acquire()
         cur.execute("select supplierCode,supplementaryCode,date_format(inDate,'%%Y-%%m-%%d'),inNum,price,remark from supplementary where supplierCode='%s' order by inDate;"%supplierCode)
+        result = cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_all_supplementary(month):
+    try:
+        lock.acquire()
+        cur.execute("select supplierCode,date_format(inDate,'%%Y-%%m-%%d'),supplementaryCode,inNum,price,remark from supplementary where date_format(inDate,'%%Y-%%m')='%s' order by supplierCode;" % (month))
         result = cur.fetchall()
         lock.release()
         return result
@@ -2571,7 +2607,7 @@ def delete_supplementaryBySupplierCode(supplierCode, entryTime, entryClerk):
         lock.release()
         for i in result:
             myThread(target=delete_supplementaryByCode, args=(i[0], entryTime, entryClerk,))
-
+        cur.execute("delete from supplementarySuppliers where supplierCode='%s';" % supplierCode)
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
@@ -2624,6 +2660,89 @@ def select_operationSumByMonth(month):
     try:
         lock.acquire()
         cur.execute("select round(sum(cost),2) from operation where date_format(costDate,'%%Y-%%m')='%s';"%month)
+        result = cur.fetchall()[0][0]
+        lock.release()
+        if not result:
+            return 0
+        else:
+            return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_operationSelect():
+    try:
+        lock.acquire()
+        cur.execute("select distinct remark from operation;")
+        result = cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_operationsBySelect(select, month):
+    try:
+        lock.acquire()
+        if select=="-1":
+            cur.execute("select costCode, costDate, cost, remark, entryTime, entryClerk from operation where date_format(costDate,'%%Y-%%m')='%s' order by costCode;"%(month))
+        else:
+            cur.execute("select costCode, costDate, cost, remark, entryTime, entryClerk from operation where remark='%s' and date_format(costDate,'%%Y-%%m')='%s' order by costCode;"%(select, month))
+        result=cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_operationSumBySelect(select, month):
+    try:
+        lock.acquire()
+        if select=="-1":
+            cur.execute("select round(sum(cost),2) from operation where date_format(costDate,'%%Y-%%m')='%s';"%(month))
+        else:
+            cur.execute("select round(sum(cost),2) from operation where remark='%s' and date_format(costDate,'%%Y-%%m')='%s';"%(select, month))
+        result = cur.fetchall()[0][0]
+        lock.release()
+        if not result:
+            return 0
+        else:
+            return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_operationsByDuration(select, startMonth, endMonth):
+    try:
+        lock.acquire()
+        if select=="-1":
+            cur.execute("select costCode, costDate, cost, remark, entryTime, entryClerk from operation where date_format(costDate,'%%Y-%%m')>='%s' and date_format(costDate,'%%Y-%%m')<='%s' order by costCode;"%(startMonth, endMonth))
+        else:
+            cur.execute("select costCode, costDate, cost, remark, entryTime, entryClerk from operation where remark='%s' and date_format(costDate,'%%Y-%%m')>='%s' and date_format(costDate,'%%Y-%%m')<='%s' order by costCode;"%(select, startMonth, endMonth))
+        result=cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_operationSumByDuration(select, startMonth, endMonth):
+    try:
+        lock.acquire()
+        if select=="-1":
+            cur.execute("select round(sum(cost),2) from operation where date_format(costDate,'%%Y-%%m')>='%s' and date_format(costDate,'%%Y-%%m')<='%s';"%(startMonth, endMonth))
+        else:
+            cur.execute("select round(sum(cost),2) from operation where remark='%s' and date_format(costDate,'%%Y-%%m')>='%s' and date_format(costDate,'%%Y-%%m')<='%s';"%(select, startMonth, endMonth))
         result = cur.fetchall()[0][0]
         lock.release()
         if not result:
@@ -2717,6 +2836,35 @@ def select_aftersaleSumByMonth(month):
     try:
         lock.acquire()
         cur.execute("select round(sum(laborCost),2), round(sum(materialCost),2), round(sum(otherCost),2) from aftersale where date_format(costDate,'%%Y-%%m')='%s';"%month)
+        result = cur.fetchall()[0]
+        lock.release()
+        if not result[0]:
+            return [0,0,0]
+        else:
+            return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_aftersalesByDuration(startMonth, endMonth):
+    try:
+        lock.acquire()
+        cur.execute("select costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk from aftersale where date_format(costDate,'%%Y-%%m')>='%s' and date_format(costDate,'%%Y-%%m')<='%s' order by costCode;"%(startMonth, endMonth))
+        result=cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_aftersaleSumByDuration(startMonth, endMonth):
+    try:
+        lock.acquire()
+        cur.execute("select round(sum(laborCost),2), round(sum(materialCost),2), round(sum(otherCost),2) from aftersale where date_format(costDate,'%%Y-%%m')>='%s' and date_format(costDate,'%%Y-%%m')<='%s';"%(startMonth, endMonth))
         result = cur.fetchall()[0]
         lock.release()
         if not result[0]:

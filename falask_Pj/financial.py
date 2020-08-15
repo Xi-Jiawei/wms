@@ -22,6 +22,10 @@ def financial_receivable():
             thread = myThread(target=select_all_clients, args=())
             clients = thread.get_result()
             receivables = []
+            remainReceivableSum = 0
+            addReceivableSum = 0
+            receivableSum = 0
+            receiptSum = 0
             for i in clients:
                 receivable = []
                 thread = myThread(target=select_receivableReportByCode, args=(i[0], month,))
@@ -34,7 +38,13 @@ def financial_receivable():
                 receivable.append(result[0][4])
                 receivable.append(result[0][5])
                 receivables.append(receivable)
-            return render_template('financial_receivable.html', form=form, receivables=receivables, username=username)
+
+                remainReceivableSum += result[0][1]
+                addReceivableSum += result[0][2]
+                receivableSum += result[0][3]
+                receiptSum += result[0][4]
+            sum = [remainReceivableSum, addReceivableSum, receivableSum, receiptSum]
+            return render_template('financial_receivable.html', form=form, receivables=receivables, sum=sum, username=username)
     else:
         return render_template('access_fail.html')
 
@@ -94,6 +104,10 @@ def financial_payable():
             thread = myThread(target=select_all_suppliers, args=())
             suppliers = thread.get_result()
             payables = []
+            remainPayableSum = 0
+            addPayableSum = 0
+            payableSum = 0
+            paymentSum = 0
             for i in suppliers:
                 payable = []
                 thread = myThread(target=select_payableReportByCode, args=(i[0], month,))
@@ -106,7 +120,13 @@ def financial_payable():
                 payable.append(result[0][4])
                 payable.append(result[0][5])
                 payables.append(payable)
-            return render_template('financial_payable.html', form=form, username=username, payables=payables)
+
+                remainPayableSum += result[0][1]
+                addPayableSum += result[0][2]
+                payableSum += result[0][3]
+                paymentSum += result[0][4]
+            sum = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+            return render_template('financial_payable.html', form=form, username=username, sum=sum, payables=payables)
     else:
         return render_template('access_fail.html')
 
@@ -182,7 +202,11 @@ def financial_salary():
             workerSalary = thread.get_result()
             thread = myThread(target=select_all_managerSalary, args=())
             managerSalary = thread.get_result()
-            return render_template('financial_salary.html', form=form, username=username, workerSalary=workerSalary, managerSalary=managerSalary, month=month)
+            thread = myThread(target=select_workerSalarySumByMonth, args=(month,))
+            workerSalarySum = thread.get_result()
+            thread = myThread(target=select_managerSalarySumByMonth, args=(month,))
+            managerSalarySum = thread.get_result()
+            return render_template('financial_salary.html', form=form, username=username, workerSalary=workerSalary, managerSalary=managerSalary, workerSalarySum=workerSalarySum, managerSalarySum=managerSalarySum, month=month)
     else:
         return render_template('access_fail.html')
 
@@ -255,9 +279,21 @@ def edit_worker_salary():
                 else:
                     myThread(target=update_workerSalary,args=(month, int(staffid), name, position, workhours, overhours, realwage, aftertaxwage, payablewage, salaryExpense, timewage, piecewage, workagewage, subsidy, amerce, tax, socialSecurityOfPersonal, otherdues, socialSecurityOfEnterprise, entryTime, entryClerk,))
 
+            month=datetime.now().strftime('%Y-%m')
             thread = myThread(target=select_all_workerSalary, args=())
             salaryArr = thread.get_result()
-            return jsonify({'ok': True, 'salaryArr': salaryArr})
+            thread = myThread(target=select_workerSalarySumByMonth, args=(month,))
+            # workerSalarySum = thread.get_result()
+            result = thread.get_result()[0]
+            workerSalarySum = []
+            workerSalarySum.append(result[0])
+            if result[1]:
+                for i in range(len(result) - 1):
+                    workerSalarySum.append(float(result[i + 1]))
+            else:
+                for i in range(len(result) - 1):
+                    workerSalarySum.append(0)
+            return jsonify({'ok': True, 'salaryArr': salaryArr, 'workerSalarySum': workerSalarySum})
     else:
         return render_template('access_fail.html')
 
@@ -352,7 +388,18 @@ def edit_manager_salary():
 
             thread = myThread(target=select_all_managerSalary, args=())
             salaryArr = thread.get_result()
-            return jsonify({'ok': True, 'salaryArr': salaryArr})
+            thread = myThread(target=select_managerSalarySumByMonth,args=(month,))
+            # managerSalarySum = thread.get_result()
+            result = thread.get_result()[0]
+            managerSalarySum = []
+            managerSalarySum.append(result[0])
+            if result[1]:
+                for i in range(len(result) - 1):
+                    managerSalarySum.append(float(result[i + 1]))
+            else:
+                for i in range(len(result) - 1):
+                    managerSalarySum.append(0)
+            return jsonify({'ok': True, 'salaryArr': salaryArr, 'managerSalarySum': managerSalarySum})
     else:
         return render_template('access_fail.html')
 
@@ -383,21 +430,38 @@ def financial_othercosts():
             username = session['username']
             form = ProductForm()
 
-            thread = myThread(target=select_supplementarySuppliers, args=())
+            thread = myThread(target=select_all_supplementarySuppliers, args=())
             suppliers = thread.get_result()
+            today = datetime.now().strftime('%Y-%m-%d')
             month = datetime.now().strftime('%Y-%m')
-            supplementaryPayables=[]
+            supplementarySuppliers=[]
+            remainPayableSum = 0
+            addPayableSum = 0
+            payableSum = 0
+            paymentSum = 0
             for i in suppliers:
                 thread = myThread(target=select_supplementaryPayableReportByCode, args=(i[0], month,)) # supplierCode,remainPayable,addPayable,payable,payment,remark
                 payable = thread.get_result()
-                supplementaryPayables.append(payable[0])
+                supplementarySuppliers.append(payable[0])
 
+                remainPayableSum += payable[0][1]
+                addPayableSum += payable[0][2]
+                payableSum += payable[0][3]
+                paymentSum += payable[0][4]
+            supplementaryPayableSum = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+
+            thread = myThread(target=select_operationSelect, args=())
+            operationSelects = thread.get_result()
             thread = myThread(target=select_operationsByMonth, args=(month,))  # costCode, costDate, cost, remark, entryTime, entryClerk
             operations = thread.get_result()
+            thread = myThread(target=select_operationSumByMonth, args=(month,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationSum = thread.get_result()
 
             thread = myThread(target=select_aftersalesByMonth, args=(month,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
             aftersales = thread.get_result()
-            return render_template('financial_othercosts.html', form=form, username=username, supplementaryPayables=supplementaryPayables, operations=operations, aftersales=aftersales, month=month)
+            thread = myThread(target=select_aftersaleSumByMonth, args=(month,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
+            aftersaleSum = thread.get_result()
+            return render_template('financial_othercosts.html', form=form, username=username, supplementarySuppliers=supplementarySuppliers, supplementaryPayableSum=supplementaryPayableSum, operationSelects=operationSelects, operations=operations, operationSum=operationSum, aftersales=aftersales, aftersaleSum=aftersaleSum, month=month, today=today)
     else:
         return render_template('access_fail.html')
 
@@ -416,15 +480,25 @@ def add_supplementaries():
                 thread = myThread(target=insert_supplementary,args=(i[0], i[2], i[1], i[3], i[4], i[6], entryTime, entryClerk,))
 
             # 返回数据
-            thread = myThread(target=select_supplementarySuppliers, args=())
+            thread = myThread(target=select_all_supplementarySuppliers, args=())
             suppliers = thread.get_result()
             month = entryTime[0:7]
             payables=[]
+            remainPayableSum = 0
+            addPayableSum = 0
+            payableSum = 0
+            paymentSum = 0
             for i in suppliers:
                 thread = myThread(target=select_supplementaryPayableReportByCode, args=(i[0], month,)) # supplierCode,remainPayable,addPayable,payable,payment,remark
                 payable = thread.get_result()
                 payables.append(payable[0])
-            return jsonify({'ok': True,'payables':payables})
+
+                remainPayableSum += payable[0][1]
+                addPayableSum += payable[0][2]
+                payableSum += payable[0][3]
+                paymentSum += payable[0][4]
+            supplementaryPayableSum = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+            return jsonify({'ok': True, 'payables': payables, 'supplementaryPayableSum': supplementaryPayableSum})
     else:
         return render_template('access_fail.html')
 
@@ -471,7 +545,23 @@ def edit_supplementary(supplierCode):
             month = entryTime[0:7]
             thread = myThread(target=select_supplementaryPayableReportByCode, args=(supplierCode, month,))  # supplierCode,remainPayable,addPayable,payable,payment,remark
             payable = thread.get_result()
-            return jsonify({'ok': True, 'payable': payable})
+            thread = myThread(target=select_all_supplementarySuppliers, args=())
+            suppliers = thread.get_result()
+            remainPayableSum = 0
+            addPayableSum = 0
+            payableSum = 0
+            paymentSum = 0
+            for i in suppliers:
+                thread = myThread(target=select_supplementaryPayableReportByCode, args=(i[0], month,))  # supplierCode,remainPayable,addPayable,payable,payment,remark
+                payable = thread.get_result()
+                payables.append(payable[0])
+
+                remainPayableSum += payable[0][1]
+                addPayableSum += payable[0][2]
+                payableSum += payable[0][3]
+                paymentSum += payable[0][4]
+            supplementaryPayableSum = [remainPayableSum, addPayableSum, payableSum, paymentSum]
+            return jsonify({'ok': True, 'payable': payable, 'supplementaryPayableSum': supplementaryPayableSum})
         elif request.method=="GET":
             thread = myThread(target=select_supplementaryByCode, args=(supplierCode,))
             supplementary=thread.get_result()
@@ -528,6 +618,43 @@ def search_operation(month):
         return render_template('access_fail.html')
 
 # xijiawei
+# 按时间段查询运营费用（新）
+@financial_app.route('/search_operationBySelect', methods=['POST'])
+def search_operationBySelect():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            select = data['operationSelect']
+            month = data['operationMonth']
+            thread = myThread(target=select_operationsBySelect,args=(select, month,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationArr = thread.get_result()
+            thread = myThread(target=select_operationSumBySelect, args=(select, month,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationSum = thread.get_result()
+            return jsonify({'ok': True,'operationArr':operationArr, 'operationSum': operationSum})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 按时间段查询运营费用（新·加强）
+@financial_app.route('/search_operationByDuration', methods=['POST'])
+def search_operationByDuration():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            select = data['operationSelect']
+            startMonth = data['operationStartMonth']
+            endMonth = data['operationEndMonth']
+            thread = myThread(target=select_operationsByDuration,args=(select, startMonth, endMonth,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationArr = thread.get_result()
+            thread = myThread(target=select_operationSumByDuration, args=(select, startMonth, endMonth,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationSum = thread.get_result()
+            return jsonify({'ok': True,'operationArr':operationArr, 'operationSum': operationSum})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
 # 订单管理
 @financial_app.route('/add_operations', methods=['POST'])
 def add_operations():
@@ -545,9 +672,74 @@ def add_operations():
                     myThread(target=update_operation,args=(i[0], i[1], i[2], i[3], entryTime, entryClerk,))
 
             # 返回数据
+            thread = myThread(target=select_operationSelect, args=())
+            operationSelects = thread.get_result()
             thread = myThread(target=select_operationsByMonth,args=(entryTime[0:7],))  # costCode, costDate, cost, remark, entryTime, entryClerk
             operationArr = thread.get_result()
-            return jsonify({'ok': True,'operationArr':operationArr})
+            thread = myThread(target=select_operationSumByMonth, args=(entryTime[0:7],))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationSum = thread.get_result()
+            return jsonify({'ok': True, 'operationArr': operationArr, 'operationSum': operationSum, 'operationSelects': operationSelects})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
+@financial_app.route('/add_operationsBySelect', methods=['POST'])
+def add_operationsBySelect():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            select = data['operationSelect']
+            month = data['operationMonth']
+            operations = data['operations']  # supplierCode, inDate, supplementaryCode, inNum, price, money, remark
+            entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            entryClerk = username
+            for i in operations:
+                if i[0]=="":
+                    myThread(target=insert_operation,args=(i[1], i[2], i[3], entryTime, entryClerk,))
+                else:
+                    myThread(target=update_operation,args=(i[0], i[1], i[2], i[3], entryTime, entryClerk,))
+
+            # 返回数据
+            thread = myThread(target=select_operationSelect, args=())
+            operationSelects = thread.get_result()
+            thread = myThread(target=select_operationsBySelect,args=(select, month,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationArr = thread.get_result()
+            thread = myThread(target=select_operationSumBySelect, args=(select, month,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationSum = thread.get_result()
+            return jsonify({'ok': True, 'operationArr': operationArr, 'operationSum': operationSum, 'operationSelects': operationSelects})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
+@financial_app.route('/add_operationsInCondition', methods=['POST'])
+def add_operationsInCondition():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            select = data['operationSelect']
+            startMonth = data['operationStartMonth']
+            endMonth = data['operationEndMonth']
+            operations = data['operations']  # supplierCode, inDate, supplementaryCode, inNum, price, money, remark
+            entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            entryClerk = username
+            for i in operations:
+                if i[0]=="":
+                    myThread(target=insert_operation,args=(i[1], i[2], i[3], entryTime, entryClerk,))
+                else:
+                    myThread(target=update_operation,args=(i[0], i[1], i[2], i[3], entryTime, entryClerk,))
+
+            # 返回数据
+            thread = myThread(target=select_operationSelect, args=())
+            operationSelects = thread.get_result()
+            thread = myThread(target=select_operationsByDuration,args=(select, startMonth, endMonth,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationArr = thread.get_result()
+            thread = myThread(target=select_operationSumByDuration, args=(select, startMonth, endMonth,))  # costCode, costDate, cost, remark, entryTime, entryClerk
+            operationSum = thread.get_result()
+            return jsonify({'ok': True, 'operationArr': operationArr, 'operationSum': operationSum, 'operationSelects': operationSelects})
     else:
         return render_template('access_fail.html')
 
@@ -583,12 +775,31 @@ def search_aftersale(month):
 
 # xijiawei
 # 订单管理
+@financial_app.route('/search_aftersaleByDuration', methods=['POST'])
+def search_aftersaleByDuration():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            startMonth = data['aftersaleStartMonth']
+            endMonth = data['aftersaleEndMonth']
+            thread = myThread(target=select_aftersalesByDuration,args=(startMonth, endMonth,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
+            aftersaleArr = thread.get_result()
+            thread = myThread(target=select_aftersaleSumByDuration, args=(startMonth, endMonth,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
+            aftersaleSum = thread.get_result()
+            return jsonify({'ok': True,'aftersaleArr':aftersaleArr, 'aftersaleSum': aftersaleSum})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
 @financial_app.route('/add_aftersales', methods=['POST'])
 def add_aftersales():
     if session.get('username'):
         username = session['username']
         if request.method == "POST":
             data = request.get_json()
+            month = data['aftersaleMonth']
             aftersales = data['aftersales']  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             entryClerk = username
@@ -599,9 +810,39 @@ def add_aftersales():
                     myThread(target=update_aftersale,args=(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], entryTime, entryClerk,))
 
             # 返回数据
-            thread = myThread(target=select_aftersalesByMonth,args=(entryTime[0:7],))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
+            thread = myThread(target=select_aftersalesByMonth,args=(month,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
             aftersaleArr = thread.get_result()
-            return jsonify({'ok': True,'aftersaleArr':aftersaleArr})
+            thread = myThread(target=select_aftersaleSumByMonth, args=(month,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
+            aftersaleSum = thread.get_result()
+            return jsonify({'ok': True, 'aftersaleArr': aftersaleArr, 'aftersaleSum': aftersaleSum})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
+@financial_app.route('/add_aftersalesInCondition', methods=['POST'])
+def add_aftersalesInCondition():
+    if session.get('username'):
+        username = session['username']
+        if request.method == "POST":
+            data = request.get_json()
+            startMonth = data['aftersaleStartMonth']
+            endMonth = data['aftersaleEndMonth']
+            aftersales = data['aftersales']  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark
+            entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            entryClerk = username
+            for i in aftersales:
+                if i[0]=="":
+                    myThread(target=insert_aftersale,args=(i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], entryTime, entryClerk,))
+                else:
+                    myThread(target=update_aftersale,args=(i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], entryTime, entryClerk,))
+
+            # 返回数据
+            thread = myThread(target=select_aftersalesByDuration,args=(startMonth, endMonth,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
+            aftersaleArr = thread.get_result()
+            thread = myThread(target=select_aftersaleSumByDuration, args=(startMonth, endMonth,))  # costCode, costDate, productType, client, laborCost, materialCost, otherCost, trackNumber, remark, entryTime, entryClerk
+            aftersaleSum = thread.get_result()
+            return jsonify({'ok': True,'aftersaleArr':aftersaleArr, 'aftersaleSum': aftersaleSum})
     else:
         return render_template('access_fail.html')
 

@@ -160,7 +160,6 @@
                                             <thead>
                                             <tr>
                                                 <th rowspan="2">发放月份</th>
-                                                <th style='display:none'>员工id</th>
                                                 <th rowspan="2">员工</th>
                                                 <th rowspan="2">岗位</th>
                                                 <th rowspan="2">上班时间</th>
@@ -189,7 +188,6 @@
                                                 {% for i in workerSalary %}
                                                     <tr>
                                                         <td>{{ month }}</td>
-                                                        <td style='display:none'>{{ i[1] }}</td>
                                                         <td>{{ i[2] }}</td>
                                                         <td>{{ i[3] }}</td>
                                                         <td>{{ i[4] }}</td>
@@ -223,21 +221,21 @@
                                                     <td>合计</td>
                                                     <td>-</td>
                                                     <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>{{ workerSalarySum }}</td>
+                                                    <td>{{ workerSalarySum[0][1] }}</td>
+                                                    <td>{{ workerSalarySum[0][2] }}</td>
+                                                    <td>{{ workerSalarySum[0][3] }}</td>
+                                                    <td>{{ workerSalarySum[0][4] }}</td>
+                                                    <td>{{ workerSalarySum[0][5] }}</td>
+                                                    <td>{{ workerSalarySum[0][6] }}</td>
+                                                    <td>{{ workerSalarySum[0][7] }}</td>
+                                                    <td>{{ workerSalarySum[0][8] }}</td>
+                                                    <td>{{ workerSalarySum[0][9] }}</td>
+                                                    <td>{{ workerSalarySum[0][10] }}</td>
+                                                    <td>{{ workerSalarySum[0][11] }}</td>
+                                                    <td>{{ workerSalarySum[0][12] }}</td>
+                                                    <td>{{ workerSalarySum[0][13] }}</td>
+                                                    <td>{{ workerSalarySum[0][14] }}</td>
+                                                    <td>{{ workerSalarySum[0][15] }}</td>
                                                 </tr>
                                             {% endif %}
                                             </tfoot>
@@ -261,7 +259,6 @@
                                             <thead>
                                             <tr>
                                                 <th rowspan="2">发放月份</th>
-                                                <th style='display:none'>员工id</th>
                                                 <th rowspan="2">员工</th>
                                                 <th rowspan="2">岗位</th>
                                                 <th rowspan="2">上班时间</th>
@@ -292,7 +289,6 @@
                                                 {% for i in managerSalary %}
                                                     <tr>
                                                         <td>{{ month }}</td>
-                                                        <td style='display:none'>{{ i[1] }}</td>
                                                         <td>{{ i[2] }}</td>
                                                         <td>{{ i[3] }}</td>
                                                         <td>{{ i[4] }}</td>
@@ -327,23 +323,23 @@
                                                     <td>合计</td>
                                                     <td>-</td>
                                                     <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>-</td>
-                                                    <td>{{ managerSalarySum }}</td>
+                                                    <td>{{ managerSalarySum[0][1] }}</td>
+                                                    <td>{{ managerSalarySum[0][2] }}</td>
+                                                    <td>{{ managerSalarySum[0][3] }}</td>
+                                                    <td>{{ managerSalarySum[0][4] }}</td>
+                                                    <td>{{ managerSalarySum[0][5] }}</td>
+                                                    <td>{{ managerSalarySum[0][6] }}</td>
+                                                    <td>{{ managerSalarySum[0][7] }}</td>
+                                                    <td>{{ managerSalarySum[0][8] }}</td>
+                                                    <td>{{ managerSalarySum[0][9] }}</td>
+                                                    <td>{{ managerSalarySum[0][10] }}</td>
+                                                    <td>{{ managerSalarySum[0][11] }}</td>
+                                                    <td>{{ managerSalarySum[0][12] }}</td>
+                                                    <td>{{ managerSalarySum[0][13] }}</td>
+                                                    <td>{{ managerSalarySum[0][14] }}</td>
+                                                    <td>{{ managerSalarySum[0][15] }}</td>
+                                                    <td>{{ managerSalarySum[0][16] }}</td>
+                                                    <td>{{ managerSalarySum[0][17] }}</td>
                                                 </tr>
                                             {% endif %}
                                             </tfoot>
@@ -424,7 +420,6 @@
                         tbody.rows[i].cells[2].innerHTML=salaries[i][1];*/
                     for (var i = 0; i < salaries.length; i++)
                         tbody.insertRow(i).innerHTML = "<tr><td>" + salaries[i][0] + "</td>\n" +
-                            "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
                             "<td>" + salaries[i][2] + "</td>\n" +
                             "<td>" + salaries[i][3] + "</td>\n" +
                             "<td>" + salaries[i][4] + "</td>\n" +
@@ -446,9 +441,26 @@
                     if(!salaries.length)
                         tbody.insertRow(i).innerHTML="<tr><td colspan='18' style='text-align: center'>No data available in table</td></tr>";
 
-                    if(salarySum) {
-                        var tfootRow = $('#workerSalary tfoot tr td');
-                        tfootRow.eq(17).text(salarySum);
+                    var tfootRow = $('#workerSalary tfoot tr td');
+                    if(salarySum[1]) {
+                        tfootRow.eq(3).text(salarySum[1]);
+                        tfootRow.eq(4).text(salarySum[2]);
+                        tfootRow.eq(5).text(salarySum[3]);
+                        tfootRow.eq(6).text(salarySum[4]);
+                        tfootRow.eq(7).text(salarySum[5]);
+                        tfootRow.eq(8).text(salarySum[6]);
+                        tfootRow.eq(9).text(salarySum[7]);
+                        tfootRow.eq(10).text(salarySum[8]);
+                        tfootRow.eq(11).text(salarySum[9]);
+                        tfootRow.eq(12).text(salarySum[10]);
+                        tfootRow.eq(13).text(salarySum[11]);
+                        tfootRow.eq(14).text(salarySum[12]);
+                        tfootRow.eq(15).text(salarySum[13]);
+                        tfootRow.eq(16).text(salarySum[14]);
+                        tfootRow.eq(17).text(salarySum[15]);
+                    } else {
+                        for(i=3;i<18;i++)
+                            tfootRow.eq(i).text(0);
                     }
                 }
             },
@@ -478,7 +490,6 @@
                         tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
                     for (var i = 0; i < salaries.length; i++)
                         tbody.insertRow(i).innerHTML = "<tr><td>" + salaries[i][0] + "</td>\n" +
-                            "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
                             "<td>" + salaries[i][2] + "</td>\n" +
                             "<td>" + salaries[i][3] + "</td>\n" +
                             "<td>" + salaries[i][4] + "</td>\n" +
@@ -502,9 +513,28 @@
                     if(!salaries.length)
                         tbody.insertRow(i).innerHTML="<tr><td colspan='20' style='text-align: center'>No data available in table</td></tr>";
 
-                    if(salarySum) {
-                        var tfootRow = $('#managerSalary tfoot tr td');
-                        tfootRow.eq(19).text(salarySum);
+                    var tfootRow = $('#managerSalary tfoot tr td');
+                    if(salarySum[1]) {
+                        tfootRow.eq(3).text(salarySum[1]);
+                        tfootRow.eq(4).text(salarySum[2]);
+                        tfootRow.eq(5).text(salarySum[3]);
+                        tfootRow.eq(6).text(salarySum[4]);
+                        tfootRow.eq(7).text(salarySum[5]);
+                        tfootRow.eq(8).text(salarySum[6]);
+                        tfootRow.eq(9).text(salarySum[7]);
+                        tfootRow.eq(10).text(salarySum[8]);
+                        tfootRow.eq(11).text(salarySum[9]);
+                        tfootRow.eq(12).text(salarySum[10]);
+                        tfootRow.eq(13).text(salarySum[11]);
+                        tfootRow.eq(14).text(salarySum[12]);
+                        tfootRow.eq(15).text(salarySum[13]);
+                        tfootRow.eq(16).text(salarySum[14]);
+                        tfootRow.eq(17).text(salarySum[15]);
+                        tfootRow.eq(18).text(salarySum[16]);
+                        tfootRow.eq(19).text(salarySum[17]);
+                    }else {
+                        for(i=3;i<20;i++)
+                            tfootRow.eq(i).text(0);
                     }
                 }
             },

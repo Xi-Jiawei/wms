@@ -104,6 +104,10 @@
                         <button type="button" class="close" onclick="dlgClose()">&times;</button>
                         <form id="order_form" action="#" method="post" novalidate="novalidate">
                             <div class="card-body">
+
+                                <datalist id="productTypeList">
+                                </datalist>
+
                                 <div class="row" style="position:relative;width:1000px;height: 60px">
                                     <div class="col-xs-12" style="position:absolute;bottom:30px;left: 20px;width: 320px;">
                                         {{ form.orderCode }}
@@ -366,6 +370,7 @@
                         console.log(this.row(length-1).nodes()[0]);  //最后一行
                         this.cell(length-1, 1).node().setAttribute("contenteditable",true); //productType
                         this.cell(length-1, 1).node().setAttribute("class","productType"); //productType.class
+                        this.cell(length-1, 1).node().setAttribute("list","productTypeList"); //productType.list
                         this.cell(length-1, 3).node().setAttribute("contenteditable",true); //productNum
                         this.cell(length-1, 3).node().setAttribute("class","productNum"); //productNum.class
                         this.cell(length-1, 6).node().setAttribute("contenteditable",true); //deliveryDate
@@ -601,10 +606,41 @@
             }
         });
     });
+    /*$('#orderItem').on("input",".productType", function (){
+        if(this.textContent=="")return;
+        $.ajax({
+            url: "/search_product/"+this.textContent,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var products=callback['products']; // productCode,client,uint,price,profit,totalCost,taxRate,materialCost,processCost,adminstrationCost,supplementaryCost,operatingCost,remark,entryTime,entryClerk
+
+                    $("#productTypeList").empty();
+                    var list=document.getElementById("productTypeList");
+                    if(products!=null) {
+                        for (var i = 0; i < products.length; i++)
+                            $("#productTypeList").append('<option value="'+products[i]+'"/>');
+                    }
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });*/
     $('#orderItem').on("blur",".productType", function (){
         console.log("查询");
         console.log(this);
         var row=this.parentElement;
+
+        if(this.textContent=="")return;
 
         $.ajax({
             url: "/productInfoByType/"+this.textContent,
@@ -689,6 +725,7 @@
 
                         table.cell(i, 1).node().setAttribute("contenteditable",true); //productType
                         table.cell(i, 1).node().setAttribute("class","productType"); //productType.class
+                        table.cell(i, 1).node().setAttribute("list","productTypeList"); //productType.list
                         table.cell(i, 3).node().setAttribute("contenteditable",true); //productNum
                         table.cell(i, 3).node().setAttribute("class","productNum"); //productNum.class
                         table.cell(i, 6).node().setAttribute("contenteditable",true); //deliveryDate

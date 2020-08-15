@@ -235,6 +235,31 @@
                                         </tr>
                                     {% endfor %}
                                     </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        {% if sum %}
+                                            <td>合计</td>
+                                            <td style="display: none"></td>
+                                            <td>{{ sum[0] }}</td>
+                                            <td>{{ sum[1] }}</td>
+                                            <td>{{ sum[2] }}</td>
+                                            <td>{{ sum[3] }}</td>
+                                            <td>{{ sum[2]-sum[3] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        {% else %}
+                                            <td>合计</td>
+                                            <td style="display: none"></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        {% endif %}
+                                    </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -302,9 +327,14 @@
                 console.log(callback);
 
                 if(callback['ok']) {
-                    var row=document.getElementById("payableTable").rows[$("#rowindex").val()];
+                    var table=document.getElementById("payableTable");
+                    var tfoot=table.children[2];
+                    var row=table.rows[$("#rowindex").val()];
                     row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat(payment)).toFixed(2);
                     row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat(payment)).toFixed(2);
+
+                    tfoot.rows[0].cells[5].textContent=(parseFloat(tfoot.rows[0].cells[5].textContent)+parseFloat(payment)).toFixed(2);
+                    tfoot.rows[0].cells[6].textContent=(parseFloat(tfoot.rows[0].cells[6].textContent)-parseFloat(payment)).toFixed(2);
 
                     $('#supplierCode').val("");
                     $('#beforePayable').val("");
@@ -356,11 +386,17 @@
                 console.log(callback);
 
                 if(callback['ok']) {
-                    var row=document.getElementById("payableTable").rows[$("#rowindex").val()];
+                    var table=document.getElementById("payableTable");
+                    var tfoot=table.children[2];
+                    var row=table.rows[$("#rowindex").val()];
                     var beforeHistoryPayable=parseFloat(row.cells[1].textContent);
                     row.cells[2].textContent=(parseFloat(row.cells[2].textContent)-beforeHistoryPayable+historyPayable).toFixed(2);
                     row.cells[4].textContent=(parseFloat(row.cells[4].textContent)-beforeHistoryPayable+historyPayable).toFixed(2);
                     row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-beforeHistoryPayable+historyPayable).toFixed(2);
+
+                    tfoot.rows[0].cells[2].textContent=(parseFloat(tfoot.rows[0].cells[2].textContent)-beforeHistoryPayable+historyPayable).toFixed(2);
+                    tfoot.rows[0].cells[4].textContent=(parseFloat(tfoot.rows[0].cells[4].textContent)-beforeHistoryPayable+historyPayable).toFixed(2);
+                    tfoot.rows[0].cells[6].textContent=(parseFloat(tfoot.rows[0].cells[6].textContent)-beforeHistoryPayable+historyPayable).toFixed(2);
 
                     $('#supplierCode2').val("");
                     $('#historyPayable').val("");

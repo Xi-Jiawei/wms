@@ -376,8 +376,8 @@
                                                         <td style='display:none'>{{ i[1] }}</td>
                                                         <td>{{ i[2] }}</td>
                                                         <td>{{ i[3] }}</td>
-                                                        <td>{{ i[4] }}</td>
-                                                        <td>{{ i[5] }}</td>
+                                                        <td class="hour">{{ i[4] }}</td>
+                                                        <td class="hour">{{ i[5] }}</td>
                                                         <td class='payablewage'>{{ i[6] }}</td>
                                                         <td class='payablewage'>{{ i[7] }}</td>
                                                         <td class='payablewage'>{{ i[8] }}</td>
@@ -395,6 +395,54 @@
                                                 {% endfor %}
                                             {% endif %}
                                             </tbody>
+                                            <tfoot>
+                                            {% if workerSalarySum %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td>{{ month }}</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>{{ workerSalarySum[0][1] }}</td>
+                                                    <td>{{ workerSalarySum[0][2] }}</td>
+                                                    <td>{{ workerSalarySum[0][3] }}</td>
+                                                    <td>{{ workerSalarySum[0][4] }}</td>
+                                                    <td>{{ workerSalarySum[0][5] }}</td>
+                                                    <td>{{ workerSalarySum[0][6] }}</td>
+                                                    <td>{{ workerSalarySum[0][7] }}</td>
+                                                    <td>{{ workerSalarySum[0][8] }}</td>
+                                                    <td>{{ workerSalarySum[0][9] }}</td>
+                                                    <td>{{ workerSalarySum[0][10] }}</td>
+                                                    <td>{{ workerSalarySum[0][11] }}</td>
+                                                    <td>{{ workerSalarySum[0][12] }}</td>
+                                                    <td>{{ workerSalarySum[0][13] }}</td>
+                                                    <td>{{ workerSalarySum[0][14] }}</td>
+                                                    <td>{{ workerSalarySum[0][15] }}</td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                </tr>
+                                            {% endif %}
+                                            </tfoot>
                                         </table>
                                         <div id="workerSalaryButtonToolbar" class="row" style="display:none;position:relative;left: 68%;width:100%;height: 42px;">
                                             <div class="col-xs-12" style="position:relative;right: 20px;width: 16%">
@@ -464,8 +512,8 @@
                                                         <td style='display:none'>{{ i[1] }}</td>
                                                         <td>{{ i[2] }}</td>
                                                         <td>{{ i[3] }}</td>
-                                                        <td>{{ i[4] }}</td>
-                                                        <td>{{ i[5] }}</td>
+                                                        <td class="hour">{{ i[4] }}</td>
+                                                        <td class="hour">{{ i[5] }}</td>
                                                         <td class='payablewage'>{{ i[6] }}</td>
                                                         <td class='payablewage'>{{ i[7] }}</td>
                                                         <td class='payablewage'>{{ i[8] }}</td>
@@ -480,11 +528,64 @@
                                                         <td>{{ i[17] }}</td>
                                                         <td>{{ i[18] }}</td>
                                                         <td>{{ i[19] }}</td>
-                                                        <td>{{ i[10] }}</td>
+                                                        <td>{{ i[20] }}</td>
                                                     </tr>
                                                 {% endfor %}
                                             {% endif %}
                                             </tbody>
+                                            <tfoot>
+                                            {% if managerSalarySum %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td>{{ month }}</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>{{ managerSalarySum[0][1] }}</td>
+                                                    <td>{{ managerSalarySum[0][2] }}</td>
+                                                    <td>{{ managerSalarySum[0][3] }}</td>
+                                                    <td>{{ managerSalarySum[0][4] }}</td>
+                                                    <td>{{ managerSalarySum[0][5] }}</td>
+                                                    <td>{{ managerSalarySum[0][6] }}</td>
+                                                    <td>{{ managerSalarySum[0][7] }}</td>
+                                                    <td>{{ managerSalarySum[0][8] }}</td>
+                                                    <td>{{ managerSalarySum[0][9] }}</td>
+                                                    <td>{{ managerSalarySum[0][10] }}</td>
+                                                    <td>{{ managerSalarySum[0][11] }}</td>
+                                                    <td>{{ managerSalarySum[0][12] }}</td>
+                                                    <td>{{ managerSalarySum[0][13] }}</td>
+                                                    <td>{{ managerSalarySum[0][14] }}</td>
+                                                    <td>{{ managerSalarySum[0][15] }}</td>
+                                                    <td>{{ managerSalarySum[0][16] }}</td>
+                                                    <td>{{ managerSalarySum[0][17] }}</td>
+                                                </tr>
+                                            {% else %}
+                                                <tr>
+                                                    <td>合计</td>
+                                                    <td>{{ month }}</td>
+                                                    <td style='display:none'></td>
+                                                    <td>-</td>
+                                                    <td>-</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                    <td>0</td>
+                                                </tr>
+                                            {% endif %}
+                                            </tfoot>
                                         </table>
                                         <div id="managerSalaryButtonToolbar" class="row" style="display:none;position:relative;left: 68%;width:100%;height: 42px;">
                                             <div class="col-xs-12" style="position:relative;right: 20px;width: 16%">
@@ -574,9 +675,12 @@
         }
     }
     function deleteWorkerSalaries() {
-        var tbody=document.getElementById("workerSalary").children[1];
+        var table=document.getElementById("workerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
         var length=tbody.rows.length,j=0;
 	    var staffidArr=new Array();
+	    var workhours=0,overhours=0,timewage=0,piecewage=0,workagewage=0,subsidy=0,amerce=0,tax=0,socialSecurityOfPersonal=0,socialSecurityOfEnterprise=0;
         for(var i=length-1;i>=0;i--){
             var checktd=tbody.rows[i].cells[0].children[0];
             if(checktd.checked) {
@@ -584,9 +688,25 @@
                 staffidArr[j][0] = tbody.rows[i].cells[1].innerHTML; // month
                 staffidArr[j][1] = tbody.rows[i].cells[2].innerHTML; // staffid
                 j++;
+
+                workhours+=parseInt(tbody.rows[i].cells[5].innerHTML);
+                overhours+=parseInt(tbody.rows[i].cells[6].innerHTML);
+                timewage+=parseFloat(tbody.rows[i].cells[7].innerHTML);
+                piecewage+=parseFloat(tbody.rows[i].cells[8].innerHTML);
+                workagewage+=parseFloat(tbody.rows[i].cells[9].innerHTML);
+                subsidy+=parseFloat(tbody.rows[i].cells[10].innerHTML);
+                amerce+=parseFloat(tbody.rows[i].cells[11].innerHTML);
+                tax+=parseFloat(tbody.rows[i].cells[13].innerHTML);
+                socialSecurityOfPersonal+=parseFloat(tbody.rows[i].cells[14].innerHTML);
+                socialSecurityOfEnterprise+=parseFloat(tbody.rows[i].cells[18].innerHTML);
             }
         }
 	    var data={'staffidArr':staffidArr};
+        console.log("workhours: "+workhours);
+        console.log("timewage: "+timewage);
+        console.log("socialSecurityOfPersonal: "+socialSecurityOfPersonal);
+        console.log("(timewage+piecewage+workagewage+subsidy-amerce): "+(timewage+piecewage+workagewage+subsidy-amerce));
+        console.log("tfoot.rows[0].cells[12].textContent: "+tfoot.rows[0].cells[12].textContent);
 
 	    $.ajax({
             url: "/delete_workerSalaries",
@@ -604,6 +724,22 @@
                         if(checktd.checked)
                             tbody.deleteRow(i);
                     }
+
+                    tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)-workhours;
+                    tfoot.rows[0].cells[6].textContent = parseInt(tfoot.rows[0].cells[6].textContent)-overhours;
+                    tfoot.rows[0].cells[7].textContent = parseFloat(tfoot.rows[0].cells[7].textContent)-timewage;
+                    tfoot.rows[0].cells[8].textContent = parseFloat(tfoot.rows[0].cells[8].textContent)-piecewage;
+                    tfoot.rows[0].cells[9].textContent = parseFloat(tfoot.rows[0].cells[9].textContent)-workagewage;
+                    tfoot.rows[0].cells[10].textContent = parseFloat(tfoot.rows[0].cells[10].textContent)-subsidy;
+                    tfoot.rows[0].cells[11].textContent = parseFloat(tfoot.rows[0].cells[11].textContent)-amerce;
+                    tfoot.rows[0].cells[12].textContent = parseFloat(tfoot.rows[0].cells[12].textContent)-(timewage+piecewage+workagewage+subsidy-amerce);
+                    tfoot.rows[0].cells[13].textContent = parseFloat(tfoot.rows[0].cells[13].textContent)-tax;
+                    tfoot.rows[0].cells[14].textContent = parseFloat(tfoot.rows[0].cells[14].textContent)-socialSecurityOfPersonal;
+                    //tfoot.rows[0].cells[15].textContent = parseFloat(tfoot.rows[0].cells[15].textContent);
+                    tfoot.rows[0].cells[16].textContent = parseFloat(tfoot.rows[0].cells[16].textContent)-(tax+socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[17].textContent = parseFloat(tfoot.rows[0].cells[17].textContent)-(timewage+piecewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[18].textContent = parseFloat(tfoot.rows[0].cells[18].textContent)-socialSecurityOfEnterprise;
+                    tfoot.rows[0].cells[19].textContent = parseFloat(tfoot.rows[0].cells[19].textContent)-(timewage+piecewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -656,14 +792,16 @@
                 if (callback['ok']) {
                     var month=callback['month'];
                     var staffid=callback['staffid'];
-                    var tbody = document.getElementById("workerSalary").children[1];
+                    var table=document.getElementById("workerSalary");
+                    var tbody = table.children[1];
+                    var tfoot = table.children[2];
                     tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td>" + month + "</td>\n" +
                             "<td style='display:none'>" + staffid + "</td>\n" +
                             "<td>" + name + "</td>\n" +
                             "<td>" + position + "</td>\n" +
-                            "<td>" + workhours + "</td>\n" +
-                            "<td>" + overhours + "</td>\n" +
+                            "<td class='hour'>" + workhours + "</td>\n" +
+                            "<td class='hour'>" + overhours + "</td>\n" +
                             "<td class='payablewage'>" + timewage + "</td>\n" +
                             "<td class='payablewage'>" + piecewage + "</td>\n" +
                             "<td class='payablewage'>" + workagewage + "</td>\n" +
@@ -677,6 +815,22 @@
                             "<td>" + (timewage+piecewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
                             "<td>" + socialSecurityOfEnterprise + "</td>\n" +
                             "<td>" + (timewage+piecewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
+
+                    tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)+workhours;
+                    tfoot.rows[0].cells[6].textContent = parseInt(tfoot.rows[0].cells[6].textContent)+overhours;
+                    tfoot.rows[0].cells[7].textContent = parseFloat(tfoot.rows[0].cells[7].textContent)+timewage;
+                    tfoot.rows[0].cells[8].textContent = parseFloat(tfoot.rows[0].cells[8].textContent)+piecewage;
+                    tfoot.rows[0].cells[9].textContent = parseFloat(tfoot.rows[0].cells[9].textContent)+workagewage;
+                    tfoot.rows[0].cells[10].textContent = parseFloat(tfoot.rows[0].cells[10].textContent)+subsidy;
+                    tfoot.rows[0].cells[11].textContent = parseFloat(tfoot.rows[0].cells[11].textContent)+amerce;
+                    tfoot.rows[0].cells[12].textContent = parseFloat(tfoot.rows[0].cells[12].textContent)+(timewage+piecewage+workagewage+subsidy-amerce);
+                    tfoot.rows[0].cells[13].textContent = parseFloat(tfoot.rows[0].cells[13].textContent)+tax;
+                    tfoot.rows[0].cells[14].textContent = parseFloat(tfoot.rows[0].cells[14].textContent)+socialSecurityOfPersonal;
+                    //tfoot.rows[0].cells[15].textContent = parseFloat(tfoot.rows[0].cells[15].textContent);
+                    tfoot.rows[0].cells[16].textContent = parseFloat(tfoot.rows[0].cells[16].textContent)+(tax+socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[17].textContent = parseFloat(tfoot.rows[0].cells[17].textContent)+(timewage+piecewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[18].textContent = parseFloat(tfoot.rows[0].cells[18].textContent)+socialSecurityOfEnterprise;
+                    tfoot.rows[0].cells[19].textContent = parseFloat(tfoot.rows[0].cells[19].textContent)+(timewage+piecewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -773,7 +927,10 @@
 
                 if (callback['ok']) {
                     var salaryArr=callback['salaryArr'];
-                    var tbody = document.getElementById("workerSalary").children[1];
+                    var workerSalarySum=callback['workerSalarySum'];
+                    var table=document.getElementById("workerSalary");
+                    var tbody = table.children[1];
+                    var tfoot = table.children[2];
                     $('#workerSalary tbody').html("");
                     /*for (var i = 0; i < salaryArr.length; i++)
                         tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
@@ -783,8 +940,8 @@
                             "<td style='display:none'>" + salaryArr[i][1] + "</td>\n" +
                             "<td>" + salaryArr[i][2] + "</td>\n" +
                             "<td>" + salaryArr[i][3] + "</td>\n" +
-                            "<td>" + salaryArr[i][4] + "</td>\n" +
-                            "<td>" + salaryArr[i][5] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][4] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][5] + "</td>\n" +
                             "<td class='payablewage'>" + salaryArr[i][6] + "</td>\n" +
                             "<td class='payablewage'>" + salaryArr[i][7] + "</td>\n" +
                             "<td class='payablewage'>" + salaryArr[i][8] + "</td>\n" +
@@ -798,6 +955,27 @@
                             "<td>" + salaryArr[i][16] + "</td>\n" +
                             "<td>" + salaryArr[i][17] + "</td>\n" +
                             "<td>" + salaryArr[i][18] + "</td></tr>";
+
+                    if(workerSalarySum[1]) {
+                        tfoot.rows[0].cells[5].textContent = workerSalarySum[1];
+                        tfoot.rows[0].cells[6].textContent = workerSalarySum[2];
+                        tfoot.rows[0].cells[7].textContent = workerSalarySum[3];
+                        tfoot.rows[0].cells[8].textContent = workerSalarySum[4];
+                        tfoot.rows[0].cells[9].textContent = workerSalarySum[5];
+                        tfoot.rows[0].cells[10].textContent = workerSalarySum[6];
+                        tfoot.rows[0].cells[11].textContent = workerSalarySum[7];
+                        tfoot.rows[0].cells[12].textContent = workerSalarySum[8];
+                        tfoot.rows[0].cells[13].textContent = workerSalarySum[9];
+                        tfoot.rows[0].cells[14].textContent = workerSalarySum[10];
+                        tfoot.rows[0].cells[15].textContent = workerSalarySum[11];
+                        tfoot.rows[0].cells[16].textContent = workerSalarySum[12];
+                        tfoot.rows[0].cells[17].textContent = workerSalarySum[13];
+                        tfoot.rows[0].cells[18].textContent = workerSalarySum[14];
+                        tfoot.rows[0].cells[19].textContent = workerSalarySum[15];
+                    }else {
+                        for(i=5;i<20;i++)
+                            tfoot.rows[0].cells[i].textContent = 0;
+                    }
 
                     $('#workerSalaryButtonToolbar').hide();
                 }
@@ -849,8 +1027,8 @@
                             "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
                             "<td>" + salaries[i][2] + "</td>\n" +
                             "<td>" + salaries[i][3] + "</td>\n" +
-                            "<td>" + salaries[i][4] + "</td>\n" +
-                            "<td>" + salaries[i][5] + "</td>\n" +
+                            "<td class='hour'>" + salaries[i][4] + "</td>\n" +
+                            "<td class='hour'>" + salaries[i][5] + "</td>\n" +
                             "<td class='payablewage'>" + salaries[i][6] + "</td>\n" +
                             "<td class='payablewage'>" + salaries[i][7] + "</td>\n" +
                             "<td class='payablewage'>" + salaries[i][8] + "</td>\n" +
@@ -920,6 +1098,21 @@
         row.cells[12].textContent=payablewage.toFixed(2);
         row.cells[17].textContent=(payablewage-totaldues).toFixed(2);
         row.cells[19].textContent=(payablewage+socialSecurityOfEnterprise).toFixed(2);
+
+        var table=document.getElementById("workerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+        tfoot.rows[0].cells[12].textContent=(parseFloat(tfoot.rows[0].cells[7].textContent)+parseFloat(tfoot.rows[0].cells[8].textContent)+parseFloat(tfoot.rows[0].cells[9].textContent)+parseFloat(tfoot.rows[0].cells[10].textContent)-parseFloat(tfoot.rows[0].cells[11].textContent)).toFixed(2);
+        tfoot.rows[0].cells[17].textContent=(parseFloat(tfoot.rows[0].cells[12].textContent)-parseFloat(tfoot.rows[0].cells[16].textContent)).toFixed(2);
+        tfoot.rows[0].cells[19].textContent=(parseFloat(tfoot.rows[0].cells[12].textContent)+parseFloat(tfoot.rows[0].cells[18].textContent)).toFixed(2);
     });
 	workerSalaryTable.on("input", '.dues', function () {
         var row=this.parentElement;
@@ -937,7 +1130,35 @@
         totaldues=tax+socialSecurityOfPersonal+otherdues;
         row.cells[16].textContent=totaldues.toFixed(2);
         row.cells[17].textContent=(payablewage-totaldues).toFixed(2);
+
+        var table=document.getElementById("workerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+        tfoot.rows[0].cells[12].textContent=(parseFloat(tfoot.rows[0].cells[7].textContent)+parseFloat(tfoot.rows[0].cells[8].textContent)+parseFloat(tfoot.rows[0].cells[9].textContent)+parseFloat(tfoot.rows[0].cells[10].textContent)-parseFloat(tfoot.rows[0].cells[11].textContent)).toFixed(2);
+        tfoot.rows[0].cells[17].textContent=(parseFloat(tfoot.rows[0].cells[12].textContent)-parseFloat(tfoot.rows[0].cells[16].textContent)).toFixed(2);
+        tfoot.rows[0].cells[19].textContent=(parseFloat(tfoot.rows[0].cells[12].textContent)+parseFloat(tfoot.rows[0].cells[18].textContent)).toFixed(2);
     });
+	workerSalaryTable.on("input", '.hour', function () {
+        var table=document.getElementById("workerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+	});
 
 	function addManagerSalary() {
         $('#managerSalaryButtonToolbar').hide();
@@ -962,9 +1183,12 @@
         }
     }
     function deleteManagerSalaries() {
-        var tbody=document.getElementById("managerSalary").children[1];
+        var table=document.getElementById("managerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
         var length=tbody.rows.length,j=0;
 	    var staffidArr=new Array();
+	    var workhours=0,overhours=0,basewage=0,jobwage=0,overtimewage=0,performancewage=0,workagewage=0,subsidy=0,amerce=0,tax=0,socialSecurityOfPersonal=0,socialSecurityOfEnterprise=0;
         for(var i=length-1;i>=0;i--){
             var checktd=tbody.rows[i].cells[0].children[0];
             if(checktd.checked) {
@@ -972,9 +1196,27 @@
                 staffidArr[j][0] = tbody.rows[i].cells[1].innerHTML; // month
                 staffidArr[j][1] = tbody.rows[i].cells[2].innerHTML; // staffid
                 j++;
+
+                workhours+=parseInt(tbody.rows[i].cells[5].innerHTML);
+                overhours+=parseInt(tbody.rows[i].cells[6].innerHTML);
+                basewage+=parseFloat(tbody.rows[i].cells[7].innerHTML);
+                jobwage+=parseFloat(tbody.rows[i].cells[8].innerHTML);
+                overtimewage+=parseFloat(tbody.rows[i].cells[9].innerHTML);
+                performancewage+=parseFloat(tbody.rows[i].cells[10].innerHTML);
+                workagewage+=parseFloat(tbody.rows[i].cells[11].innerHTML);
+                subsidy+=parseFloat(tbody.rows[i].cells[12].innerHTML);
+                amerce+=parseFloat(tbody.rows[i].cells[13].innerHTML);
+                tax+=parseFloat(tbody.rows[i].cells[15].innerHTML);
+                socialSecurityOfPersonal+=parseFloat(tbody.rows[i].cells[16].innerHTML);
+                socialSecurityOfEnterprise+=parseFloat(tbody.rows[i].cells[20].innerHTML);
             }
         }
 	    var data={'staffidArr':staffidArr};
+        console.log("workhours: "+workhours);
+        console.log("basewage: "+basewage);
+        console.log("socialSecurityOfPersonal: "+socialSecurityOfPersonal);
+        console.log("(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce): "+(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce));
+        console.log("tfoot.rows[0].cells[14].textContent: "+tfoot.rows[0].cells[14].textContent);
 
 	    $.ajax({
             url: "/delete_managerSalaries",
@@ -992,6 +1234,24 @@
                         if(checktd.checked)
                             tbody.deleteRow(i);
                     }
+
+                    tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)-workhours;
+                    tfoot.rows[0].cells[6].textContent = parseInt(tfoot.rows[0].cells[6].textContent)-overhours;
+                    tfoot.rows[0].cells[7].textContent = parseFloat(tfoot.rows[0].cells[7].textContent)-basewage;
+                    tfoot.rows[0].cells[8].textContent = parseFloat(tfoot.rows[0].cells[8].textContent)-jobwage;
+                    tfoot.rows[0].cells[9].textContent = parseFloat(tfoot.rows[0].cells[9].textContent)-overtimewage;
+                    tfoot.rows[0].cells[10].textContent = parseFloat(tfoot.rows[0].cells[10].textContent)-performancewage;
+                    tfoot.rows[0].cells[11].textContent = parseFloat(tfoot.rows[0].cells[11].textContent)-workagewage;
+                    tfoot.rows[0].cells[12].textContent = parseFloat(tfoot.rows[0].cells[12].textContent)-subsidy;
+                    tfoot.rows[0].cells[13].textContent = parseFloat(tfoot.rows[0].cells[13].textContent)-amerce;
+                    tfoot.rows[0].cells[14].textContent = parseFloat(tfoot.rows[0].cells[14].textContent)-(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce);
+                    tfoot.rows[0].cells[15].textContent = parseFloat(tfoot.rows[0].cells[15].textContent)-tax;
+                    tfoot.rows[0].cells[16].textContent = parseFloat(tfoot.rows[0].cells[16].textContent)-socialSecurityOfPersonal;
+                    //tfoot.rows[0].cells[17].textContent = parseFloat(tfoot.rows[0].cells[17].textContent);
+                    tfoot.rows[0].cells[18].textContent = parseFloat(tfoot.rows[0].cells[18].textContent)-(tax+socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[19].textContent = parseFloat(tfoot.rows[0].cells[19].textContent)-(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[20].textContent = parseFloat(tfoot.rows[0].cells[20].textContent)-socialSecurityOfEnterprise;
+                    tfoot.rows[0].cells[21].textContent = parseFloat(tfoot.rows[0].cells[21].textContent)-(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -1048,14 +1308,16 @@
                 if (callback['ok']) {
                     var month=callback['month'];
                     var staffid=callback['staffid'];
-                    var tbody = document.getElementById("managerSalary").children[1];
+                    var table=document.getElementById("managerSalary");
+                    var tbody = table.children[1];
+                    var tfoot = table.children[2];
                     tbody.insertRow(tbody.rows.length).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
                             "<td>" + month + "</td>\n" +
                             "<td style='display:none'>" + staffid + "</td>\n" +
                             "<td>" + name + "</td>\n" +
                             "<td>" + position + "</td>\n" +
-                            "<td>" + workhours + "</td>\n" +
-                            "<td>" + overhours + "</td>\n" +
+                            "<td class='hour'>" + workhours + "</td>\n" +
+                            "<td class='hour'>" + overhours + "</td>\n" +
                             "<td class='payablewage'>" + basewage + "</td>\n" +
                             "<td class='payablewage'>" + jobwage + "</td>\n" +
                             "<td class='payablewage'>" + overtimewage + "</td>\n" +
@@ -1071,6 +1333,24 @@
                             "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal) + "</td>\n" +
                             "<td>" + socialSecurityOfEnterprise + "</td>\n" +
                             "<td>" + (basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise) + "</td></tr>";
+
+                    tfoot.rows[0].cells[5].textContent = parseInt(tfoot.rows[0].cells[5].textContent)+workhours;
+                    tfoot.rows[0].cells[6].textContent = parseInt(tfoot.rows[0].cells[6].textContent)+overhours;
+                    tfoot.rows[0].cells[7].textContent = parseFloat(tfoot.rows[0].cells[7].textContent)+basewage;
+                    tfoot.rows[0].cells[8].textContent = parseFloat(tfoot.rows[0].cells[8].textContent)+jobwage;
+                    tfoot.rows[0].cells[9].textContent = parseFloat(tfoot.rows[0].cells[9].textContent)+overtimewage;
+                    tfoot.rows[0].cells[10].textContent = parseFloat(tfoot.rows[0].cells[10].textContent)+performancewage;
+                    tfoot.rows[0].cells[11].textContent = parseFloat(tfoot.rows[0].cells[11].textContent)+workagewage;
+                    tfoot.rows[0].cells[12].textContent = parseFloat(tfoot.rows[0].cells[12].textContent)+subsidy;
+                    tfoot.rows[0].cells[13].textContent = parseFloat(tfoot.rows[0].cells[13].textContent)+amerce;
+                    tfoot.rows[0].cells[14].textContent = parseFloat(tfoot.rows[0].cells[14].textContent)+(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce);
+                    tfoot.rows[0].cells[15].textContent = parseFloat(tfoot.rows[0].cells[15].textContent)+tax;
+                    tfoot.rows[0].cells[16].textContent = parseFloat(tfoot.rows[0].cells[16].textContent)+socialSecurityOfPersonal;
+                    //tfoot.rows[0].cells[17].textContent = parseFloat(tfoot.rows[0].cells[17].textContent);
+                    tfoot.rows[0].cells[18].textContent = parseFloat(tfoot.rows[0].cells[18].textContent)+(tax+socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[19].textContent = parseFloat(tfoot.rows[0].cells[19].textContent)+(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce-tax-socialSecurityOfPersonal);
+                    tfoot.rows[0].cells[20].textContent = parseFloat(tfoot.rows[0].cells[20].textContent)+socialSecurityOfEnterprise;
+                    tfoot.rows[0].cells[21].textContent = parseFloat(tfoot.rows[0].cells[21].textContent)+(basewage+jobwage+overtimewage+performancewage+workagewage+subsidy-amerce+socialSecurityOfEnterprise);
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -1171,7 +1451,10 @@
 
                 if (callback['ok']) {
                     var salaryArr=callback['salaryArr'];
-                    var tbody = document.getElementById("managerSalary").children[1];
+                    var managerSalarySum=callback['managerSalarySum'];
+                    var table=document.getElementById("managerSalary");
+                    var tbody = table.children[1];
+                    var tfoot = table.children[2];
                     $('#managerSalary tbody').html("");
                     /*for (var i = 0; i < salaryArr.length; i++)
                         tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
@@ -1181,8 +1464,8 @@
                             "<td style='display:none'>" + salaryArr[i][1] + "</td>\n" +
                             "<td>" + salaryArr[i][2] + "</td>\n" +
                             "<td>" + salaryArr[i][3] + "</td>\n" +
-                            "<td>" + salaryArr[i][4] + "</td>\n" +
-                            "<td>" + salaryArr[i][5] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][4] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][5] + "</td>\n" +
                             "<td class='payablewage'>" + salaryArr[i][6] + "</td>\n" +
                             "<td class='payablewage'>" + salaryArr[i][7] + "</td>\n" +
                             "<td class='payablewage'>" + salaryArr[i][8] + "</td>\n" +
@@ -1198,6 +1481,29 @@
                             "<td>" + salaryArr[i][18] + "</td>\n" +
                             "<td>" + salaryArr[i][19] + "</td>\n" +
                             "<td>" + salaryArr[i][20] + "</td></tr>";
+
+                    if(managerSalarySum[1]) {
+                        tfoot.rows[0].cells[5].textContent = managerSalarySum[1];
+                        tfoot.rows[0].cells[6].textContent = managerSalarySum[2];
+                        tfoot.rows[0].cells[7].textContent = managerSalarySum[3];
+                        tfoot.rows[0].cells[8].textContent = managerSalarySum[4];
+                        tfoot.rows[0].cells[9].textContent = managerSalarySum[5];
+                        tfoot.rows[0].cells[10].textContent = managerSalarySum[6];
+                        tfoot.rows[0].cells[11].textContent = managerSalarySum[7];
+                        tfoot.rows[0].cells[12].textContent = managerSalarySum[8];
+                        tfoot.rows[0].cells[13].textContent = managerSalarySum[9];
+                        tfoot.rows[0].cells[14].textContent = managerSalarySum[10];
+                        tfoot.rows[0].cells[15].textContent = managerSalarySum[11];
+                        tfoot.rows[0].cells[16].textContent = managerSalarySum[12];
+                        tfoot.rows[0].cells[17].textContent = managerSalarySum[13];
+                        tfoot.rows[0].cells[18].textContent = managerSalarySum[14];
+                        tfoot.rows[0].cells[19].textContent = managerSalarySum[15];
+                        tfoot.rows[0].cells[20].textContent = managerSalarySum[16];
+                        tfoot.rows[0].cells[21].textContent = managerSalarySum[17];
+                    }else {
+                        for(i=5;i<22;i++)
+                            tfoot.rows[0].cells[i].textContent = 0;
+                    }
 
                     $('#managerSalaryButtonToolbar').hide();
                 }
@@ -1251,8 +1557,8 @@
                             "<td style='display:none'>" + salaries[i][1] + "</td>\n" +
                             "<td>" + salaries[i][2] + "</td>\n" +
                             "<td>" + salaries[i][3] + "</td>\n" +
-                            "<td>" + salaries[i][4] + "</td>\n" +
-                            "<td>" + salaries[i][5] + "</td>\n" +
+                            "<td class='hour'>" + salaries[i][4] + "</td>\n" +
+                            "<td class='hour'>" + salaries[i][5] + "</td>\n" +
                             "<td class='payablewage'>" + salaries[i][6] + "</td>\n" +
                             "<td class='payablewage'>" + salaries[i][7] + "</td>\n" +
                             "<td class='payablewage'>" + salaries[i][8] + "</td>\n" +
@@ -1330,6 +1636,21 @@
         row.cells[14].textContent=payablewage.toFixed(2);
         row.cells[19].textContent=(payablewage-totaldues).toFixed(2);
         row.cells[21].textContent=(payablewage+socialSecurityOfEnterprise).toFixed(2);
+
+        var table=document.getElementById("managerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+        tfoot.rows[0].cells[14].textContent=(parseFloat(tfoot.rows[0].cells[7].textContent)+parseFloat(tfoot.rows[0].cells[8].textContent)+parseFloat(tfoot.rows[0].cells[9].textContent)+parseFloat(tfoot.rows[0].cells[10].textContent)+parseFloat(tfoot.rows[0].cells[11].textContent)+parseFloat(tfoot.rows[0].cells[12].textContent)-parseFloat(tfoot.rows[0].cells[13].textContent)).toFixed(2);
+        tfoot.rows[0].cells[19].textContent=(parseFloat(tfoot.rows[0].cells[14].textContent)-parseFloat(tfoot.rows[0].cells[18].textContent)).toFixed(2);
+        tfoot.rows[0].cells[21].textContent=(parseFloat(tfoot.rows[0].cells[14].textContent)+parseFloat(tfoot.rows[0].cells[20].textContent)).toFixed(2);
     });
 	managerSalaryTable.on("input", '.dues', function () {
         var row=this.parentElement;
@@ -1347,7 +1668,35 @@
         totaldues=tax+socialSecurityOfPersonal+otherdues;
         row.cells[18].textContent=totaldues.toFixed(2);
         row.cells[19].textContent=(payablewage-totaldues).toFixed(2);
+
+        var table=document.getElementById("managerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+        tfoot.rows[0].cells[14].textContent=(parseFloat(tfoot.rows[0].cells[7].textContent)+parseFloat(tfoot.rows[0].cells[8].textContent)+parseFloat(tfoot.rows[0].cells[9].textContent)+parseFloat(tfoot.rows[0].cells[10].textContent)+parseFloat(tfoot.rows[0].cells[11].textContent)+parseFloat(tfoot.rows[0].cells[12].textContent)-parseFloat(tfoot.rows[0].cells[13].textContent)).toFixed(2);
+        tfoot.rows[0].cells[19].textContent=(parseFloat(tfoot.rows[0].cells[14].textContent)-parseFloat(tfoot.rows[0].cells[18].textContent)).toFixed(2);
+        tfoot.rows[0].cells[21].textContent=(parseFloat(tfoot.rows[0].cells[14].textContent)+parseFloat(tfoot.rows[0].cells[20].textContent)).toFixed(2);
     });
+	managerSalaryTable.on("input", '.hour', function () {
+        var table=document.getElementById("managerSalary");
+        var tbody = table.children[1];
+        var tfoot = table.children[2];
+        var rowindex=this.parentElement.rowIndex-2;
+        var colindex=this.cellIndex;
+        var sum=0;
+        for (var i = 0; i < tbody.rows.length; i++) {
+            if ($.isNumeric(tbody.rows[i].cells[colindex].innerHTML))
+                sum += parseFloat(tbody.rows[i].cells[colindex].innerHTML);
+        }
+        tfoot.rows[0].cells[colindex].textContent=sum.toFixed(2);
+	});
 
     function checkAll() {
         var mckeckbox=document.activeElement;

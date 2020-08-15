@@ -449,6 +449,19 @@ def search_material():
     else: return jsonify({'ok': False})
 
 # xijiawei
+# 订单管理
+@product_app.route('/search_product/<filterStr>', methods=['GET'])
+def search_product(filterStr):
+    if session.get('username'):
+        username = session['username']
+        if request.method == "GET":
+            thread = myThread(target=select_productInfoByFilter, args=(filterStr,))  # client, address, contact, telephone
+            products = thread.get_result()
+            return jsonify({'ok': True,'products':products})
+    else:
+        return jsonify({'ok': False})
+
+# xijiawei
 # 删除成品
 @product_app.route('/product_in', methods=['GET', 'POST'])
 def product_in():

@@ -237,6 +237,31 @@
                                         </tr>
                                     {% endfor %}
                                     </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        {% if sum %}
+                                            <td>合计</td>
+                                            <td style="display: none"></td>
+                                            <td>{{ sum[0] }}</td>
+                                            <td>{{ sum[1] }}</td>
+                                            <td>{{ sum[2] }}</td>
+                                            <td>{{ sum[3] }}</td>
+                                            <td>{{ sum[2]-sum[3] }}</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        {% else %}
+                                            <td>合计</td>
+                                            <td style="display: none"></td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                            <td>-</td>
+                                        {% endif %}
+                                    </tr>
+                                    </tfoot>
                                 </table>
                             </div>
                         </div>
@@ -283,17 +308,18 @@
         $('#rowindex').val(rowindex);
     }
     function modalSubmit() {
+        var clientCode=$('#clientCode').val(),receipt=$('#receipt').val();
         var data = {
-            'clientCode': $('#clientCode').val(),
+            'clientCode': clientCode,
             'beforeReceivable': $('#beforeReceivable').val(),
             'receiptDate': $('#receiptDate').val(),
-            'receipt': $('#receipt').val(),
+            'receipt': receipt,
             'remark': $('#remark').val()
         };
         console.log(data);
 
         $.ajax({
-            url: "/financial_receipts/"+$('#clientCode').val(),
+            url: "/financial_receipts/"+clientCode,
             type: "POST",
             dataType: "json",
             //data:$(this).serialize(),
@@ -303,9 +329,14 @@
                 console.log(callback);
 
                 if(callback['ok']) {
-                    var row=document.getElementById("receivableTable").rows[$("#rowindex").val()];
-                    row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat($('#receipt').val())).toFixed(2);
-                    row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat($('#receipt').val())).toFixed(2);
+                    var table=document.getElementById("receivableTable");
+                    var tfoot=table.children[2];
+                    var row=table.rows[$("#rowindex").val()];
+                    row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat(receipt)).toFixed(2);
+                    row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat(receipt)).toFixed(2);
+
+                    tfoot.rows[0].cells[5].textContent=(parseFloat(tfoot.rows[0].cells[5].textContent)+parseFloat(receipt)).toFixed(2);
+                    tfoot.rows[0].cells[6].textContent=(parseFloat(tfoot.rows[0].cells[6].textContent)-parseFloat(receipt)).toFixed(2);
 
                     $('#clientCode').val("");
                     $('#beforeReceivable').val("");
@@ -358,11 +389,17 @@
                 console.log(callback);
 
                 if(callback['ok']) {
-                    var row=document.getElementById("receivableTable").rows[$("#rowindex").val()];
+                    var table=document.getElementById("receivableTable");
+                    var tfoot=table.children[2];
+                    var row=table.rows[$("#rowindex").val()];
                     var beforeHistoryReceivable=parseFloat(row.cells[1].textContent);
                     row.cells[2].textContent=(parseFloat(row.cells[2].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
                     row.cells[4].textContent=(parseFloat(row.cells[4].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
                     row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
+
+                    tfoot.rows[0].cells[2].textContent=(parseFloat(tfoot.rows[0].cells[2].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
+                    tfoot.rows[0].cells[4].textContent=(parseFloat(tfoot.rows[0].cells[4].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
+                    tfoot.rows[0].cells[6].textContent=(parseFloat(tfoot.rows[0].cells[6].textContent)-beforeHistoryReceivable+historyReceivable).toFixed(2);
 
                     $('#clientCode2').val("");
                     $('#historyReceivable').val("");
