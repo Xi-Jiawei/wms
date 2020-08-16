@@ -101,7 +101,7 @@
                     <div class="card" style="overflow: hidden">
                         <div class="card-body">
 
-                            <!--（删减）
+                            <!--（删减）-->
                             <div class="row" style="position:relative;">
                                 <form id="searchForm" method="post" novalidate="novalidate">
                                     <div class="col-xs-12" style="width: 240px;">
@@ -127,9 +127,9 @@
                                         <button type="submit" id="search" name="search" class="btn btn-default" style="width: 240px;">查询</button>
                                     </div>
                                 </form>
-                            </div>-->
+                            </div>
                             <!--（删减）-->
-                            <div class="row" style="position:relative;">
+                            <!--<div class="row" style="position:relative;">
                                 <form id="searchForm" method="post" novalidate="novalidate">
                                     <div class="col-xs-12" style="width: 240px;">
                                         <label class="control-label mb-1">选择月份</label>
@@ -140,7 +140,7 @@
                                         >
                                     </div>
                                 </form>
-                            </div>
+                            </div>-->
 
                             <hr align="left" style="width: 100%;color: #987cb9;size: 3px">
                             <!--<h3>客户"<span id="clientHeader" style="color: #8a6d3b">"</span></h3>-->
@@ -328,6 +328,21 @@
                     tfootRow.eq(6).text(receivable[2]);
                     tfootRow.eq(7).text(receivable[3]);
                     tfootRow.eq(8).text(receivable[2]-receivable[3]);
+                }else {
+                    var receivable=callback['receivable']; //clientCode,remainReceivable,addReceivable,receivable,receipt,remark
+                    var receivablesOfProduct=callback['receivablesOfProduct']
+                    var table=$('#receivableTable').DataTable();
+                    table.clear();
+                    table.draw();
+
+                    var tfootRow=$('#receivableTable tfoot tr td');
+                    tfootRow.eq(4).text(receivable[1]);
+                    tfootRow.eq(5).text(receivable[0]);
+                    tfootRow.eq(6).text(receivable[2]);
+                    tfootRow.eq(7).text(receivable[3]);
+                    tfootRow.eq(8).text(receivable[2]-receivable[3]);
+
+                    alert("客户不存在.");
                 }
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -367,7 +382,7 @@
     });
     $('#month').on("change", function () {
         var data = {
-            'clientCode':'',
+            'clientCode':$('#clientCode').val(),
             'month': $('#month').val()
         };
         console.log(data);

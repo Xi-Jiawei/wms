@@ -111,6 +111,9 @@
                                 </thead>
                                 <tbody>
                                 </tbody>
+                                <tfoot>
+                                <tr></tr>
+                                </tfoot>
                             </table>
                         </div>
                     </div>
@@ -425,7 +428,10 @@
 
                 if(callback['ok']) {
                     var payments=callback['payments']; // client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark]
-                    var tbody=document.getElementById("paymentsJournal").children[2]; // caption=document.getElementById("paymentsJournal").children[0]; thead=document.getElementById("paymentsJournal").children[1];
+                    var paymentSum=callback['paymentSum'];
+                    var table=document.getElementById("paymentsJournal");
+                    var tbody=table.children[2]; // caption=document.getElementById("paymentsJournal").children[0]; thead=document.getElementById("paymentsJournal").children[1];
+                    var tfoot=table.children[3];
                     $('#paymentsJournal tbody').html("");
                     for(var i=0;i<payments.length;i++){
                         tbody.insertRow(i).innerHTML="<tr><td>"+payments[i][0]+"</td>\n" +
@@ -433,6 +439,10 @@
                             "                                    <td>"+payments[i][2]+"</td>\n" +
                             "                                    <td>"+payments[i][3]+"</td></tr>";
                     }
+                    tfoot.rows[0].innerHTML="<tr><td>合计</td>\n" +
+                            "                                    <td>-</td>\n" +
+                            "                                    <td>"+paymentSum+"</td>\n" +
+                            "                                    <td>-</td></tr>";
 
                     $('#paymentsJournalHeader').text(supplierCode);
                 }

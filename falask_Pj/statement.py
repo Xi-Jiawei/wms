@@ -94,11 +94,19 @@ def statement_receivable():
                 thread = myThread(target=select_all_receivableReportGroupByProductType, args=(month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
                 receivablesOfProduct = thread.get_result()
             else:
-                thread = myThread(target=select_receivableReportByCode, args=(clientCode, month,))
-                receivable = thread.get_result()
-                thread = myThread(target=select_receivableReportGroupByProductTypeByCode, args=(clientCode, month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
-                receivablesOfProduct = thread.get_result()
-            return jsonify({'ok': True,'receivable':receivable,'receivablesOfProduct':receivablesOfProduct})
+                thread = myThread(target=select_clientByCode, args=(clientCode,))
+                clientInfo = thread.get_result()
+                if clientInfo:
+                    thread = myThread(target=select_receivableReportByCode, args=(clientCode, month,))
+                    result = thread.get_result()
+                    receivable = [result[0][1], result[0][2], result[0][3], result[0][4]]
+                    thread = myThread(target=select_receivableReportGroupByProductTypeByCode, args=(clientCode, month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
+                    receivablesOfProduct = thread.get_result()
+                    return jsonify({'ok': True, 'receivable': receivable, 'receivablesOfProduct': receivablesOfProduct})
+                else:
+                    receivable = [0, 0, 0, 0]
+                    receivablesOfProduct = []
+                    return jsonify({'ok': False, 'receivable': receivable, 'receivablesOfProduct': receivablesOfProduct})
         elif request.method=="GET":
             form = ProductForm()
             month = datetime.now().strftime('%Y-%m')
@@ -149,11 +157,19 @@ def statement_payable():
                 thread = myThread(target=select_all_payableReportGroupByMaterialCode, args=(month,))  # productType, addDeliveryNum, price, addReceivable, receivable, remark
                 payablesOfMaterial = thread.get_result()
             else:
-                thread = myThread(target=select_payableReportByCode, args=(supplierCode, month,))
-                payable = thread.get_result()
-                thread = myThread(target=select_payableReportGroupByMaterialCodeByCode, args=(supplierCode, month,))
-                payablesOfMaterial = thread.get_result()
-            return jsonify({'ok': True,'payable':payable,'payablesOfMaterial':payablesOfMaterial})
+                thread = myThread(target=select_supplierByCode, args=(supplierCode,))
+                supplierInfo = thread.get_result()
+                if supplierInfo:
+                    thread = myThread(target=select_payableReportByCode, args=(supplierCode, month,))
+                    result = thread.get_result()
+                    payable = [result[0][1], result[0][2], result[0][3], result[0][4]]
+                    thread = myThread(target=select_payableReportGroupByMaterialCodeByCode, args=(supplierCode, month,))
+                    payablesOfMaterial = thread.get_result()
+                    return jsonify({'ok': True, 'payable': payable, 'payablesOfMaterial': payablesOfMaterial})
+                else:
+                    payable = [0, 0, 0, 0]
+                    payablesOfMaterial = []
+                    return jsonify({'ok': False, 'payable': payable, 'payablesOfMaterial': payablesOfMaterial})
         elif request.method=="GET":
             username = session['username']
             form = ProductForm()

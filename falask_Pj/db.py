@@ -1587,6 +1587,24 @@ def select_deliveryGroupByProductTypeByClientCode(clientCode):
 
 # xijiawei
 # 查询所有订单
+def select_deliveryGroupByProductTypeSumByClientCode(clientCode, productType, month):
+    try:
+        sql = "select date_format(sendDate,'%%Y-%%m') as month, sum(sendNum) from deliveryGroupByProductType where clientCode='%s' and productType='%s' and date_format(sendDate,'%%Y-%%m')='%s' group by month;"%(clientCode, productType, month)
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        if result:
+            return result[0][1]
+        else:
+            return 0
+        conn.close()
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
 def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, unit, price, receivable, remark, entryTime, entryClerk):
     try:
         lock.acquire()
@@ -1647,7 +1665,7 @@ def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, del
         #     cur.execute("update receivableReportGroupByProductType set addDeliveryNum=addDeliveryNum+'%d', deliveryNum=deliveryNum+'%d', addReceivable=addReceivable+'%f', receivable=receivable+'%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month='%s';" % (deliveryNum, deliveryNum, receivable, receivable, remark, entryTime, entryClerk, clientCode, productType, month)) # 更新该月的addDeliveryNum和addReceivable
         #     cur.execute("update receivableReportGroupByProductType set remainDeliveryNum=remainDeliveryNum+'%d', deliveryNum=deliveryNum+'%d', remainReceivable=remainReceivable+'%f', receivable=receivable+'%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month>'%s';" % (deliveryNum, deliveryNum, receivable, receivable, remark, entryTime, entryClerk, clientCode, productType, month)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
         # else:
-        #     cur.execute("select deliveryNum-deliveredNum,receivable-receipt from receivableReportGroupByProductType where clientCode='%s' and month in (select max(month) from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month<'%s');" % (clientCode, clientCode, productType, month))
+        #     cur.execute("select deliveryNum-deliveredNum,receivable-receipt from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month in (select max(month) from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month<'%s');" % (clientCode, productType, clientCode, productType, month))
         #     result = cur.fetchall()
         #     if result:
         #         remainDeliveryNum = result[0][0]
@@ -1679,7 +1697,7 @@ def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, del
             cur.execute("update receivableReportGroupByProductType set addDeliveryNum=addDeliveryNum+'%d', deliveryNum=deliveryNum+'%d', price='%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month='%s';" % (deliveryNum, deliveryNum, price, remark, entryTime, entryClerk, clientCode, productType, month)) # 更新该月的addDeliveryNum和addReceivable
             cur.execute("update receivableReportGroupByProductType set remainDeliveryNum=remainDeliveryNum+'%d', deliveryNum=deliveryNum+'%d', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month>'%s';" % (deliveryNum, deliveryNum, remark, entryTime, entryClerk, clientCode, productType, month)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
         else:
-            cur.execute("select deliveryNum-deliveredNum,receivable-receipt from receivableReportGroupByProductType where clientCode='%s' and month in (select max(month) from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month<'%s');" % (clientCode, clientCode, productType, month))
+            cur.execute("select deliveryNum-deliveredNum,receivable-receipt from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month in (select max(month) from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month<'%s');" % (clientCode, productType, clientCode, productType, month))
             result = cur.fetchall()
             if result:
                 remainDeliveryNum = result[0][0]
@@ -1687,7 +1705,7 @@ def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, del
             else:
                 remainDeliveryNum = 0
                 remainReceivable = 0
-            cur.execute("insert into receivableReportGroupByProductType (clientCode, productType, month, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, price, remainReceivable, addReceivable, receivable, receipt, remark, entryTime, entryClerk) value ('%s','%s','%s','%d','%d','%d','%d','%f','%f','%f','%f','%f','%s','%s','%s');" % (clientCode, productType, month, remainDeliveryNum, deliveryNum, deliveryNum, 0, price, remainReceivable, 0, remainReceivable, 0, remark, entryTime, entryClerk))
+            cur.execute("insert into receivableReportGroupByProductType (clientCode, productType, month, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, price, remainReceivable, addReceivable, receivable, receipt, remark, entryTime, entryClerk) value ('%s','%s','%s','%d','%d','%d','%d','%f','%f','%f','%f','%f','%s','%s','%s');" % (clientCode, productType, month, remainDeliveryNum, deliveryNum, remainDeliveryNum + deliveryNum, 0, price, remainReceivable, 0, remainReceivable, 0, remark, entryTime, entryClerk))
         # 更新deliveryGroupByProductType
         cur.execute("update deliveryGroupByProductType set beforeDeliveryNum=beforeDeliveryNum+'%d' where clientCode='%s' and productType='%s' and date_format(entryTime,'%%Y-%%m')>='%s';"%(deliveryNum, clientCode, productType, orderDate[0:7]))
 
@@ -1873,7 +1891,25 @@ def insert_deliveryGroupByProductType(deliveryCode, clientCode, productType, bef
             else:
                 remainReceivable = 0
             cur.execute("insert into receivableReport (clientCode, month, remainReceivable, addReceivable, receivable, receipt, remark, entryTime, entryClerk) value ('%s','%s','%f','%f','%f','%f','%s','%s','%s');" % (clientCode, month, remainReceivable, receivable, remainReceivable + receivable, 0, remark, entryTime, entryClerk))
-        cur.execute("update receivableReportGroupByProductType set deliveredNum=deliveredNum+'%d', addReceivable=addReceivable+'%f', receivable=receivable+'%f', price='%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month='%s';" % (sendNum, receivable, receivable, price, remark, entryTime, entryClerk, clientCode, productType, month))
+
+        # cur.execute("update receivableReportGroupByProductType set deliveredNum=deliveredNum+'%d', addReceivable=addReceivable+'%f', receivable=receivable+'%f', price='%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month='%s';" % (sendNum, receivable, receivable, price, remark, entryTime, entryClerk, clientCode, productType, month))
+        # 更新receivableReportGroupByProductType
+        cur.execute("select clientCode from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month='%s';"%(clientCode,productType,month))
+        result = cur.fetchall()
+        if result:
+            cur.execute("update receivableReportGroupByProductType set deliveredNum=deliveredNum+'%d', addReceivable=addReceivable+'%f', receivable=receivable+'%f', price='%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month='%s';" % (sendNum, receivable, receivable, price, remark, entryTime, entryClerk, clientCode, productType, month)) # 更新该月的addDeliveryNum和addReceivable
+            cur.execute("update receivableReportGroupByProductType set remainDeliveryNum=remainDeliveryNum-'%d', deliveryNum=deliveryNum-'%d', remainReceivable=remainReceivable+'%f', receivable=receivable+'%f', remark=concat(remark,'%s'), entryTime='%s', entryClerk='%s' where clientCode='%s' and productType='%s' and month>'%s';" % (sendNum, sendNum, receivable, receivable, remark, entryTime, entryClerk, clientCode, productType, month)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
+        else:
+            cur.execute("select deliveryNum-deliveredNum,receivable-receipt from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month in (select max(month) from receivableReportGroupByProductType where clientCode='%s' and productType='%s' and month<'%s');" % (clientCode, productType, clientCode, productType, month))
+            result = cur.fetchall()
+            if result:
+                remainDeliveryNum = result[0][0]
+                remainReceivable = result[0][1]
+            else:
+                remainDeliveryNum = 0
+                remainReceivable = 0
+            cur.execute("insert into receivableReportGroupByProductType (clientCode, productType, month, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, price, remainReceivable, addReceivable, receivable, receipt, remark, entryTime, entryClerk) value ('%s','%s','%s','%d','%d','%d','%d','%f','%f','%f','%f','%f','%s','%s','%s');" % (clientCode, productType, month, remainDeliveryNum, 0, remainDeliveryNum, sendNum, price, remainReceivable, receivable, remainReceivable + receivable, 0, remark, entryTime, entryClerk))
+
         cur.execute("update clients set client='%s', contact='%s', address='%s', telephone='%s',receivable=receivable+'%f' where clientCode='%s';" % (client, contact, address, telephone, receivable, clientCode))
         cur.execute("update productInfo set inventoryNum=inventoryNum-'%d' where productType='%s';" % (sendNum, productType))
 
@@ -1883,7 +1919,6 @@ def insert_deliveryGroupByProductType(deliveryCode, clientCode, productType, bef
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
-
 
 # xijiawei
 # 删除订单
@@ -1972,6 +2007,23 @@ def select_receiptsJournal(clientCode):
         result = cur.fetchall()
         lock.release()
         return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_receiptsJournalSum(clientCode):
+    try:
+        sql = "select round(sum(receipt),2) from receiptsJournal where clientCode='%s' group by clientCode;"%clientCode
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        if result:
+            return result[0][0]
+        else:
+            return 0
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
@@ -2103,6 +2155,20 @@ def select_all_suppliers():
         conn.rollback()
 
 # xijiawei
+# 查询所有订单
+def select_supplierByCode(supplierCode):
+    try:
+        sql = "select supplier, address, contact, telephone  from suppliers where supplierCode='%s';"%supplierCode
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
 # 模糊查询物料信息
 def select_supplierInfoByFilter(filterStr):
     conn=db.conn()
@@ -2137,6 +2203,23 @@ def select_paymentsJournal(supplierCode):
         result = cur.fetchall()
         lock.release()
         return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_paymentsJournalSum(supplierCode):
+    try:
+        sql = "select round(sum(payment),2) from paymentsJournal where supplierCode='%s' group by supplierCode;"%supplierCode
+        lock.acquire()
+        cur.execute(sql)
+        result = cur.fetchall()
+        lock.release()
+        if result:
+            return result[0][0]
+        else:
+            return 0
     except Exception as e:
         print("数据库操作异常：",e)
         conn.rollback()
@@ -2623,7 +2706,23 @@ def insert_supplementaryPayments(supplierCode, paymentDate, beforePayable, payme
         lock.acquire()
         cur.execute("insert into supplementaryPaymentsJournal (supplierCode,paymentDate,beforePayable,payment,remark,entryTime,entryClerk) values('%s','%s','%f','%f','%s','%s','%s');" % (supplierCode, paymentDate, beforePayable, payment, remark, entryTime, entryClerk))
         cur.execute("update supplementarySuppliers set payment=payment+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s';" % (payment, entryTime, entryClerk, supplierCode))
-        cur.execute("update supplementaryPayableReport set payment=payment+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s' and month='%s';" % (payment, entryTime, entryClerk, supplierCode, paymentDate[0:7]))
+
+        # 更新应付报表
+        # cur.execute("update supplementaryPayableReport set payment=payment+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s' and month='%s';" % (payment, entryTime, entryClerk, supplierCode, paymentDate[0:7]))
+        month = entryTime[0:7]
+        cur.execute("select supplierCode from supplementaryPayableReport where supplierCode='%s' and month='%s';" % (supplierCode, month))
+        result = cur.fetchall()
+        if result:
+            cur.execute("update supplementaryPayableReport set payment=payment+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s' and month='%s';" % (payment, entryTime, entryClerk, supplierCode, paymentDate[0:7]))
+        else:
+            cur.execute("select payable-payment from supplementaryPayableReport where supplierCode='%s' and month in (select max(month) from supplementaryPayableReport where supplierCode='%s' and month<'%s');" % (supplierCode, supplierCode, month))
+            result = cur.fetchall()
+            if result:
+                remainPayable = result[0][0]
+            else:
+                remainPayable = 0
+            cur.execute("insert into supplementaryPayableReport (supplierCode, month, remainPayable, addPayable, payable, payment, entryTime, entryClerk) value ('%s','%s','%f','%f','%f','%f','%s','%s');" % (supplierCode, month, remainPayable, 0, remainPayable, payment, entryTime, entryClerk))
+
         conn.commit()
         lock.release()
     except Exception as e:

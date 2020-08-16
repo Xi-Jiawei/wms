@@ -129,7 +129,8 @@
                         <button type="button" class="close" onclick="deliverDialogClose()">&times;</button>
                         <div class="card-body">
                             <table id="deliverOrder" class="table table-striped table-bordered">
-                                <caption><h3 id="deliverOrderHeader">订单<span style="color: #8a6d3b"></span></h3></caption>
+                                <!--<caption><h3 id="deliverOrderHeader">订单<span style="color: #8a6d3b"></span></h3></caption>-->
+                                <caption><h3 id="deliverOrderHeader">选择出货成品</h3></caption>
                                 <thead>
                                 <tr>
                                     <td width=20px><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAllProduct()"/></td>
@@ -137,7 +138,7 @@
                                     <td>上月结余应出货</td>
                                     <td>本月新增应出货</td>
                                     <td>本月应出货</td>
-                                    <td>已出货</td>
+                                    <td>本月已出货</td>
                                     <td>库存</td>
                                     <td>出货日期</td>
                                     <td>出货量</td>
@@ -906,7 +907,7 @@
                             "<td>" + deliveries[i][2][0][1] + "</td>\n" +
                             "<td>" + deliveries[i][2][0][2] + "</td>\n" +
                             "<td>" + deliveries[i][2][0][3] + "</td>\n" +
-                            "<td>" + deliveries[i][2][0][4] + "</td>\n" +
+                            "<td>" + deliveries[i][2][0][4].toFixed(2) + "</td>\n" +
                             "<td>" + deliveries[i][2][0][7] + "</td>\n" +
                             "<td rowspan=" + deliveries[i][2].length + "><a onclick='deliverBillPrint(\"" + clientCode + "\",\"" + deliveries[i][2][0][0] + "\",\"" + deliveries[i][0] + "\")'> 打印 </a></td>\n" +
                             "<td rowspan=" + deliveries[i][2].length + "><a onclick='deliverRecordDelete(\"" + deliveries[i][0] + "\")'> 删除 </a></td></tr>";
@@ -916,7 +917,7 @@
                                 "<td>" + deliveries[i][2][j][1] + "</td>\n" +
                                 "<td>" + deliveries[i][2][j][2] + "</td>\n" +
                                 "<td>" + deliveries[i][2][j][3] + "</td>\n" +
-                                "<td>" + deliveries[i][2][j][4] + "</td>\n" +
+                                "<td>" + deliveries[i][2][j][4].toFixed(2) + "</td>\n" +
                                 "<td>" + deliveries[i][2][j][7] + "</td></tr>";
                             tableHtml += rowTemplate;
                         }

@@ -264,7 +264,9 @@ def deliverGroupByProductType(clientCode):
                 # 返回刷新数据
                 productDeliverRecord = []
                 productDeliverRecord.append(productType)
-                productDeliverRecord.append(beforeDeliveredNum + sendNum)
+                # productDeliverRecord.append(beforeDeliveredNum + sendNum)
+                thread = myThread(target=select_deliveryGroupByProductTypeSumByClientCode, args=(clientCode, productType, entryTime[0:7], ))
+                productDeliverRecord.append(int(thread.get_result()))
                 productDeliverRecord.append(beforeInventoryNum - sendNum)
                 productDeliverRecord.append(deliveryCode)
                 productDeliverRecord.append(sendDate)

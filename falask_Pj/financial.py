@@ -68,7 +68,9 @@ def financial_receipts(clientCode):
         elif request.method=="GET":
             thread = myThread(target=select_receiptsJournal, args=(clientCode,))
             receipts = thread.get_result()
-            return jsonify({'ok': True,'receipts':receipts})
+            thread = myThread(target=select_receiptsJournalSum, args=(clientCode,))
+            receiptSum = thread.get_result()
+            return jsonify({'ok': True, 'receipts': receipts, 'receiptSum': receiptSum})
     else:
         return render_template('access_fail.html')
 
@@ -150,7 +152,9 @@ def financial_payments(supplierCode):
         elif request.method=="GET":
             thread = myThread(target=select_paymentsJournal, args=(supplierCode,))
             payments = thread.get_result()
-            return jsonify({'ok': True,'payments':payments})
+            thread = myThread(target=select_paymentsJournalSum, args=(supplierCode,))
+            paymentSum = thread.get_result()
+            return jsonify({'ok': True, 'payments': payments, 'paymentSum': paymentSum})
     else:
         return render_template('access_fail.html')
 
@@ -584,7 +588,7 @@ def supplementary_payments(supplierCode):
             remark = data['remark']
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             entryClerk = username
-            thread = myThread(target=insert_supplementaryPayments,args=(supplierCode, paymentDate, beforePayable, payment, remark, entryTime, entryClerk,))
+            myThread(target=insert_supplementaryPayments,args=(supplierCode, paymentDate, beforePayable, payment, remark, entryTime, entryClerk,))
             return jsonify({'ok': True})
     else:
         return render_template('access_fail.html')

@@ -101,7 +101,7 @@
                     <div class="card" style="overflow: hidden">
                         <div class="card-body">
 
-                            <!--（未删减）
+                            <!--（未删减）-->
                             <div class="row" style="position:relative;">
                                 <form id="searchForm" method="post" novalidate="novalidate">
                                     <div class="col-xs-12" style="width: 240px;">
@@ -127,9 +127,9 @@
                                         <button type="submit" id="search" name="search" class="btn btn-default" style="width: 240px;">查询</button>
                                     </div>
                                 </form>
-                            </div>-->
+                            </div>
                             <!--（删减）-->
-                            <div class="row" style="position:relative;">
+                            <!--<div class="row" style="position:relative;">
                                 <form id="searchForm" method="post" novalidate="novalidate">
                                     <div class="col-xs-12" style="width: 240px;">
                                         <label class="control-label mb-1">选择月份</label>
@@ -140,7 +140,7 @@
                                         >
                                     </div>
                                 </form>
-                            </div>
+                            </div>-->
 
                             <hr align="left" style="width: 100%;color: #987cb9;size: 3px">
                             <!--<h3>供应商"<span id="clientHeader" style="color: #8a6d3b">"</span></h3>-->
@@ -346,7 +346,7 @@
     });
     $('#month').on("change", function () {
         var data = {
-            'supplierCode':'',
+            'supplierCode':$('#supplierCode').val(),
             'month': $('#month').val()
         };
         console.log(data);
