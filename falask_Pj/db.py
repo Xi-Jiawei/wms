@@ -3,6 +3,7 @@ import pymysql
 
 import uuid
 from datetime import datetime
+from flask import current_app
 
 # 说明：
 # 其中一些方法是可用不用、暂不用、弃用，分别表示：
@@ -158,6 +159,7 @@ def select_user_authority(username):
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -172,9 +174,9 @@ def insert_user(username, password, authority):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     except Exception as e:
-        print("插入异常：", e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -189,9 +191,9 @@ def update_user_authority(userid, authority):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     except Exception as e:
-        print("插入异常：", e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -206,9 +208,9 @@ def update_user_password(username, password):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     except Exception as e:
-        print("插入异常：", e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -223,9 +225,9 @@ def delete_userByID(userid):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     except Exception as e:
-        print("插入异常：", e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -265,9 +267,9 @@ def select_productInfoByCode(productCode):
         conn.close()
         return result
     except Exception as e:
-        print("异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 根据成品编码查询成品信息
@@ -283,9 +285,9 @@ def select_productInfoByType(productType):
         conn.close()
         return result
     except Exception as e:
-        print("异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 根据成品编码查询成品物料组成
@@ -302,8 +304,8 @@ def select_materialsOfProductByCode(productCode):
         conn.close()
         return result
     except Exception as e:
-        print("异常：",e)
-        conn.close()
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -330,9 +332,9 @@ def select_materialsOfProductByCodeArr(productCodeArr):
         conn.close()
         return result
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 根据成品型号查询成品编码
@@ -348,12 +350,9 @@ def select_productCodeByType(productType):
         conn.close()
         return result
     except Exception as e:
-        print("异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
-        #lock.release()
-    finally:
-        print("查询编码")
 
 # xijiawei
 # 根据成品编码查询成品型号
@@ -369,12 +368,9 @@ def select_productTypeByCode(productCode):
         conn.close()
         return result
     except Exception as e:
-        print("异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
-        #lock.release()
-    finally:
-        print("查询型号")
 
 # xijiawei
 # 根据成品编码查询成品其他成本组成信息
@@ -410,8 +406,8 @@ def select_productInfoByFilter(filterStr):
         return None
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 插入成品
@@ -501,9 +497,9 @@ def insert_otherCosts(productCode,processCost,adminstrationCost,supplementaryCos
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     except Exception as e:
-        print("插入异常：", e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -521,11 +517,11 @@ def insert_productChange(productCode,entryClerk,updateOfContent,entryDate):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
-        print("插入异常：", e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -578,11 +574,11 @@ def copy_productInfo(productCode, newProductCode, newProductType):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -596,7 +592,8 @@ def update_productInventoryNum(productCode, productNum, remark):
         conn.commit()
         lock.release()
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -613,11 +610,11 @@ def delete_productInfo(productCode):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -652,11 +649,11 @@ def delete_materialsOfProduct(productCode):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -673,11 +670,11 @@ def delete_otherCosts(productCode):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
-        print("删除异常：",e)
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -740,6 +737,7 @@ def select_procurement():
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -756,6 +754,7 @@ def select_procurementByCode(procurementCode):
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -786,6 +785,7 @@ def select_materialsOfProcurementByCode(procurementCode):
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -831,6 +831,7 @@ def delete_procurementByCode(procurementCode, entryClerk):
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -876,6 +877,7 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -915,6 +917,7 @@ def update_procurement(procurementCode,productCodeArr,productNumArr,client,remar
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -952,8 +955,8 @@ def select_materialInfoByCode(materialCode):
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 模糊查询物料信息
@@ -992,6 +995,7 @@ def select_materialInfoForOptions(filterStr):
 #     #     conn.rollback()
 #     except Exception as e:
 #         print("数据库操作异常：",e)
+#         current_app.logger.exception(e)
 #         conn.rollback()
 
 # xijiawei
@@ -1020,6 +1024,7 @@ def select_materialInfoForOptions(filterStr):
 #     #     conn.rollback()
 #     except Exception as e:
 #         print("数据库操作异常：",e)
+#         current_app.logger.exception(e)
 #         conn.rollback()
 
 # xijiawei
@@ -1057,6 +1062,7 @@ def select_materialInfoForOptions(filterStr):
 #     #     conn.rollback()
 #     except Exception as e:
 #         print("数据库操作异常：",e)
+#         current_app.logger.exception(e)
 #         conn.rollback()
 
 # xijiawei
@@ -1091,8 +1097,8 @@ def select_materialInfoByFilter(filterStr):
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 添加或更新物料
@@ -1114,11 +1120,11 @@ def insertOrUpdate_materialInfo(materialCode, materialType, materialName, remark
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1173,9 +1179,9 @@ def select_all_materialInOut():
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1189,9 +1195,9 @@ def select_sum_materialInOut():
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1271,11 +1277,11 @@ def insert_materialInOut(documentNumber,documentTime,materialCode,isInOrOut,oper
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1368,11 +1374,11 @@ def update_materialInOut(documentNumber, documentTime, isInOrOut, operateNum, un
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1391,11 +1397,11 @@ def update_materialInOutByCode(materialCode, differenceOperateNum, operateTime):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1454,11 +1460,11 @@ def delete_materialInOutByDocNum(documentNumber):
         lock.release()
         print("语句已经提交")
         return True
-        conn.close()
     # except:
     #     conn.rollback()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 订单 #####
@@ -1473,9 +1479,9 @@ def select_concated_orders():
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1488,9 +1494,9 @@ def select_orderByCode(orderCode):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1502,9 +1508,9 @@ def select_orderByCodeAndType(orderCode,productType):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1519,6 +1525,7 @@ def select_all_orderGroupByProductType():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1533,6 +1540,7 @@ def select_orderGroupByProductTypeByCode(clientCode):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1554,6 +1562,7 @@ def select_receivableReportGroupByProductTypeByClientCodeAndProductType(clientCo
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1565,9 +1574,9 @@ def select_orderGroupByProductTypeByClientCodeAndProductType(clientCode, product
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1580,9 +1589,9 @@ def select_deliveryGroupByProductTypeByClientCode(clientCode):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1598,9 +1607,9 @@ def select_deliveryGroupByProductTypeSumByClientCode(clientCode, productType, mo
             return result[0][1]
         else:
             return 0
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1714,6 +1723,7 @@ def insert_order(orderCode, orderDate, clientCode, productType, deliveryNum, del
         return
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1739,9 +1749,9 @@ def delete_order(orderCode):
         conn.commit()
         lock.release()
         return
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 出货 #####
@@ -1756,9 +1766,9 @@ def select_deliveryByCode(deliveryCode):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1771,9 +1781,9 @@ def select_deliveryWithOrderByCode(orderCode):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1786,9 +1796,9 @@ def select_deliveryByOrderCodeAndProductType(orderCode,productType):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1801,9 +1811,9 @@ def select_deliveryGroupByProductTypeByCode(deliveryCode):
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1816,9 +1826,9 @@ def select_deliveryGroupByProductTypeByClientCodeAndProductType(clientCode, prod
         result = cur.fetchall()
         lock.release()
         return result
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1857,9 +1867,9 @@ def insert_delivery(deliveryCode, orderCode, productType, beforeDeliveryNum, sen
         conn.commit()
         lock.release()
         return
-        conn.close()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1918,6 +1928,7 @@ def insert_deliveryGroupByProductType(deliveryCode, clientCode, productType, bef
         return
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1936,9 +1947,9 @@ def delete_deliveryGroupByProductType(deliveryCode):
         conn.commit()
         lock.release()
         return
-        conn.close()
     except Exception as e:
         print("数据库操作异常：", e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 
@@ -1956,6 +1967,7 @@ def select_all_clients():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -1980,8 +1992,8 @@ def select_clientInfoByFilter(filterStr):
         return None
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 查询所有订单
@@ -1995,6 +2007,7 @@ def select_clientByCode(clientCode):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2009,6 +2022,7 @@ def select_receiptsJournal(clientCode):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2026,6 +2040,7 @@ def select_receiptsJournalSum(clientCode):
             return 0
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2042,6 +2057,7 @@ def select_all_receivableReport(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2064,6 +2080,7 @@ def select_receivableReportByCode(clientCode,month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2080,6 +2097,7 @@ def select_receivableReportGroupByProductTypeByCode(clientCode,month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2093,6 +2111,7 @@ def select_all_receivableReportGroupByProductType(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2123,6 +2142,7 @@ def insert_receiptsJournal(clientCode,receiptDate,beforeReceivable,receipt,remar
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2136,6 +2156,7 @@ def update_historyReceivable(clientCode,historyReceivable,entryTime,entryClerk):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 付款 #####
@@ -2152,6 +2173,7 @@ def select_all_suppliers():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2166,6 +2188,7 @@ def select_supplierByCode(supplierCode):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2190,8 +2213,8 @@ def select_supplierInfoByFilter(filterStr):
         return None
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 查询所有订单
@@ -2205,6 +2228,7 @@ def select_paymentsJournal(supplierCode):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2222,6 +2246,7 @@ def select_paymentsJournalSum(supplierCode):
             return 0
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2238,6 +2263,7 @@ def select_all_payableReport(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2260,6 +2286,7 @@ def select_payableReportByCode(supplierCode,month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2273,6 +2300,7 @@ def select_payableReportGroupByMaterialCodeByCode(supplierCode,month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2286,6 +2314,7 @@ def select_all_payableReportGroupByMaterialCode(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2300,6 +2329,7 @@ def insert_paymentsJournal(supplierCode,paymentDate,beforePayable,payment,remark
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2313,6 +2343,7 @@ def update_historyPayable(supplierCode,historyPayable,entryTime,entryClerk):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 工资 #####
@@ -2328,6 +2359,7 @@ def select_all_workerSalary():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2346,6 +2378,7 @@ def insert_workerSalary(month, name, position, workhours, overhours, realwage, a
         return staffid
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2361,6 +2394,7 @@ def update_workerSalary(month, staffid, name, position, workhours, overhours, re
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2373,6 +2407,7 @@ def delete_staffByID(staffid):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2386,6 +2421,7 @@ def delete_workerSalaryByIDAndMonth(staffid, month):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2399,6 +2435,7 @@ def delete_managerSalaryByIDAndMonth(staffid, month):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2412,6 +2449,7 @@ def select_all_managerSalary():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2430,6 +2468,7 @@ def insert_managerSalary(month, name, position, workhours, overhours, realwage, 
         return staffid
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2445,6 +2484,7 @@ def update_managerSalary(month, staffid, name, position, workhours, overhours, r
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2458,6 +2498,7 @@ def select_workerSalaryByMonth(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2471,6 +2512,7 @@ def select_managerSalaryByMonth(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2487,6 +2529,7 @@ def select_workerSalarySumByMonth(month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2503,6 +2546,7 @@ def select_managerSalarySumByMonth(month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 其他费用之辅料 #####
@@ -2518,6 +2562,7 @@ def select_all_supplementarySuppliers():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2542,8 +2587,8 @@ def select_supplementarySupplierInfoByFilter(filterStr):
         return None
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
-        conn.close()
 
 # xijiawei
 # 查询所有订单
@@ -2556,6 +2601,7 @@ def select_supplementaryByCode(supplierCode):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2569,6 +2615,7 @@ def select_all_supplementary(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2582,6 +2629,7 @@ def select_supplementaryByCodeAndMonth(supplierCode,month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2603,6 +2651,7 @@ def select_supplementaryPayableReportByCode(supplierCode,month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2651,6 +2700,7 @@ def insert_supplementary(supplierCode,supplementaryCode,inDate,inNum,price,remar
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2673,6 +2723,7 @@ def delete_supplementaryByCode(inCode, entryTime, entryClerk):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2697,6 +2748,7 @@ def delete_supplementaryBySupplierCode(supplierCode, entryTime, entryClerk):
         cur.execute("delete from supplementarySuppliers where supplierCode='%s';" % supplierCode)
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2727,6 +2779,7 @@ def insert_supplementaryPayments(supplierCode, paymentDate, beforePayable, payme
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 其他费用之运营 #####
@@ -2742,6 +2795,7 @@ def select_all_operation():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2755,6 +2809,7 @@ def select_operationsByMonth(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2771,6 +2826,7 @@ def select_operationSumByMonth(month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2784,6 +2840,7 @@ def select_operationSelect():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2800,6 +2857,7 @@ def select_operationsBySelect(select, month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2819,6 +2877,7 @@ def select_operationSumBySelect(select, month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2835,6 +2894,7 @@ def select_operationsByDuration(select, startMonth, endMonth):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2854,6 +2914,7 @@ def select_operationSumByDuration(select, startMonth, endMonth):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2867,6 +2928,7 @@ def insert_operation(costDate, cost, remark, entryTime, entryClerk):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2879,6 +2941,7 @@ def delete_operationByCode(costCode):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2891,6 +2954,7 @@ def update_operation(costCode, costDate, cost, remark, entryTime, entryClerk):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2903,6 +2967,7 @@ def delete_operationByMonth(month):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 其他费用之售后 #####
@@ -2918,6 +2983,7 @@ def select_all_aftersale():
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2931,6 +2997,7 @@ def select_aftersalesByMonth(month):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2947,6 +3014,7 @@ def select_aftersaleSumByMonth(month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2960,6 +3028,7 @@ def select_aftersalesByDuration(startMonth, endMonth):
         return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2976,6 +3045,7 @@ def select_aftersaleSumByDuration(startMonth, endMonth):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -2989,6 +3059,7 @@ def insert_aftersale(costDate, productType, client, laborCost, materialCost, oth
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -3001,6 +3072,7 @@ def delete_aftersaleByCode(costCode):
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -3013,6 +3085,7 @@ def update_aftersale(costCode, costDate, productType, client, laborCost, materia
         lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 ##### 月度报表 #####
@@ -3031,6 +3104,7 @@ def select_addReceivableSumByMonth(month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -3047,6 +3121,7 @@ def select_addPayableSumByMonth(month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()
 
 # xijiawei
@@ -3063,4 +3138,5 @@ def select_supplementaryAddPayableSumByMonth(month):
             return result
     except Exception as e:
         print("数据库操作异常：",e)
+        current_app.logger.exception(e)
         conn.rollback()

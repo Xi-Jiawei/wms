@@ -7,6 +7,7 @@ from db import *
 import config
 import os
 import sys
+import logging
 
 from product import product_app
 from procurement import procurement_app
@@ -28,6 +29,28 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
 app.config.from_object(config)
 app.config['SECRET_KEY'] = os.urandom(24)  # 设置为24位的字符,每次运行服务器都是不同的，所以服务器启动一次上次的session就清除。
 
+# 日志配置
+rootpath = os.path.abspath(".")
+prepath = os.path.abspath("..")
+logpath = os.path.join(prepath, 'log')
+nowtime = datetime.now().strftime('%Y%m%d%H%M%S%f')
+logfile = os.path.join(logpath, nowtime[0:21]+'.log')
+# os.mkdir(logpath)
+open(logfile,'w')
+logging_handler = logging.FileHandler(logfile, encoding='UTF-8')
+logging_format = logging.Formatter('%(asctime)s [%(thread)d:%(threadName)s] [%(filename)s:%(module)s:%(funcName)s] [%(levelname)s]: %(message)s')
+logging_handler.setFormatter(logging_format)
+app.logger.addHandler(logging_handler)
+# 异常打印
+@app.errorhandler(404)
+def page_not_found(error):
+    app.logger.error(error)
+    return 'This page not found.', 404
+# 异常打印
+@app.errorhandler(500)
+def special_exception_handler(error):
+    app.logger.error(error)
+    return 'System error, please contact administrator.', 500
 
 # cc管理员
 @app.route('/admin')
