@@ -176,13 +176,13 @@
                             <!--“ table table-striped table-bordered ”两行之前有不同的颜色且水平方向上有分割线和边框-->
                             <!--id="bootstrap-data-table" 引用datatables.min.js API-->
                             <div class="row">
-                                <input type="text" id="query" class="hidden-print" placeholder="过滤选择" style="float: right; margin-right: 2%;width: 20%;"/>
+                                <input type="text" id="query" class="hidden-print" placeholder="内容过滤" style="float: right; margin-right: 2%;width: 20%;"/>
                             </div>
                             <div id="procurement_div" style="position: relative; padding-top: 20px;">
                                 <table id="procurement_table" class="table table-striped">
                                     <thead>
                                     <tr>
-                                        <th width="50px">序号</th>
+                                        <th width="100px">序号</th>
                                         <th width="90px">成品编码</th>
                                         <th width="90px">成品型号</th>
                                         <th width="90px">成品数量</th>
@@ -327,10 +327,6 @@
 <script src="/static/jquery/fullcalendar.min.js"></script>
 <script src="/static/jquery/fullcalendar-init.js"></script>
 <script src="/static/jquery/weather-init.js"></script>
-<script>
-    $(function() {})
-</script>
-
 <script src="/static/jquery/jquery-2.1.4.min.js"></script>
 <script>
     $(function() {
@@ -541,6 +537,8 @@
         $("#procurement_table tbody").html(tableHtml);
         console.log("mark");
         console.log(document.getElementById("procurement_table"));
+
+        originTable=document.getElementById('procurement_table');
     };
 
     $("#productNum").on('input',function(e){
@@ -903,8 +901,8 @@
     });
 
     $("#procurement_table").on('input','.remark',function(e){
-        /*console.log(this.innerHTML);
-        var rowindex=this.parentElement.rowIndex;
+        console.log(this.innerHTML);
+        /*var rowindex=this.parentElement.rowIndex;
         var rows=document.getElementById('procurement_table').rows;
         for(var k=1;rowindex-k>0;k++)
             if(rows[rowindex-k].cells[0].hasAttribute("rowspan"))
