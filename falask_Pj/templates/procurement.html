@@ -167,7 +167,7 @@
             <div class="row">
 
                 <div class="col-md-12">
-                    <div id="procurement_div" class="card" style="overflow: hidden">
+                    <div class="card" style="overflow: hidden">
                         <div class="card-header" style="text-align: center;font-size: xx-large">
                             <strong class="card-title">采购清单</strong>
                         </div>
@@ -175,106 +175,107 @@
                             <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
                             <!--“ table table-striped table-bordered ”两行之前有不同的颜色且水平方向上有分割线和边框-->
                             <!--id="bootstrap-data-table" 引用datatables.min.js API-->
-                            <input type="text" id="query" class="hidden-print" style="float: right;width: 300px"/>
-                            <br>
-                            <br>
-                            <table id="procurement_table" class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th width="50px">序号</th>
-                                    <th width="90px">成品编码</th>
-                                    <th width="90px">成品型号</th>
-                                    <th width="90px">成品数量</th>
-                                    <th width="60px">物料编码</th>
-                                    <th width="90px">物料名称</th>
-                                    <th width="90px">物料型号</th>
-                                    <th width="60px">单位</th>
-                                    <th width="90px">库存数量</th>
-                                    <th width="100px">需出库数量</th>
-                                    <th width="100px">余库存数量</th>
-                                    <!--<th width="90px">欠料数量</th>-->
-                                    <th width="90px">供货厂家</th>
-                                    <th width="60px">备注</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for product in products %}
-                                <tr>
-                                    <td rowspan="{{ product[3].__len__() }}"></td>
-                                    <td rowspan="{{ product[3].__len__() }}">{{ product[0] }}</td>
-                                    <td rowspan="{{ product[3].__len__() }}">{{ product[1] }}</td>
-                                    <td rowspan="{{ product[3].__len__() }}">{{ product[2] }}</td>
-                                    <td>{{ product[3][0][0] }}</td>
-                                    <td>{{ product[3][0][1] }}</td>
-                                    <td>{{ product[3][0][2] }}</td>
-                                    <td>-</td>
-                                    <td>-</td>
-                                    <td>{{ product[3][0][3] }}</td>
-                                    <td>-</td>
-                                    <!--<td>-</td>-->
-                                    <td>-</td>
-                                    <td rowspan="{{ product[3].__len__() }}"><textarea rows="{{ product[3].__len__()*1.5 }}" class='remark' placeholder='备注'>{{ product[4] }}</textarea></td>
-                                </tr>
-                                    {% for material in product[3][1:product[3].__len__()] %}
+                            <div class="row">
+                                <input type="text" id="query" class="hidden-print" placeholder="过滤选择" style="float: right; margin-right: 2%;width: 20%;"/>
+                            </div>
+                            <div id="procurement_div" style="position: relative; padding-top: 20px;">
+                                <table id="procurement_table" class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th width="50px">序号</th>
+                                        <th width="90px">成品编码</th>
+                                        <th width="90px">成品型号</th>
+                                        <th width="90px">成品数量</th>
+                                        <th width="60px">物料编码</th>
+                                        <th width="90px">物料名称</th>
+                                        <th width="90px">物料型号</th>
+                                        <th width="60px">单位</th>
+                                        <th width="90px">库存数量</th>
+                                        <th width="100px">需出库数量</th>
+                                        <th width="100px">余库存数量</th>
+                                        <!--<th width="90px">欠料数量</th>-->
+                                        <th width="90px">供货厂家</th>
+                                        <th width="60px">备注</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for product in products %}
                                         <tr>
-                                            <td>{{ material[0] }}</td>
-                                            <td>{{ material[1] }}</td>
-                                            <td>{{ material[2] }}</td>
+                                            <td rowspan="{{ product[3].__len__() }}"></td>
+                                            <td rowspan="{{ product[3].__len__() }}">{{ product[0] }}</td>
+                                            <td rowspan="{{ product[3].__len__() }}">{{ product[1] }}</td>
+                                            <td rowspan="{{ product[3].__len__() }}">{{ product[2] }}</td>
+                                            <td>{{ product[3][0][0] }}</td>
+                                            <td>{{ product[3][0][1] }}</td>
+                                            <td>{{ product[3][0][2] }}</td>
                                             <td>-</td>
                                             <td>-</td>
-                                            <td>{{ material[3] }}</td>
+                                            <td>{{ product[3][0][3] }}</td>
                                             <td>-</td>
                                             <!--<td>-</td>-->
                                             <td>-</td>
+                                            <td rowspan="{{ product[3].__len__() }}">{{ product[4] }}</td>
                                         </tr>
+                                        {% for material in product[3][1:product[3].__len__()] %}
+                                            <tr>
+                                                <td>{{ material[0] }}</td>
+                                                <td>{{ material[1] }}</td>
+                                                <td>{{ material[2] }}</td>
+                                                <td>-</td>
+                                                <td>-</td>
+                                                <td>{{ material[3] }}</td>
+                                                <td>-</td>
+                                                <!--<td>-</td>-->
+                                                <td>-</td>
+                                            </tr>
+                                        {% endfor %}
                                     {% endfor %}
-                                {% endfor %}
-                                {% if materials %}
-                                    <tr>
-                                        <td rowspan="{{ materials.__len__() }}">汇总</td>
-                                        <td rowspan="{{ materials.__len__() }}">{{ productCodeInput }}</td>
-                                        <td rowspan="{{ materials.__len__() }}">{{ productTypeInput }}</td>
-                                        <td rowspan="{{ materials.__len__() }}">{{ productNumInput }}</td>
-                                        <td>{{ materials[0][0] }}</td>
-                                        <td>{{ materials[0][1] }}</td>
-                                        <td>{{ materials[0][2] }}</td>
-                                        <td>{{ materials[0][3] }}</td>
-                                        <td>{{ materials[0][4] }}</td>
-                                        <td>{{ materials[0][5] }}</td>
-                                        <td>{{ materials[0][6] }}</td>
-                                        <!--<td>
+                                    {% if materials %}
+                                        <tr>
+                                            <td rowspan="{{ materials.__len__() }}">汇总</td>
+                                            <td rowspan="{{ materials.__len__() }}">{{ productCodeInput }}</td>
+                                            <td rowspan="{{ materials.__len__() }}">{{ productTypeInput }}</td>
+                                            <td rowspan="{{ materials.__len__() }}">{{ productNumInput }}</td>
+                                            <td>{{ materials[0][0] }}</td>
+                                            <td>{{ materials[0][1] }}</td>
+                                            <td>{{ materials[0][2] }}</td>
+                                            <td>{{ materials[0][3] }}</td>
+                                            <td>{{ materials[0][4] }}</td>
+                                            <td>{{ materials[0][5] }}</td>
+                                            <td>{{ materials[0][6] }}</td>
+                                            <!--<td>
                                             {% if materials[0][6]<0 %}
                                                 {{ -materials[0][6] }}
                                             {% else %}
                                                 -
                                             {% endif %}
                                         </td>-->
-                                        <td>{{ materials[0][7] }}</td>
-                                        <td rowspan="{{ materials.__len__() }}">-</td>
-                                    </tr>
-                                    {% for material in materials[1:materials.__len__()] %}
-                                        <tr>
-                                            <td>{{ material[0] }}</td>
-                                            <td>{{ material[1] }}</td>
-                                            <td>{{ material[2] }}</td>
-                                            <td>{{ material[3] }}</td>
-                                            <td>{{ material[4] }}</td>
-                                            <td>{{ material[5] }}</td>
-                                            <td>{{ material[6] }}</td>
-                                            <!--<td>
+                                            <td>{{ materials[0][7] }}</td>
+                                            <td rowspan="{{ materials.__len__() }}">-</td>
+                                        </tr>
+                                        {% for material in materials[1:materials.__len__()] %}
+                                            <tr>
+                                                <td>{{ material[0] }}</td>
+                                                <td>{{ material[1] }}</td>
+                                                <td>{{ material[2] }}</td>
+                                                <td>{{ material[3] }}</td>
+                                                <td>{{ material[4] }}</td>
+                                                <td>{{ material[5] }}</td>
+                                                <td>{{ material[6] }}</td>
+                                                <!--<td>
                                                 {% if material[6]<0 %}
                                                     {{ -material[6] }}
                                                 {% else %}
                                                     -
                                                 {% endif %}
                                             </td>-->
-                                            <td>{{ material[7] }}</td>
-                                        </tr>
-                                    {% endfor %}
-                                {% endif %}
-                                </tbody>
-                            </table>
-
+                                                <td>{{ material[7] }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
 
@@ -361,9 +362,7 @@
             for ( var i = 1; i < table.rows.length;i++) {
                 if(table.rows[i].cells[12]){
                     if(j<productCodeOrTypeInputArr.length){
-                        console.log(table.rows[i].cells[12].firstElementChild);
-                        console.log(table.rows[i].cells[12].firstElementChild.value);
-                        remarkArr[j]=table.rows[i].cells[12].firstElementChild.value; //不要用“remarkArr[j]=table.rows[i].cells[12].firstElementChild.innerHTML;”
+                        remarkArr[j]=table.rows[i].cells[12].innerHTML;
                         j += 1;
                     }
                     else break;
@@ -461,7 +460,7 @@
                 "<td>-</td>"+
                 //"<td>-</td>"+
                 "<td>-</td>"+
-                "<td rowspan="+result['products'][i][3].length+"><textarea rows="+(result['products'][i][3].length*1.5)+" class='remark' placeholder='备注'></textarea></td></tr>";
+                "<td rowspan="+result['products'][i][3].length+" contenteditable='true' class='remark'></td></tr>";
             tableHtml += rowTemplate;
             productCodeStr+=result['products'][i][0]+"/";
             productTypeStr+=result['products'][i][1]+"/";
@@ -748,13 +747,11 @@
 
         var newstr = document.getElementById("procurement_div").innerHTML;
 
-        //去除所有的标签形如<textarea rows="6.0" class='remark'></textarea>，只保留其内容
-        console.log(newstr);
+        // 去除所有的标签形如<textarea rows="6.0" class='remark'></textarea>，只保留其内容
+        /*console.log(newstr);
         newstr=newstr.replace(/<textarea[^>]+rows=['"][0-9]+([\.][0-9]+)?['"][^>]+class=['"]remark['"][^>]+placeholder=['"]备注['"]>/g,"");// /g代表全局
         newstr=newstr.replace(/<\/textarea>/g,"");// /g代表全局
-        console.log(newstr);
-
-        newstr=newstr.replace(/<input[^>]type=['"]text['"][^>]id=['"]query['"][^>]class=['"]hidden-print['"][^>]style=['"]float:[^>]right;width:[^>]300px['"]>/g,"");
+        console.log(newstr);*/
 
         /*document.body.innerHTML = newstr;
         window.print();
@@ -811,22 +808,23 @@
         console.log($(this));
         var filterStr=$(this).val();
         console.log(filterStr);
-
-        //var table=document.getElementById('product_table');
-        //var table=$.extend(true, {}, originTable);
+        if(filterStr==""){
+            document.getElementById('procurement_table').outerHTML=originTable.outerHTML;
+            return;
+        }
 
         console.log(originTable);
         var table=originTable.cloneNode(true);
         console.log(table);
-        var data=new Array();var index=0;var rowIndexCountArr=new Array();var rowIndexArr=new Array(table.rows.length);
+        var data=new Array();var index=0;
+        var rowCountArr=new Array(); // 行组过滤后的rowspan
+        var rowIndexArr=new Array(table.rows.length); // 行是否被过滤标志
         var mflag=0,flag=0,count=0;
         for ( var i = 1; i < table.rows.length;i++) {
-            //console.log(table.rows[i]);
             mflag=0;
             flag=0;
-            //if(table.rows[i].cells[0].hasAttribute("rowspan"))console.log(table.rows[i].cells[0].getAttribute("rowspan"));
             if(table.rows[i].cells[0].hasAttribute("rowspan")) {
-                rowIndexCountArr[index] = count;
+                rowCountArr[index] = count;
                 index += 1;
                 count = 0;
             }
@@ -844,8 +842,6 @@
                     }
                 }
             }
-            //console.log(mflag);
-            //console.log(flag);
             if (mflag == 1) {
                 count = parseInt(table.rows[i].cells[0].getAttribute("rowspan"));
                 for (var j = i; j < i+count; j++)
@@ -860,82 +856,65 @@
                 rowIndexArr[i] = 0;
             }
         }
-        rowIndexCountArr[index]=count;
-        console.log(rowIndexCountArr);
+        rowCountArr[index]=count;
+        console.log(rowCountArr);
         console.log(rowIndexArr);
 
-        index=1;
+        index=1; // 行组索引
         for ( var i = 1; i < table.rows.length;i++) {
-            //console.log("table.rows["+i+"]: "+table.rows[i]);
-            if(table.rows[i].cells[0].hasAttribute("rowspan")){
-                //console.log("main: "+i);
-
-                if(rowIndexCountArr[index]!==0&&rowIndexArr[i] === 1) {
-                    //console.log("rowIndexCountArr["+index+"]!==0&&rowIndexArr["+i+"] === 1");
-
-                    table.rows[i].cells[0].setAttribute("rowspan", rowIndexCountArr[index]);
-
-                    if(table.rows[i].cells[12].getElementsByTagName("textarea").length>0)
-                        table.rows[i].cells[12].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
+            if(table.rows[i].cells[0].hasAttribute("rowspan")){ // 考虑本组第一行
+                if(rowCountArr[index]!==0&&rowIndexArr[i] === 1) { // 如果本组没全被过滤，且本组原第一行没被过滤，本组原第一行不做处理，因为"style='display: none'"属性不显示不占空间，但还是对rowspan有影响
+                    table.rows[i].cells[12].setAttribute("contenteditable", "false");
                 }
-                else if(rowIndexCountArr[index]!==0&&rowIndexArr[i] === 0){
-                    //console.log("rowIndexCountArr["+index+"]!==0&&rowIndexArr["+i+"] === 0");
-                    //table.deleteRow(i);
-
-                    var firstRow=table.rows[i].cloneNode(true);
-                    //console.log(firstRow);
-                    for(var j = 0; j < table.rows[i].cells.length;j++)
-                            table.rows[i].cells[j].setAttribute("style", "display: none");
-
-                    for (var j = i+1; j < i+parseInt(table.rows[i].cells[0].getAttribute("rowspan")); j++){
-                        if(rowIndexArr[j]===1) {
-                            //console.log("add "+j);
-                            for(var k = 0; k < 9;k++) {
-                                //console.log(firstRow.cells[4 + k]);
-                                firstRow.cells[4 + k].innerHTML = table.rows[j].cells[k].innerHTML;
-                            }
-                            //console.log(firstRow.innerHTML);
-                            table.rows[j].innerHTML=firstRow.innerHTML;
-                            //console.log("rowIndexCountArr["+index+"]: "+rowIndexCountArr[index]);
-                            for(var k = 0; k < table.rows[j].cells.length;k++)
-                                if(table.rows[j].cells[k].hasAttribute("rowspan"))
-                                    table.rows[j].cells[k].setAttribute("rowspan", rowIndexCountArr[index]);
-                            //console.log(table.rows[j].cells[13].getElementsByTagName("textarea"));
-                            //console.log(table.rows[j].cells[13].childNodes[0]);
-                            if(table.rows[j].cells[12].getElementsByTagName("textarea").length>0)
-                                table.rows[j].cells[12].childNodes[0].setAttribute("rows", rowIndexCountArr[index]*1.5);
-                            //console.log(table.rows[j]);
-
-                            for(var k = i+1; k < j;k++)
-                                for(var l = 0; l < table.rows[k].cells.length;l++)
-                                    table.rows[k].cells[l].setAttribute("style", "display: none");
-
-                            i=j;
+                else if(rowCountArr[index]!==0&&rowIndexArr[i] === 0){ // 如果本组没全被过滤，且本组原第一行被过滤掉，则隐藏本组原第一行第4-12列，同时在本组新第一行添加"备注"列
+                    for(var j = 4; j < table.rows[i].cells.length;j++) // 隐藏本组原第一行第4-12列
+                        table.rows[i].cells[j].setAttribute("style", "display: none");
+                    var rowspan=parseInt(table.rows[i].cells[0].getAttribute("rowspan"));
+                    for(var k=1;k<rowspan;k++)
+                        if(rowIndexArr[k+i]==1) { // 本组新第一行添加"备注"列
+                            table.rows[k + i].insertCell(8).innerHTML = "";
+                            table.rows[k + i].cells[8].innerHTML=table.rows[i].cells[12].innerHTML;
+                            table.rows[k + i].cells[8].setAttribute("rowspan", rowspan - k);
+                            /*if(index!=rowCountArr.length-1) {
+                                table.rows[k + i].cells[8].setAttribute("contenteditable", "true");
+                                table.rows[k + i].cells[8].setAttribute("class", "remark");
+                            }*/
                             break;
                         }
-                    }
                 }
-                else if(rowIndexCountArr[index]===0){
-                    //console.log("rowIndexCountArr["+index+"]===0");
-
-                    for (var j = i; j < i+parseInt(table.rows[i].cells[0].getAttribute("rowspan")); j++){
-                        //table.deleteRow(j);
+                else if(rowCountArr[index]===0){ // 如果本组全被过滤
+                    var rowspan=parseInt(table.rows[i].cells[0].getAttribute("rowspan"));
+                    for (var j = i; j < i+rowspan; j++){
                         for(var k = 0; k < table.rows[j].cells.length;k++)
                             table.rows[j].cells[k].setAttribute("style", "display: none");
                     }
                 }
-
                 index+=1;
-            }else {
+            }else { // 考虑本组非第一行
                 if(rowIndexArr[i]===0)
                     //table.deleteRow(i);
                     for(var j = 0; j < table.rows[i].cells.length;j++)
-                            table.rows[i].cells[j].setAttribute("style", "display: none");
+                        table.rows[i].cells[j].setAttribute("style", "display: none");
             }
         }
 
         console.log(table);
         document.getElementById('procurement_table').outerHTML=table.outerHTML;
+    });
+
+    $("#procurement_table").on('input','.remark',function(e){
+        /*console.log(this.innerHTML);
+        var rowindex=this.parentElement.rowIndex;
+        var rows=document.getElementById('procurement_table').rows;
+        for(var k=1;rowindex-k>0;k++)
+            if(rows[rowindex-k].cells[0].hasAttribute("rowspan"))
+                if(rows[rowindex-k].cells[0].getAttribute("rowspan")>k+1) {
+                    console.log(rows[rowindex - k]);
+                    rows[rowindex - k].cells[12].innerHTML = this.innerHTML;
+                    break;
+                }*/
+
+        originTable=document.getElementById('procurement_table');
     });
 </script>
 
