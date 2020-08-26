@@ -175,9 +175,11 @@
                             <!--“ table table-striped ”两行之前有不同的颜色（“斑马线”）-->
                             <!--“ table table-striped table-bordered ”两行之前有不同的颜色且水平方向上有分割线和边框-->
                             <!--id="bootstrap-data-table" 引用datatables.min.js API-->
-                            <div class="row">
-                                <input type="text" id="query" class="hidden-print" placeholder="内容过滤" style="float: right; margin-right: 2%;width: 20%;"/>
-                            </div>
+                            {% if products %}
+                                <div class="row">
+                                    <input type="text" id="query" class="hidden-print" placeholder="内容过滤" style="float: right; margin-right: 2%;width: 20%;"/>
+                                </div>
+                            {% endif %}
                             <div id="procurement_div" style="position: relative; padding-top: 20px;">
                                 <table id="procurement_table" class="table table-striped">
                                     <thead>
@@ -783,6 +785,10 @@
     }
     
     function export2excel() {
+         var oldhtml=$("#procurement_table").html();
+        if($("#query").val()!="")
+            $("#procurement_table").html(originTable.innerHTML);
+
         $("#procurement_table").table2excel({
             // 不被导出的表格行的CSS class类
             exclude: ".noExl",
@@ -799,10 +805,14 @@
             //是否排除导出输入框中的内容
             exclude_inputs: true
         });
+
+        $("#procurement_table").html(oldhtml);
     }
 
     var originTable=document.getElementById('procurement_table');
     $("#query").on('input',function(e){
+        console.log(originTable);
+
         console.log($(this));
         var filterStr=$(this).val();
         console.log(filterStr);
@@ -811,7 +821,6 @@
             return;
         }
 
-        console.log(originTable);
         var table=originTable.cloneNode(true);
         console.log(table);
         var data=new Array();var index=0;
@@ -862,7 +871,7 @@
         for ( var i = 1; i < table.rows.length;i++) {
             if(table.rows[i].cells[0].hasAttribute("rowspan")){ // 考虑本组第一行
                 if(rowCountArr[index]!==0&&rowIndexArr[i] === 1) { // 如果本组没全被过滤，且本组原第一行没被过滤，本组原第一行不做处理，因为"style='display: none'"属性不显示不占空间，但还是对rowspan有影响
-                    table.rows[i].cells[12].setAttribute("contenteditable", "false");
+                    // 不做处理
                 }
                 else if(rowCountArr[index]!==0&&rowIndexArr[i] === 0){ // 如果本组没全被过滤，且本组原第一行被过滤掉，则隐藏本组原第一行第4-12列，同时在本组新第一行添加"备注"列
                     for(var j = 4; j < table.rows[i].cells.length;j++) // 隐藏本组原第一行第4-12列
@@ -870,13 +879,8 @@
                     var rowspan=parseInt(table.rows[i].cells[0].getAttribute("rowspan"));
                     for(var k=1;k<rowspan;k++)
                         if(rowIndexArr[k+i]==1) { // 本组新第一行添加"备注"列
-                            table.rows[k + i].insertCell(8).innerHTML = "";
-                            table.rows[k + i].cells[8].innerHTML=table.rows[i].cells[12].innerHTML;
+                            table.rows[k + i].insertCell(8).innerHTML = table.rows[i].cells[12].innerHTML;
                             table.rows[k + i].cells[8].setAttribute("rowspan", rowspan - k);
-                            /*if(index!=rowCountArr.length-1) {
-                                table.rows[k + i].cells[8].setAttribute("contenteditable", "true");
-                                table.rows[k + i].cells[8].setAttribute("class", "remark");
-                            }*/
                             break;
                         }
                 }
@@ -896,23 +900,7 @@
             }
         }
 
-        console.log(table);
         document.getElementById('procurement_table').outerHTML=table.outerHTML;
-    });
-
-    $("#procurement_table").on('input','.remark',function(e){
-        console.log(this.innerHTML);
-        /*var rowindex=this.parentElement.rowIndex;
-        var rows=document.getElementById('procurement_table').rows;
-        for(var k=1;rowindex-k>0;k++)
-            if(rows[rowindex-k].cells[0].hasAttribute("rowspan"))
-                if(rows[rowindex-k].cells[0].getAttribute("rowspan")>k+1) {
-                    console.log(rows[rowindex - k]);
-                    rows[rowindex - k].cells[12].innerHTML = this.innerHTML;
-                    break;
-                }*/
-
-        originTable=document.getElementById('procurement_table');
     });
 </script>
 
