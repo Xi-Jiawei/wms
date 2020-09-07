@@ -108,6 +108,7 @@
                                     <td>上次应收款结余</td>
                                     <td>收款金额</td>
                                     <td>备注</td>
+                                    <td>操作</td>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -234,7 +235,7 @@
                                             <td>{{ i[3] }}</td>
                                             <td>{{ i[4] }}</td>
                                             <td>{{ i[5] }}</td>
-                                            <td>{{ i[4]-i[5] }}</td>
+                                            <td>{{ i[6] }}</td>
                                             <td><a data-toggle="modal" data-target="#receiptModal" onclick="receiptEnter('{{ i[0] }}','{{ i[4]-i[5] }}')"> 收款录入 </a></td>
                                             <td><a onclick="receiptsJournal('{{ i[0] }}')"> 收款明细 </a></td>
                                         </tr>
@@ -249,7 +250,7 @@
                                             <td>{{ sum[1] }}</td>
                                             <td>{{ sum[2] }}</td>
                                             <td>{{ sum[3] }}</td>
-                                            <td>{{ sum[2]-sum[3] }}</td>
+                                            <td>{{ sum[4] }}</td>
                                             <td>-</td>
                                             <td>-</td>
                                         {% else %}
@@ -309,6 +310,12 @@
         console.log(document.getElementById("receivableTable").rows[event.currentTarget.parentElement.parentElement.rowIndex]);
         var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
         $('#rowindex').val(rowindex);
+
+        /*以下代码原本想测试正则匹配"receiptEnter('','')"，后在匹配结果提取的过程中遇到麻烦，故暂时不用*/
+        var reg=/receiptEnter\('(.*)','[0-9]+.*[0-9]*'\)/g;
+        console.log(document.getElementById("receivableTable").rows[rowindex].cells[7].textContent);
+        console.log(document.getElementById("receivableTable").rows[rowindex].cells[7].innerHTML);
+        console.log(reg.exec(document.getElementById("receivableTable").rows[rowindex].cells[7].innerHTML));
     }
     function modalSubmit() {
         var clientCode=$('#clientCode').val(),receipt=$('#receipt').val();
@@ -337,6 +344,8 @@
                     var row=table.rows[$("#rowindex").val()];
                     row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat(receipt)).toFixed(2);
                     row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat(receipt)).toFixed(2);
+
+                    row.cells[7].innerHTML=row.cells[7].innerHTML.replace(/,'[0-9]+.*[0-9]*'\)/g,",'"+row.cells[6].textContent+"')");
 
                     tfoot.rows[0].cells[5].textContent=(parseFloat(tfoot.rows[0].cells[5].textContent)+parseFloat(receipt)).toFixed(2);
                     tfoot.rows[0].cells[6].textContent=(parseFloat(tfoot.rows[0].cells[6].textContent)-parseFloat(receipt)).toFixed(2);
@@ -437,16 +446,18 @@
                     var tfoot=table.children[3];
                     $('#receiptsJournal tbody').html("");
                     for(var i=0;i<receipts.length;i++){
-                        tbody.insertRow(i).innerHTML="<tr><td>"+receipts[i][0]+"</td>\n" +
+                        tbody.insertRow(i).innerHTML="<tr><td style='display: none'>"+receipts[i][0]+"</td>\n" +
                             "                                    <td>"+receipts[i][1]+"</td>\n" +
                             "                                    <td>"+receipts[i][2]+"</td>\n" +
-                            "                                    <td>"+receipts[i][3]+"</td></tr>";
+                            "                                    <td>"+receipts[i][3]+"</td>\n" +
+                            "                                    <td>"+receipts[i][4]+"</td>\n" +
+                            "                                    <td><a onclick='deleteReceipt(\""+receipts[i][0]+"\")'> 删除 </a></td></tr>";
                     }
                     tfoot.rows[0].innerHTML="<tr><td>合计</td>\n" +
                             "                                    <td>-</td>\n" +
                             "                                    <td>"+receiptSum+"</td>\n" +
+                            "                                    <td>-</td>\n" +
                             "                                    <td>-</td></tr>";
-                    }
 
                     $('#receiptsJournalHeader').text(clientCode);
                 }
@@ -462,9 +473,85 @@
         $('#mainDialog').hide();
         $('#receiptsJournalDialog').show();
     }
+
+    function deleteReceipt(receiptCode) {
+        var table=document.getElementById("receiptsJournal");
+        var tbody=table.children[2];
+        var tfoot=table.children[3];
+        var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
+        var receipt=parseFloat(table.rows[rowindex].cells[3].innerHTML);
+        $.ajax({
+            url: "/financial_delete_receipt/"+receiptCode,
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: "",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    for(var i=rowindex+1;i<table.rows.length-1;i++)
+                        table.rows[i].cells[2].innerHTML = (parseFloat(table.rows[i].cells[2].innerHTML) + receipt).toFixed(2);
+                    tbody.deleteRow(rowindex-1);
+                    tfoot.rows[0].cells[2].innerHTML=(parseFloat(tfoot.rows[0].cells[2].innerHTML)-receipt).toFixed(2);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+
     function dlgClose(){
-        $('#receiptsJournalDialog').hide();
-        $('#mainDialog').show();
+        $.ajax({
+            url: "/financial_receivable",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: "",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var sum=callback['sum'];
+                    var receivables=callback['receivables'];
+                    $('#receivableTable tbody').html("");
+                    var table=document.getElementById("receivableTable");
+                    var tbody=table.children[1];
+                    var tfoot=table.children[2];
+                    for(var i=0;i<receivables.length;i++){
+                        tbody.insertRow(i).innerHTML="<tr><td><a data-toggle='modal' data-target='#historyReceivableModal' onclick='historyReceivableEnter(\""+receivables[i][0]+"\",\""+receivables[i][1]+"\")'> "+receivables[i][0]+" </a></td>"+
+                            "                                    <td style='display: none'>"+receivables[i][1]+"</td>\n" +
+                            "                                    <td>"+receivables[i][2]+"</td>\n" +
+                            "                                    <td>"+receivables[i][3]+"</td>\n" +
+                            "                                    <td>"+receivables[i][4]+"</td>\n" +
+                            "                                    <td>"+receivables[i][5]+"</td>\n" +
+                            "                                    <td>"+receivables[i][6]+"</td>\n" +
+                            "                                    <td><a data-toggle='modal' data-target='#receiptModal' onclick='receiptEnter(\""+receivables[i][0]+"\",\""+(receivables[i][4]-receivables[i][5])+"\")'> 收款录入 </a></td>\n" +
+                            "                                    <td><a onclick='receiptsJournal(\""+receivables[i][0]+"\")'> 收款明细 </a></td></tr>";
+                    }
+                    tfoot.rows[0].cells[2].innerHTML=sum[0];
+                    tfoot.rows[0].cells[3].innerHTML=sum[1];
+                    tfoot.rows[0].cells[4].innerHTML=sum[2];
+                    tfoot.rows[0].cells[5].innerHTML=sum[3];
+                    tfoot.rows[0].cells[6].innerHTML=sum[4];
+
+                    $('#receiptsJournalDialog').hide();
+                    $('#mainDialog').show();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
     }
 </script>
 </body>

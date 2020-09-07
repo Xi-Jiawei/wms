@@ -16,12 +16,8 @@ def procurement_history():
     if request.method == 'GET':
         if session.get('username'):
             username = session['username']
-            # authority = select_user_authority(username)
-            thread = myThread(target=select_user_authority, args=(username,))
-            authority = thread.get_result()
-            # all_procurements = select_procurement() # count(p.procurementCode),procurementCode,productCode,materialCodeConcatStr,materialNameConcatStr,materialNumConcatStr,productType,productNum,client,entryClerk,entryDate
-            thread = myThread(target=select_procurement, args=())
-            all_procurements = thread.get_result()
+            authority = select_user_authority(username)
+            all_procurements = select_procurement() # count(p.procurementCode),procurementCode,productCode,materialCodeConcatStr,materialNameConcatStr,materialNumConcatStr,productType,productNum,client,entryClerk,entryDate
             procurements=[]
             procurementCode=''
             if all_procurements:
@@ -135,9 +131,7 @@ def calculate_procurement():
             product.append(productInfo[0][0])
             product.append(productNumArr[i])
             for materialOfProduct in materialsOfProduct:
-                # materialInfo = select_materialInfoByCode(materialOfProduct[0])  # materialName,materialType,remark,inventoryNum,price,inventoryMoney,supplier
-                thread = myThread(target=select_materialInfoByCode, args=(materialOfProduct[0],))
-                materialInfo = thread.get_result()
+                materialInfo = select_materialInfoByCode(materialOfProduct[0])  # materialName,materialType,remark,inventoryNum,price,inventoryMoney,supplier
                 material.append([materialOfProduct[0], materialInfo[0][0], materialInfo[0][1], materialOfProduct[3]])
             product.append(material)
             # productCode,productType,productNum,[materialCode,materialName,materialType,materialNum]
@@ -194,9 +188,7 @@ def procurement():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        # authority = select_user_authority(username)
-        thread = myThread(target=select_user_authority,args=(username,))
-        authority = thread.get_result()
+        authority = select_user_authority(username)
         if request.method == "POST":
             data = request.get_json()
             productCodeOrTypeInputArr = data['productCodeOrTypeInputArr']
@@ -262,9 +254,7 @@ def edit_procurement(procurementCode):
     form = ProductForm()
     if session.get('username'):
         username = session['username']
-        # authority = select_user_authority(username)
-        thread = myThread(target=select_user_authority,args=(username,))
-        authority = thread.get_result()
+        authority = select_user_authority(username)
 
         # POST
         if request.method == "POST":
@@ -331,9 +321,7 @@ def edit_procurement(procurementCode):
             myThread(target=insert_procurement, args=(procurementCode, productCodeArr, productNumArr, client, remarkArr, entryClerk, entryTime,))
             return jsonify({'ok': True})
         elif request.method == 'GET':
-            # all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialType,materialNum
-            thread = myThread(target=select_procurementByCode, args=(procurementCode,))
-            all_products = thread.get_result()
+            all_products = select_procurementByCode(procurementCode) # productCode,productType,productNum,client,remark,materialCode,materialName,materialType,materialNum
             products = []
             productCode = ''
             productCodeInput = ''
@@ -368,9 +356,7 @@ def edit_procurement(procurementCode):
                 else:
                     material.append([i[5], i[6], i[7], i[8]])  # materialCode,materialName,materialType,materialNum
             # sum(materialNum) group by materialCode
-            # materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
-            thread = myThread(target=select_materialsOfProcurementByCode, args=(procurementCode,))
-            materials = thread.get_result()
+            materials=select_materialsOfProcurementByCode(procurementCode) # materialCode,materialName,materialType,unit,inventoryNum,materialNum,(inventoryNum-materialNum),supplier
             # for i in materials:
             #     print("materialCode: " + i[0])
             # form data

@@ -107,6 +107,7 @@
                                     <td>上次应付款结余</td>
                                     <td>付款金额</td>
                                     <td>备注</td>
+                                    <td>操作</td>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -232,8 +233,8 @@
                                             <td>{{ i[3] }}</td>
                                             <td>{{ i[4] }}</td>
                                             <td>{{ i[5] }}</td>
-                                            <td>{{ i[4]-i[5] }}</td>
-                                            <td><a data-toggle="modal" data-target="#paymentModal" onclick="paymentEnter('{{ i[0] }}','{{ i[4]-i[5] }}')"> 收款录入 </a></td>
+                                            <td>{{ i[6] }}</td>
+                                            <td><a data-toggle="modal" data-target="#paymentModal" onclick="paymentEnter('{{ i[0] }}','{{ i[4]-i[5] }}')"> 付款录入 </a></td>
                                             <td><a onclick="paymentsJournal('{{ i[0] }}')"> 付款明细 </a></td>
                                         </tr>
                                     {% endfor %}
@@ -247,7 +248,7 @@
                                             <td>{{ sum[1] }}</td>
                                             <td>{{ sum[2] }}</td>
                                             <td>{{ sum[3] }}</td>
-                                            <td>{{ sum[2]-sum[3] }}</td>
+                                            <td>{{ sum[4] }}</td>
                                             <td>-</td>
                                             <td>-</td>
                                         {% else %}
@@ -335,6 +336,8 @@
                     var row=table.rows[$("#rowindex").val()];
                     row.cells[5].textContent=(parseFloat(row.cells[5].textContent)+parseFloat(payment)).toFixed(2);
                     row.cells[6].textContent=(parseFloat(row.cells[6].textContent)-parseFloat(payment)).toFixed(2);
+
+                    row.cells[7].innerHTML=row.cells[7].innerHTML.replace(/,'[0-9]+.*[0-9]*'\)/g,",'"+row.cells[6].textContent+"')");
 
                     tfoot.rows[0].cells[5].textContent=(parseFloat(tfoot.rows[0].cells[5].textContent)+parseFloat(payment)).toFixed(2);
                     tfoot.rows[0].cells[6].textContent=(parseFloat(tfoot.rows[0].cells[6].textContent)-parseFloat(payment)).toFixed(2);
@@ -434,14 +437,17 @@
                     var tfoot=table.children[3];
                     $('#paymentsJournal tbody').html("");
                     for(var i=0;i<payments.length;i++){
-                        tbody.insertRow(i).innerHTML="<tr><td>"+payments[i][0]+"</td>\n" +
+                        tbody.insertRow(i).innerHTML="<tr><td style='display: none'>"+payments[i][0]+"</td>\n" +
                             "                                    <td>"+payments[i][1]+"</td>\n" +
                             "                                    <td>"+payments[i][2]+"</td>\n" +
-                            "                                    <td>"+payments[i][3]+"</td></tr>";
+                            "                                    <td>"+payments[i][3]+"</td>\n" +
+                            "                                    <td>"+payments[i][4]+"</td>\n" +
+                            "                                    <td><a onclick='deletePayment(\""+payments[i][0]+"\")'> 删除 </a></td></tr>";
                     }
                     tfoot.rows[0].innerHTML="<tr><td>合计</td>\n" +
                             "                                    <td>-</td>\n" +
                             "                                    <td>"+paymentSum+"</td>\n" +
+                            "                                    <td>-</td>\n" +
                             "                                    <td>-</td></tr>";
 
                     $('#paymentsJournalHeader').text(supplierCode);
@@ -458,9 +464,84 @@
         $('#mainDialog').hide();
         $('#paymentsJournalDialog').show();
     }
+    function deletePayment(paymentCode) {
+        var table=document.getElementById("paymentsJournal");
+        var tbody=table.children[2];
+        var tfoot=table.children[3];
+        var rowindex=event.currentTarget.parentElement.parentElement.rowIndex;
+        var payment=parseFloat(table.rows[rowindex].cells[3].innerHTML);
+        $.ajax({
+            url: "/financial_delete_payment/"+paymentCode,
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: "",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    for(var i=rowindex+1;i<table.rows.length-1;i++)
+                        table.rows[i].cells[2].innerHTML = (parseFloat(table.rows[i].cells[2].innerHTML) + payment).toFixed(2);
+                    tbody.deleteRow(rowindex-1);
+                    tfoot.rows[0].cells[2].innerHTML=(parseFloat(tfoot.rows[0].cells[2].innerHTML)-payment).toFixed(2);
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    }
+
     function dlgClose(){
-        $('#paymentsJournalDialog').hide();
-        $('#mainDialog').show();
+        $.ajax({
+            url: "/financial_payable",
+            type: "POST",
+            dataType: "json",
+            //data:$(this).serialize(),
+            data: "",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var sum=callback['sum'];
+                    var payables=callback['payables'];
+                    $('#payableTable tbody').html("");
+                    var table=document.getElementById("payableTable");
+                    var tbody=table.children[1];
+                    var tfoot=table.children[2];
+                    for(var i=0;i<payables.length;i++){
+                        tbody.insertRow(i).innerHTML="<tr><td><a data-toggle='modal' data-target='#historyPayableModal' onclick='historyPayableEnter(\""+payables[i][0]+"\",\""+payables[i][1]+"\")'> "+payables[i][0]+" </a></td>"+
+                            "                                    <td style='display: none'>"+payables[i][1]+"</td>\n" +
+                            "                                    <td>"+payables[i][2]+"</td>\n" +
+                            "                                    <td>"+payables[i][3]+"</td>\n" +
+                            "                                    <td>"+payables[i][4]+"</td>\n" +
+                            "                                    <td>"+payables[i][5]+"</td>\n" +
+                            "                                    <td>"+payables[i][6]+"</td>\n" +
+                            "                                    <td><a data-toggle='modal' data-target='#paymentModal' onclick='paymentEnter(\""+payables[i][0]+"\",\""+(payables[i][4]-payables[i][5])+"\")'> 付款录入 </a></td>\n" +
+                            "                                    <td><a onclick='paymentsJournal(\""+payables[i][0]+"\")'> 付款明细 </a></td></tr>";
+                    }
+                    tfoot.rows[0].cells[2].innerHTML=sum[0];
+                    tfoot.rows[0].cells[3].innerHTML=sum[1];
+                    tfoot.rows[0].cells[4].innerHTML=sum[2];
+                    tfoot.rows[0].cells[5].innerHTML=sum[3];
+                    tfoot.rows[0].cells[6].innerHTML=sum[4];
+
+                    $('#paymentsJournalDialog').hide();
+                    $('#mainDialog').show();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
     }
 </script>
 </body>

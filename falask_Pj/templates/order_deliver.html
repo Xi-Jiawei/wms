@@ -426,12 +426,13 @@
                 table.rows[deliverTableRowsLength+1].cells[3].textContent=this.parentElement.parentElement.children[14].textContent;
 
                 table.rows[deliverTableRowsLength+1].cells[2].setAttribute("contenteditable","true");
+                table.rows[deliverTableRowsLength+1].cells[3].setAttribute("contenteditable","true");
                 table.rows[deliverTableRowsLength+1].cells[5].setAttribute("contenteditable","true");
             }else {
                 var rowHtml='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[1].textContent+'</td>\n' +
                     '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[13].textContent+'</td>\n' +
                     '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true"></td>\n' +
-                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+this.parentElement.parentElement.children[14].textContent+'</td>\n' +
+                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;" contenteditable="true">'+this.parentElement.parentElement.children[14].textContent+'</td>\n' +
                     '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
                     '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true"></td></tr>';
                 //方式一：此方式添加行会出问题，行会添加到tfoot
@@ -508,13 +509,14 @@
                                 deliverTable.rows[deliverTableRowsLength+1].cells[3].textContent=table.rows[i].cells[14].textContent;
 
                                 deliverTable.rows[deliverTableRowsLength+1].cells[2].setAttribute("contenteditable","true");
+                                deliverTable.rows[deliverTableRowsLength+1].cells[3].setAttribute("contenteditable","true");
                                 deliverTable.rows[deliverTableRowsLength+1].cells[5].setAttribute("contenteditable","true");
                             }else {
                                 var row=deliverTable.insertRow(deliverTableRowsLength+1);
                                 row.outerHTML='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+table.rows[i].cells[1].textContent+'</td>\n' +
                                     '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+table.rows[i].cells[13].textContent+'</td>\n' +
                                     '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true"></td>\n' +
-                                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+table.rows[i].cells[14].textContent+'</td>\n' +
+                                    '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;" contenteditable="true">'+table.rows[i].cells[14].textContent+'</td>\n' +
                                     '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;"></td>\n' +
                                     '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true"></td></tr>';
                             }
@@ -798,7 +800,7 @@
                             deliverTable.children[1].insertRow(i).innerHTML='<tr valign="top" align="center"><td width="90px" class="billProductType" style="color:#2e2e2e;">'+productOfDeliverArr[i][5]+'</td>\n' +
                                 '                                                        <td width="50px" class="billUnit" style="color:#2e2e2e;">'+productOfDeliverArr[i][6]+'</td>\n' +
                                 '                                                        <td width="90px" class="billSendNum" style="color:#2e2e2e;" contenteditable="true">'+productOfDeliverArr[i][8]+'</td>\n' +
-                                '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;">'+productOfDeliverArr[i][7]+'</td>\n' +
+                                '                                                        <td width="90px" class="billPrice" style="color:#2e2e2e;" contenteditable="true">'+productOfDeliverArr[i][7]+'</td>\n' +
                                 '                                                        <td width="90px" class="billMoney" style="color:#2e2e2e;">'+money.toFixed(2)+'</td>\n' +
                                 '                                                        <td width="90px" class="billRemark" style="color:#2e2e2e;" contenteditable="true">'+productOfDeliverArr[i][9]+'</td></tr>';
                         }

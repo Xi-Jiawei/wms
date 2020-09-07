@@ -17,8 +17,7 @@ def order():
         elif request.method=="GET":
             username = session['username']
             form = ProductForm()
-            thread = myThread(target=select_concated_orders, args=())
-            orders = thread.get_result()
+            orders = select_concated_orders()
             return render_template('order.html', form=form, orders=orders, username=username)
     else:
         return render_template('access_fail.html')
@@ -78,8 +77,7 @@ def edit_order(orderCode):
                 myThread(target=insert_order, args=(orderCode, orderDate, clientCode, productType, deliveryNum, deliveryDate, unit, price, receivable, remark, entryTime, entryClerk,))
             return jsonify({'ok': True})
         elif request.method=="GET":
-            thread = myThread(target=select_orderByCode, args=(orderCode,)) # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, deliveredNum, uint, price, receivable, remark
-            productOfOrderArr = thread.get_result()
+            productOfOrderArr = select_orderByCode(orderCode) # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, deliveredNum, uint, price, receivable, remark
             return jsonify({'ok': True, 'productOfOrderArr': productOfOrderArr})
         else:
             return jsonify({'ok': False})
@@ -126,8 +124,7 @@ def deliver(orderCode):
                 sendNum = product[2]
                 price = product[3]
                 remark = product[4]
-                thread = myThread(target=select_orderByCodeAndType, args=(orderCode, productType,))
-                productInfo = thread.get_result()
+                productInfo = select_orderByCodeAndType(orderCode, productType)
                 beforeDeliveryNum = productInfo[0][0]
                 inventoryNum = productInfo[0][1]
                 myThread(target=insert_delivery, args=(deliveryCode, orderCode, productType, beforeDeliveryNum, sendDate, sendNum, price, remark, client, client, address, contact, telephone, entryTime, entryClerk,))
@@ -171,8 +168,7 @@ def deliver(orderCode):
             #     else:
             #         deliverRecord.append([i[3], i[4], i[5], i[6], i[7], i[8], i[9]])  # deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark
             # 方式二：
-            thread = myThread(target=select_orderByCode, args=(orderCode,))  # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, deliveredNum, uint, price, receivable, remark
-            productOfOrderArr = thread.get_result()
+            productOfOrderArr = select_orderByCode(orderCode) # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, deliveredNum, uint, price, receivable, remark
             products = []
             for i in productOfOrderArr:
                 product = []
@@ -189,8 +185,7 @@ def deliver(orderCode):
                 product.append(i[10])  # price
                 # i[11] # receivable
                 # i[12] # remark
-                thread = myThread(target=select_deliveryByOrderCodeAndProductType, args=(orderCode,i[5],))  # deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark
-                deliverRecord = thread.get_result()
+                deliverRecord = select_deliveryByOrderCodeAndProductType(orderCode, i[5]) # deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark
                 product.append(deliverRecord)
                 product.append(i[8])  # orderDate
                 # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, productInfo.inventoryNum, productInfo.inventoryNum-sendNum, delivery.remark]
@@ -209,8 +204,7 @@ def print_deliver(deliveryCode):
     if session.get('username'):
         username = session['username']
         if request.method == "GET":
-            thread = myThread(target=select_deliveryByCode, args=(deliveryCode,))  # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, uint, price, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, delivery.remark, delivery.entryClerk
-            deliverRecord = thread.get_result()
+            deliverRecord = select_deliveryByCode(deliveryCode) # client, address, contact, telephone, orderDate, productType, deliveryNum, deliveryDate, uint, price, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, delivery.remark, delivery.entryClerk
             return jsonify({'ok': True,'productOfDeliverArr':deliverRecord})
     else:
         return jsonify({'ok': False})
@@ -223,8 +217,7 @@ def deliverGroupByClient():
         if request.method=="GET":
             username = session['username']
             form = ProductForm()
-            thread = myThread(target=select_all_orderGroupByProductType, args=())
-            clients = thread.get_result()
+            clients = select_all_orderGroupByProductType()
             return render_template('order_deliver.html', form=form, clients=clients, username=username)
     else:
         return render_template('access_fail.html')
@@ -254,8 +247,7 @@ def deliverGroupByProductType(clientCode):
                 sendNum = product[2]
                 price = product[3]
                 remark = product[4]
-                thread = myThread(target=select_orderGroupByProductTypeByClientCodeAndProductType, args=(clientCode, productType,))
-                productInfo = thread.get_result()
+                productInfo = select_orderGroupByProductTypeByClientCodeAndProductType(clientCode, productType)
                 beforeDeliveryNum = productInfo[0][0]
                 beforeDeliveredNum = productInfo[0][1]
                 beforeInventoryNum = productInfo[0][2]
@@ -265,8 +257,7 @@ def deliverGroupByProductType(clientCode):
                 productDeliverRecord = []
                 productDeliverRecord.append(productType)
                 # productDeliverRecord.append(beforeDeliveredNum + sendNum)
-                thread = myThread(target=select_deliveryGroupByProductTypeSumByClientCode, args=(clientCode, productType, entryTime[0:7], ))
-                productDeliverRecord.append(int(thread.get_result()))
+                productDeliverRecord.append(int(select_deliveryGroupByProductTypeSumByClientCode(clientCode, productType, entryTime[0:7])))
                 productDeliverRecord.append(beforeInventoryNum - sendNum)
                 productDeliverRecord.append(deliveryCode)
                 productDeliverRecord.append(sendDate)
@@ -282,10 +273,8 @@ def deliverGroupByProductType(clientCode):
             nowTime = datetime.now().strftime('%Y-%m-%d')
             month = nowTime[0:7]
             deliveryCode = "D" + datetime.now().strftime('%Y%m%d%H%M%S%f')[0:16]  # 使用时间戳生成唯一代号
-            thread = myThread(target=select_clientByCode, args=(clientCode,))
-            clientInfo = thread.get_result()
-            thread = myThread(target=select_orderGroupByProductTypeByCode, args=(clientCode,))
-            productOfOrderArr = thread.get_result()
+            clientInfo = select_clientByCode(clientCode)
+            productOfOrderArr = select_orderGroupByProductTypeByCode(clientCode)
             products = []
             for i in productOfOrderArr:
                 product = []
@@ -298,8 +287,7 @@ def deliverGroupByProductType(clientCode):
                 # product.append(i[6])  # uint
                 # product.append(i[7])  # price
 
-                thread = myThread(target=select_receivableReportGroupByProductTypeByClientCodeAndProductType, args=(clientCode, i[0], month,))
-                result = thread.get_result()
+                result = select_receivableReportGroupByProductTypeByClientCodeAndProductType(clientCode, i[0], month)
                 product.append(i[0])  # productType
                 product.append(result[0][0])  # remainDeliveryNum
                 product.append(result[0][1])  # addDeliveryNum
@@ -309,8 +297,7 @@ def deliverGroupByProductType(clientCode):
                 product.append(i[1])  # uint
                 product.append(i[2])  # price
 
-                thread = myThread(target=select_deliveryGroupByProductTypeByClientCodeAndProductType, args=(clientCode, i[0], month,))  # deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark
-                deliverRecord = thread.get_result()
+                deliverRecord = select_deliveryGroupByProductTypeByClientCodeAndProductType(clientCode, i[0], month) # deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark
                 product.append(deliverRecord)
                 # productType, remainDeliveryNum, addDeliveryNum, deliveryNum, deliveredNum, inventoryNum, uint, price, [deliveryCode, sendDate, sendNum, beforeDeliveryNum, beforeDeliveryNum-sendNum, remark]
                 products.append(product)
@@ -325,8 +312,7 @@ def print_deliveryGroupByProductType(deliveryCode):
     if session.get('username'):
         username = session['username']
         if request.method == "GET":
-            thread = myThread(target=select_deliveryGroupByProductTypeByCode, args=(deliveryCode,))  # client, address, contact, telephone, sendDate, productType, uint, price, sendNum, delivery.remark, delivery.entryClerk
-            deliverRecord = thread.get_result()
+            deliverRecord = select_deliveryGroupByProductTypeByCode(deliveryCode) # client, address, contact, telephone, sendDate, productType, uint, price, sendNum, delivery.remark, delivery.entryClerk
             return jsonify({'ok': True,'productOfDeliverArr':deliverRecord})
     else:
         return jsonify({'ok': False})
@@ -340,10 +326,8 @@ def deliveryGroupByProductTypeGroupByDeliveryCode(clientCode):
         if request.method=="GET":
             username = session['username']
             form = ProductForm()
-            thread = myThread(target=select_clientByCode, args=(clientCode,))
-            clientInfo = thread.get_result()
-            thread = myThread(target=select_deliveryGroupByProductTypeByClientCode, args=(clientCode,))
-            deliveryRecordOfOrderArr = thread.get_result()
+            clientInfo = select_clientByCode(clientCode)
+            deliveryRecordOfOrderArr = select_deliveryGroupByProductTypeByClientCode(clientCode)
             deliveries = []
             delivery = []
             product = []
@@ -387,8 +371,7 @@ def search_client(filterStr):
     if session.get('username'):
         username = session['username']
         if request.method == "GET":
-            thread = myThread(target=select_clientInfoByFilter, args=(filterStr,))  # client, address, contact, telephone
-            clients = thread.get_result()
+            clients = select_clientInfoByFilter(filterStr) # client, address, contact, telephone
             return jsonify({'ok': True,'clients':clients})
     else:
         return jsonify({'ok': False})

@@ -17,9 +17,7 @@ def show_products():
     print(session.get('username'))
     if session.get('username'):
         username = session['username']
-        # authority = select_user_authority(username)
-        thread = myThread(target=select_user_authority,args=(username,))
-        authority = thread.get_result()
+        authority = select_user_authority(username)
         # result = select_all_products()
         thread = myThread(target=select_all_products, args=())
         result = thread.get_result()
@@ -78,9 +76,7 @@ def add_product():
     form=ProductForm()
     if session.get('username'):
         username = session['username']
-        # authority = select_user_authority(username)
-        thread = myThread(target=select_user_authority,args=(username,))
-        authority = thread.get_result()
+        authority = select_user_authority(username)
         if authority[1] == '1' or authority[1] == '2':
             return render_template('access_fail.html')
         elif authority[1]=='3' or authority[1]=='8' or authority[1]=='4':
@@ -107,10 +103,8 @@ def add_product():
                 entryTime = nowTime.strftime('%Y-%m-%d %H:%M:%S.%f')
                 # entryClerk = data['entryClerk']
                 entryClerk=username
-                thread=myThread(target=check_productInfoByCode,args=(productCode,))
-                product1=thread.get_result()
-                thread=myThread(target=check_productInfoByType,args=(productType,))
-                product2=thread.get_result()
+                product1 = check_productInfoByCode(productCode)
+                product2 = check_productInfoByType(productType)
                 if not product1 and not product2:
                     print("数据库中不存在此成品。")
                     if authority[1] == '4':
@@ -143,9 +137,7 @@ def add_product():
                     return jsonify({'ok': "type"})
             elif request.method == 'GET':
                 # create_materialsOfProduct_temp()
-                # result=select_all_materials()
-                thread = myThread(target=select_all_materials, args=())
-                result = thread.get_result()
+                result=select_all_materials()
                 materialCodes=[]
                 for i in result:
                     materialCodes.append(i[0])
@@ -165,9 +157,7 @@ def edit_product(productCode):
     form = ProductForm()
     if session.get('username'):
         username = session['username']
-        # authority = select_user_authority(username)
-        thread = myThread(target=select_user_authority,args=(username,))
-        authority = thread.get_result()
+        authority = select_user_authority(username)
         if authority[1]=='2':
             print("当前权限仅限查看")
 
@@ -302,9 +292,7 @@ def edit_product(productCode):
                 thread = myThread(target=select_otherCostsByCode, args=(productCode,))
                 otherCosts = thread.get_result()
 
-                # result=select_all_materials()
-                thread = myThread(target=select_all_materials, args=())
-                result = thread.get_result()
+                result=select_all_materials()
                 materialCodes=[]
                 for i in result:
                     materialCodes.append(i[0])
@@ -350,9 +338,7 @@ def copy_product():
 def delete_products():
     if session.get('username'):
         username = session['username']
-        # authority = select_user_authority(username)
-        thread = myThread(target=select_user_authority,args=(username,))
-        authority = thread.get_result()
+        authority = select_user_authority(username)
         form = ProductForm()
         # result = select_all_products()
         thread = myThread(target=select_all_products, args=())
@@ -398,12 +384,9 @@ def check_uniqueness():
         data = request.get_json()
         materialCode = data['materialCode']  # 不要写成productCode=request.data["productcode"]
         if materialCode:
-            thread=myThread(target=check_materialInfo,args=(materialCode,))
-            temp=thread.get_result()
+            temp = check_materialInfo(materialCode)
             if temp:
-                # material=select_materialInfoByCode(materialCode)
-                thread = myThread(target=select_materialInfoByCode,args=(materialCode,))
-                material=thread.get_result()
+                material=select_materialInfoByCode(materialCode)
                 return jsonify({'ok': True,'material':material})
             else:
                 return jsonify({'ok': True,'material':None})
@@ -420,9 +403,7 @@ def search_materials_for_options():
         filterStr = data['filterStr']  # 不要写成productCode=request.data["productcode"]
         if filterStr:
             time.sleep(0.1)
-            # materials=select_materialInfoForOptions(filterStr)
-            thread = myThread(target=select_materialInfoForOptions, args=(filterStr,))
-            materials = thread.get_result()
+            materials=select_materialInfoForOptions(filterStr)
             if materials:
                 print(materials[0][0])
             return jsonify({'ok': True, 'materials': materials})
@@ -440,9 +421,7 @@ def search_material():
         if filterStr:
             print(filterStr)
             time.sleep(0.1)
-            # materials=select_materialInfoByFilter(filterStr)
-            thread = myThread(target=select_materialInfoByFilter,args=(filterStr,))
-            materials=thread.get_result()
+            materials=select_materialInfoByFilter(filterStr)
             return jsonify({'ok': True, 'materials': materials})
         else:
             return jsonify({'ok': True, 'materials': None})
@@ -489,9 +468,7 @@ def test():
         # form.userid.choices = choices
         # return render_template('test.html',form=form,users=users,sum=sum)
 
-        # choices = select_all_users_for_selector()
-        thread = myThread(target=select_all_users_for_selector, args=())
-        choices = thread.get_result()
+        choices = select_all_users_for_selector()
         form.userid.choices = choices
         productCodeArr=["P00001","P00002","P00003"]
         products=[]
