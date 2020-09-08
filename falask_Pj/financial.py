@@ -586,7 +586,7 @@ def edit_supplementary(supplierCode):
             entryClerk = username
 
             # 先删除
-            thread = myThread(target=delete_supplementaryBySupplierCode,args=(supplierCode, entryTime, entryClerk,))
+            myThread(target=delete_supplementaryBySupplierCode,args=(supplierCode, entryTime, entryClerk,))
 
             # 后添加
             data = request.get_json()
@@ -595,11 +595,10 @@ def edit_supplementary(supplierCode):
             entryClerk = username
             payables = []
             for i in supplementaries:
-                thread = myThread(target=insert_supplementary, args=(i[0], i[2], i[1], i[3], i[4], i[6], entryTime, entryClerk,))
+                myThread(target=insert_supplementary, args=(i[0], i[2], i[1], i[3], i[4], i[6], entryTime, entryClerk,))
 
             # 返回数据
             month = entryTime[0:7]
-            payable = select_supplementaryPayableReportByCode(supplierCode, month) # supplierCode,remainPayable,addPayable,payable,payment,remark
             suppliers = select_all_supplementarySuppliers()
             remainPayableSum = 0
             addPayableSum = 0
@@ -614,7 +613,7 @@ def edit_supplementary(supplierCode):
                 payableSum += payable[0][3]
                 paymentSum += payable[0][4]
             supplementaryPayableSum = [remainPayableSum, addPayableSum, payableSum, paymentSum]
-            return jsonify({'ok': True, 'payable': payable, 'supplementaryPayableSum': supplementaryPayableSum})
+            return jsonify({'ok': True, 'payables': payables, 'supplementaryPayableSum': supplementaryPayableSum})
         elif request.method=="GET":
             supplementary = select_supplementaryByCode(supplierCode)
             return jsonify({'ok': True,'supplementary':supplementary})

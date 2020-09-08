@@ -2850,7 +2850,13 @@ def select_supplementaryPayableReportByCode(supplierCode, month):
         lock.acquire()
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("select supplierCode,round(remainPayable,2),round(addPayable,2),round(payable,2),round(payment,2),remark from supplementaryPayableReport where supplierCode='%s' and month='%s';" % (supplierCode, month))
+        cursor.execute("select remark from supplementarySuppliers where supplierCode='%s';" % (supplierCode))
+        result = cursor.fetchall()
+        if result:
+            remark = result[0][0]
+        else:
+            remark = ""
+        cursor.execute("select supplierCode,round(remainPayable,2),round(addPayable,2),round(payable,2),round(payment,2) from supplementaryPayableReport where supplierCode='%s' and month='%s';" % (supplierCode, month))
         result = cursor.fetchall()
         if not result:
             cursor.execute("select round(payable-payment,2) from supplementaryPayableReport where supplierCode='%s' and month in (select max(month) from supplementaryPayableReport where supplierCode='%s' and month<'%s');" % (supplierCode, supplierCode, month))
@@ -2859,9 +2865,9 @@ def select_supplementaryPayableReportByCode(supplierCode, month):
                 remainPayable = remainPayableResult[0][0]
             else:
                 remainPayable = 0
-            result=[[supplierCode,remainPayable,0,remainPayable,0,'']]
+            result=[[supplierCode,remainPayable,0,remainPayable,0,remark]]
         lock.release()
-        return result
+        return [[result[0][0],result[0][1],result[0][2],result[0][3],result[0][4],remark]]
     except Exception as e:
         print("数据库操作异常：",e)
         current_app.logger.exception(e)
@@ -2882,10 +2888,9 @@ def insert_supplementary(supplierCode,supplementaryCode,inDate,inNum,price,remar
         cursor.execute("select supplierCode from supplementarySuppliers where supplierCode='%s';" % supplierCode)
         result = cursor.fetchall()
         if result:
-            cursor.execute("update supplementarySuppliers set payable=payable+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s';" % (payable, entryTime, entryClerk, supplierCode))
+            cursor.execute("update supplementarySuppliers set payable=payable+'%f', remark=concat(remark, '%s'), entryTime='%s', entryClerk='%s' where supplierCode='%s';" % (payable, remark, entryTime, entryClerk, supplierCode))
         else:
-            cursor.execute(
-                "insert into supplementarySuppliers (supplierCode, supplier, payable, payment, entryTime, entryClerk) values ('%s','%s','%f','%f','%s','%s');" % (supplierCode, supplierCode, payable, 0, entryTime, entryClerk))
+            cursor.execute("insert into supplementarySuppliers (supplierCode, supplier, payable, payment, remark, entryTime, entryClerk) values ('%s','%s','%f','%f','%s','%s','%s');" % (supplierCode, supplierCode, payable, 0, remark, entryTime, entryClerk))
 
         # 更新应付款报表
         month = inDate[0:7]
@@ -2964,7 +2969,10 @@ def delete_supplementaryBySupplierCode(supplierCode, entryTime, entryClerk):
         lock.release()
         for i in result:
             myThread(target=delete_supplementaryByCode, args=(i[0], entryTime, entryClerk,))
+        lock.acquire()
         cursor.execute("delete from supplementarySuppliers where supplierCode='%s';" % supplierCode)
+        conn.commit()
+        lock.release()
     except Exception as e:
         print("数据库操作异常：",e)
         current_app.logger.exception(e)
