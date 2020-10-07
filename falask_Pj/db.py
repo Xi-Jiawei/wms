@@ -19,13 +19,13 @@ lock=threading.Lock()
 # 单连接，优化，能保证长连接
 class mydb(object):
     def __init__(self):
-        self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8", autocommit=True)
+        self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="314159", db="test", charset="utf8", autocommit=True)
 
     def connect(self):
         try:
             self.conn.ping()
         except:
-            self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8", autocommit=True)
+            self.conn = pymysql.connect(host="127.0.0.1", port=3306, user="root", passwd="314159", db="test", charset="utf8", autocommit=True)
         return self.conn
 db = mydb()
 
@@ -68,7 +68,7 @@ class dbHelper(object):
         if self.pool[name]._closed:
             self.pool[name]=pymysql.connect(host=self.host, port=self.port, user=self.user, passwd=self.passwd, db=self.db, charset=self.charset)
         return self.pool[name]
-dbpool = dbHelper(host="127.0.0.1", port=3306, user="root", passwd="123456", db="test", charset="utf8")
+dbpool = dbHelper(host="127.0.0.1", port=3306, user="root", passwd="314159", db="test", charset="utf8")
 
 class myThread:
     def __init__(self, target, args):
@@ -899,24 +899,20 @@ def insert_procurement(procurementCode,productCodeArr,productNumArr,client,remar
         # 更新materialInOut
         cursor.execute("select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum),materialInfo.unit,materialInfo.price,materialInfo.supplierCode from procurementInfo p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode;" % (procurementCode))
         result = cursor.fetchall()
+        documentNumber = datetime.now().strftime('%Y%m%d%H%M%S%f')  # 使用时间戳生成唯一代号
+        documentNumber = int(documentNumber[0:16])  # 使用时间戳生成唯一代号
         for i in result:
-            # documentNumber=uuid.uuid1() # 使用uuid生成唯一代号
-            documentNumber=datetime.now().strftime('%Y%m%d%H%M%S%f') # 使用时间戳生成唯一代号
-            print(documentNumber)
-            print(documentNumber[12:20])
-            documentNumber=procurementCode+documentNumber[12:20] # 使用时间戳生成唯一代号
-            print(documentNumber)
-
+            documentNumber+=1
             cursor.execute("select inventoryNum from materialInfo where materialCode='%s';" % (i[0]))
             inventoryNum = cursor.fetchall()[0][0]
-            cursor.execute("insert into procurement (procurementCode, documentNumber, materialCode, beforeinventoryNum, materialNum) value('%s','%s','%s','%d','%d');" % (procurementCode,documentNumber,i[0],inventoryNum,i[1]))
+            cursor.execute("insert into procurement (procurementCode, documentNumber, materialCode, beforeinventoryNum, materialNum) value('%s','%s','%s','%d','%d');" % (procurementCode,str(documentNumber),i[0],inventoryNum,i[1]))
 
             lock.release()
             documentTime=datetime.now().strftime('%Y-%m-%d')
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             # insert_materialInOut(documentNumber,i[0],1,i[1],i[2],i[3],i[4],entryTime,"系统账号")
             # insert_materialInOut(documentNumber,documentTime,i[0],1,i[1],i[2],i[3],i[4],entryTime,entryClerk)
-            myThread(target=insert_materialInOut, args=(documentNumber, documentTime, i[0], 1, i[1], i[2], i[3], i[4], entryTime, entryClerk,))
+            myThread(target=insert_materialInOut, args=(str(documentNumber), documentTime, i[0], 1, i[1], i[2], i[3], i[4], entryTime, entryClerk,))
             lock.acquire()
         # 更新materialInfo
         cursor.execute("update materialInfo,(select materialInfo.materialCode,sum(materialsOfProduct.materialNum*p.productNum) sum from procurementInfo p left join productInfo on p.productCode=productInfo.productCode left join materialsOfProduct on p.productCode=materialsOfProduct.productCode left join materialInfo on materialsOfProduct.materialCode=materialInfo.materialCode where p.procurementCode='%s' group by materialInfo.materialCode) m set materialInfo.inventoryNum=materialInfo.inventoryNum-m.sum,materialInfo.inventoryMoney=materialInfo.inventoryMoney-price*m.sum where materialInfo.materialCode=m.materialCode;"%(procurementCode))
@@ -1497,50 +1493,51 @@ def delete_materialInOutByDocNum(documentNumber):
     try:
         lock.acquire()
         cursor.execute("select materialCode,isInOrOut,operateNum,operateTime,documentTime,supplierCode from materialInOut where documentNumber='%s';" % (documentNumber))
-        result = cursor.fetchall()
-        if result:
-            materialCode = result[0][0]
-            isInOrOut = result[0][1]
-            operateNum = result[0][2]
-            operateTime = result[0][3]
-            documentTime = result[0][4]
-            supplierCode = result[0][5]
-        if isInOrOut == 0:
-            cursor.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
-            # 更新materialInfo表
-            cursor.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
-        if isInOrOut == 1:
-            cursor.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
-            # 更新materialInfo表
-            cursor.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
-        # 更新materialInfo表price
-        cursor.execute(("select * from materialInOut a,(select materialCode,operateTime from materialInOut where documentNumber='%s') b where a.operateTime>b.operateTime and a.materialCode=b.materialCode;") % documentNumber)
-        result = cursor.fetchall()  # 如果记录为此物料最新记录，则查询结果为空
-        if not result:
-            cursor.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
-            # cursor.execute(("select materialCode,price from materialInOut,(select a.materialCode as mCode,max(a.operateTime) as latest from materialInOut a,(select materialCode from materialInOut where documentNumber='%s') b where a.materialCode=b.materialCode) m where materialCode=m.mCode and operateTime=m.latest;") % documentNumber)
-            cursor.execute(("select materialInOut.price from materialInOut,(select materialCode,max(operateTime) as latest from materialInOut where materialCode='%s') m where materialInOut.materialCode=m.materialCode and operateTime=m.latest;") % materialCode)
-            price = cursor.fetchall()
-            if price:
-                cursor.execute("update materialInfo set price='%f' where materialCode='%s';" % (price[0][0], materialCode))
-        else:
-            cursor.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
-        # 更新余库存金额
-        cursor.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
-        # 更新成品费用
-        cursor.execute("update materialsOfProduct mOP,materialInfo m set materialPrice=m.price,materialCost=m.price*materialNum where mOP.materialCode='%s' and mOP.materialCode=m.materialCode;" % materialCode)
-        cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
+        materialInOutInfo = cursor.fetchall()
+        if materialInOutInfo:
+            materialCode = materialInOutInfo[0][0]
+            isInOrOut = materialInOutInfo[0][1]
+            operateNum = materialInOutInfo[0][2]
+            operateTime = materialInOutInfo[0][3]
+            documentTime = materialInOutInfo[0][4]
+            supplierCode = materialInOutInfo[0][5]
+            if isInOrOut == 0:
+                cursor.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum-'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
+                # 更新materialInfo表
+                cursor.execute("update materialInfo set inventoryNum=inventoryNum-'%d',inventoryMoney=inventoryMoney-'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
+            if isInOrOut == 1:
+                cursor.execute("update materialInOut set beforeinventoryNum=beforeinventoryNum+'%d' where materialCode='%s' and operateTime>'%s';" % (operateNum, materialCode, operateTime))
+                # 更新materialInfo表
+                cursor.execute("update materialInfo set inventoryNum=inventoryNum+'%d',inventoryMoney=inventoryMoney+'%d'*price where materialCode='%s';" % (operateNum, operateNum, materialCode))
 
-        # 更新供应商的应付款
-        if isInOrOut == 0:
-            cursor.execute(("select price from materialInfo where materialCode='%s';") % materialCode)
-            price = cursor.fetchall()[0][0]
-            payableDelta = -operateNum * price
-            month = documentTime.strftime('%Y-%m')
-            cursor.execute("update suppliers set payable=payable+'%f' where supplierCode='%s';" % (payableDelta, supplierCode))
-            cursor.execute("update payableReport set addPayable=addPayable+'%f',payable=payable+'%f' where supplierCode='%s' and month='%s';" % (payableDelta, payableDelta, supplierCode, month)) # 更新该月的addPayable
-            cursor.execute("update payableReport set remainPayable=remainPayable+'%f',payable=payable+'%f' where supplierCode='%s' and month>'%s';" % (payableDelta, payableDelta, supplierCode,month)) # 更新该月以后月份的remainPayable
-            cursor.execute("update payableReportGroupByMaterialCode set materialNum=materialNum-'%d', payable=payable+'%f' where supplierCode='%s' and materialCode='%s' and month='%s';" % (operateNum, payableDelta, supplierCode, materialCode, month))
+            # 更新materialInfo表price
+            cursor.execute(("select * from materialInOut a,(select materialCode,operateTime from materialInOut where documentNumber='%s') b where a.operateTime>b.operateTime and a.materialCode=b.materialCode;") % documentNumber)
+            result = cursor.fetchall()  # 如果记录为此物料最新记录，则查询结果为空
+            if not result:
+                cursor.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
+                # cursor.execute(("select materialCode,price from materialInOut,(select a.materialCode as mCode,max(a.operateTime) as latest from materialInOut a,(select materialCode from materialInOut where documentNumber='%s') b where a.materialCode=b.materialCode) m where materialCode=m.mCode and operateTime=m.latest;") % documentNumber)
+                cursor.execute(("select materialInOut.price from materialInOut,(select materialCode,max(operateTime) as latest from materialInOut where materialCode='%s') m where materialInOut.materialCode=m.materialCode and operateTime=m.latest;") % materialCode)
+                price = cursor.fetchall()
+                if price:
+                    cursor.execute("update materialInfo set price='%f' where materialCode='%s';" % (price[0][0], materialCode))
+            else:
+                cursor.execute("delete from materialInOut where documentNumber='%s';" % (documentNumber))
+            # 更新余库存金额
+            cursor.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
+            # 更新成品费用
+            cursor.execute("update materialsOfProduct mOP,materialInfo m set materialPrice=m.price,materialCost=m.price*materialNum where mOP.materialCode='%s' and mOP.materialCode=m.materialCode;" % materialCode)
+            cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
+
+            # 更新供应商的应付款
+            if isInOrOut == 0:
+                cursor.execute(("select price from materialInfo where materialCode='%s';") % materialCode)
+                price = cursor.fetchall()[0][0]
+                payableDelta = -operateNum * price
+                month = documentTime.strftime('%Y-%m')
+                cursor.execute("update suppliers set payable=payable+'%f' where supplierCode='%s';" % (payableDelta, supplierCode))
+                cursor.execute("update payableReport set addPayable=addPayable+'%f',payable=payable+'%f' where supplierCode='%s' and month='%s';" % (payableDelta, payableDelta, supplierCode, month)) # 更新该月的addPayable
+                cursor.execute("update payableReport set remainPayable=remainPayable+'%f',payable=payable+'%f' where supplierCode='%s' and month>'%s';" % (payableDelta, payableDelta, supplierCode,month)) # 更新该月以后月份的remainPayable
+                cursor.execute("update payableReportGroupByMaterialCode set materialNum=materialNum-'%d', payable=payable+'%f' where supplierCode='%s' and materialCode='%s' and month='%s';" % (operateNum, payableDelta, supplierCode, materialCode, month))
 
         # 提交到数据库执行
         conn.commit()

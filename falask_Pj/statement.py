@@ -78,6 +78,7 @@ def statement_receivable():
                     receiptSum += receivable[0][4]
                 receivable=[round(remainReceivableSum,2),round(addReceivableSum,2),round(receivableSum,2),round(receiptSum,2)]
                 receivablesOfProduct = select_all_receivableReportGroupByProductType(month) # productType, addDeliveryNum, price, addReceivable, receivable, remark
+                return jsonify({'ok': True, 'receivable': receivable, 'receivablesOfProduct': receivablesOfProduct})
             else:
                 clientInfo = select_clientByCode(clientCode)
                 if clientInfo:
@@ -132,6 +133,7 @@ def statement_payable():
                     paymentSum += payable[0][4]
                 payable = [round(remainPayableSum,2), round(addPayableSum,2), round(payableSum,2), round(paymentSum,2)]
                 payablesOfMaterial = select_all_payableReportGroupByMaterialCode(month) # productType, addDeliveryNum, price, addReceivable, receivable, remark
+                return jsonify({'ok': True, 'payable': payable, 'payablesOfMaterial': payablesOfMaterial})
             else:
                 supplierInfo = select_supplierByCode(supplierCode)
                 if supplierInfo:

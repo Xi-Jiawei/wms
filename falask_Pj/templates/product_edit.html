@@ -533,16 +533,16 @@
                                                                 <td><input type='text' style='width:150px' class='materialName'
                                                                            value='{{ i[1] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:150px' class='materialType'
+                                                                <td><input type='text' style='width:240px' class='materialType'
                                                                            value='{{ i[2] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialsOfProduct'
+                                                                <td><input type='text' style='width:80px' class='materialsOfProduct'
                                                                            value='{{ i[3] }}'
                                                                 /></td>
                                                                 <td><input type='text' style='width:100px' class='materialsOfProduct'
                                                                            value='{{ i[4] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialsOfProduct'
+                                                                <td><input type='text' style='width:80px' class='materialsOfProduct'
                                                                            value='{{ i[6] }}'
                                                                 /></td>
                                                                 <td><input type='text' style='width:100px' class='materialsOfProduct'
@@ -610,16 +610,16 @@
                                                                 <td><input type='text' style='width:150px' class='materialName'
                                                                            value='{{ i[1] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:150px' class='materialType'
+                                                                <td><input type='text' style='width:240px' class='materialType'
                                                                            value='{{ i[2] }}'
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialsOfProduct'
+                                                                <td><input type='text' style='width:80px' class='materialsOfProduct'
                                                                            value='{{ i[3] }}'
                                                                 /></td>
                                                                 <td style='width:100px;display: none'><input type='text' class='materialsOfProduct'
                                                                            value={{ i[4] }}
                                                                 /></td>
-                                                                <td><input type='text' style='width:100px' class='materialsOfProduct'
+                                                                <td><input type='text' style='width:80px' class='materialsOfProduct'
                                                                            value='{{ i[6] }}'
                                                                 /></td>
                                                                 <td><input type='text' style='width:100px' class='materialsOfProduct'
@@ -1227,10 +1227,10 @@
                 "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
                 "<td><div class='input-group'><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/><span class='fa fa-search' onclick='filter()'></span></div></td>" +
                 "<td><input type='text' style='width:150px' class='materialName'/></td>" +
-                "<td><input type='text' style='width:150px' class='materialType'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
+                "<td><input type='text' style='width:240px' class='materialType'/></td>" +
+                "<td><input type='text' style='width:80px' class='materialsOfProduct' value='0'/></td>" +
                 "<td style='width:100px;display: none'><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
+                "<td><input type='text' style='width:80px' class='materialsOfProduct' value='0'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td></tr>";
             var tableHtml = $("#materialsOfProduct tbody").html();
             console.log(tableHtml);
@@ -1243,10 +1243,10 @@
                 "<td><input type='checkbox' name='checkbox' value='checkbox' /></td>" +
                 "<td><div class='input-group'><input type='text' style='width:150px' class='materialCode' list='materialCodeList'/><span class='fa fa-search' onclick='filter()'></span></div></td>" +
                 "<td><input type='text' style='width:150px' class='materialName'/></td>" +
-                "<td><input type='text' style='width:150px' class='materialType'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
+                "<td><input type='text' style='width:240px' class='materialType'/></td>" +
+                "<td><input type='text' style='width:80px' class='materialsOfProduct' value='0'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td>" +
-                "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0'/></td>" +
+                "<td><input type='text' style='width:80px' class='materialsOfProduct' value='0'/></td>" +
                 "<td><input type='text' style='width:100px' class='materialsOfProduct' value='0.00'/></td></tr>";
             var tableHtml = $("#materialsOfProduct tbody").html();
             console.log(tableHtml);
@@ -1341,12 +1341,14 @@
         $("#totalCost").val(totalCost.toFixed(2));
 
         /*price*/
-        console.log($("#taxRate").val());
-        console.log($("#profit").val());
         //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);//不要写成var price=($("#taxRate").val()+1)*($("#profit").val()+totalCost);
-        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
+        /*var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
-        $("#price").val(price.toFixed(2));
+        $("#price").val(price.toFixed(2));*/
+        var profit=0;
+        if($.isNumeric($("#taxRate").val())&&$("#taxRate").val()!=0)
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())-totalCost;
+        $("#profit").val(profit.toFixed(2));
     }
     function deleteRow2() {
         var table=document.getElementById("otherCosts");
@@ -1405,12 +1407,18 @@
         $("#totalCost").val(totalCost.toFixed(2));
 
         /*price*/
-        console.log($("#taxRate").val());
-        console.log($("#profit").val());
         //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
-        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
+        /*var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
-        $("#price").val(price.toFixed(2));
+        $("#price").val(price.toFixed(2));*/
+        /*var profit=0;
+        if($.isNumeric($("#taxRate").val())&&$("#taxRate").val()!=0)
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())*-totalCost;
+        $("#profit").val(profit.toFixed(2));*/
+        var profit=0;
+        if($.isNumeric($("#taxRate").val())&&$("#taxRate").val()!=0)
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())-totalCost;
+        $("#profit").val(profit.toFixed(2));
     }
     /*全部勾选*/
     function checkAll() {
@@ -1513,12 +1521,14 @@
         $("#totalCost").val(totalCost.toFixed(2));
 
         /*price*/
-        console.log($("#taxRate").val());
-        console.log($("#profit").val());
         //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);//不要写成var price=($("#taxRate").val()+1)*($("#profit").val()+totalCost);
-        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
+        /*var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
-        $("#price").val(price.toFixed(2));
+        $("#price").val(price.toFixed(2));*/
+        var profit=0;
+        if($.isNumeric($("#taxRate").val())&&$("#taxRate").val()!=0)
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())-totalCost;
+        $("#profit").val(profit.toFixed(2));
     });
     $("#otherCosts").on('input', '.otherCosts', function () {
         document.activeElement.setAttribute("value", $(this).val());
@@ -1567,12 +1577,14 @@
         $("#totalCost").val(totalCost.toFixed(2));
 
         /*price*/
-        console.log($("#taxRate").val());
-        console.log($("#profit").val());
         //var price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
-        var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
+        /*var price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
-        $("#price").val(price.toFixed(2));
+        $("#price").val(price.toFixed(2));*/
+        var profit=0;
+        if($.isNumeric($("#taxRate").val())&&$("#taxRate").val()!=0)
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())-totalCost;
+        $("#profit").val(profit.toFixed(2));
     });
     /*输入框数据变成持久值*/
     $("#otherCosts").on('blur','.projects', function() {
@@ -1861,14 +1873,16 @@
         console.log($("#totalCost"));
 
         /*price*/
-        console.log($("#taxRate").val());
-        console.log($("#profit").val());
-        var price=0;
+        /*var price=0;
         if($.isNumeric(parseFloat($("#taxRate").val())) && $.isNumeric(parseFloat($("#profit").val())))
             //price=(parseFloat($("#taxRate").val())+1)*(parseFloat($("#profit").val())+totalCost);
             price=parseFloat($("#taxRate").val())*(parseFloat($("#profit").val())+totalCost);
         console.log($("#price"));
-        $("#price").val(price.toFixed(2));
+        $("#price").val(price.toFixed(2));*/
+        var profit=0;
+        if($.isNumeric($("#taxRate").val())&&$("#taxRate").val()!=0)
+            profit=parseFloat($("#price").val())/parseFloat($("#taxRate").val())-totalCost;
+        $("#profit").val(profit.toFixed(2));
     };
     /*输入利润、税率，自动计算*/
     $("#price").on('input', function () {

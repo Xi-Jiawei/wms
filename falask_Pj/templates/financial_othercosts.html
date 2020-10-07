@@ -884,6 +884,11 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        $('#supplementary').DataTable({
+            'paging': false,
+            //"info" : false,
+            'filter':false,
+        });
         $('#supplementaries').DataTable({
             'paging': false,
             //"info" : false,

@@ -200,7 +200,8 @@ class ProductForm(Form):
             "id": 'profit',
             "class": "form-control",
             "placeholder": "请输入成品利润",
-            "required": 'required'  # 表示输入框不能为空，并有提示信息
+            "required": 'required',  # 表示输入框不能为空，并有提示信息
+            "readonly": 'true'
         }
     )
     # 成品税率
