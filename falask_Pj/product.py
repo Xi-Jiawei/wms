@@ -455,9 +455,53 @@ def product_in():
         return jsonify({'ok': False})
 
 # # xijiawei
-# # 物料编码校验
+# # 测试
 @product_app.route('/test', methods=['GET', 'POST'])
 def test():
+    form=UserForm()
+    if request.method == "GET":
+        users=select_all_users()
+        sum=0
+        for i in users:
+            sum+=int(i[3])
+        # choices=select_all_users_for_selector()
+        # form.userid.choices = choices
+        # return render_template('test.html',form=form,users=users,sum=sum)
+
+        choices = select_all_users_for_selector()
+        form.userid.choices = choices
+        productCodeArr=["P00001","P00002","P00003"]
+        products=[]
+        for i in range(productCodeArr.__len__()):
+            product=[]
+            products.append(product)
+            product.append(productCodeArr[i])
+            # productInfo=select_productInfoByCode(productCodeArr[i])
+            thread = myThread(target=select_productInfoByCode, args=(productCodeArr[i],))
+            productInfo = thread.get_result()
+            product.append(productInfo[0][0])
+            product.append(i)
+            # materialsOfProduct=select_materialsOfProductByCode(productCodeArr[i])
+            thread = myThread(target=select_materialsOfProductByCode, args=(productCodeArr[i],))
+            materialsOfProduct = thread.get_result()
+            materials=[]
+            product.append(materials)
+            for material in materialsOfProduct:
+                materials.append([material[0],material[1],material[3]])
+            product.append("无")
+        return render_template('test.html',form=form,users=users,sum=sum,products=products)
+    elif request.method == "POST":
+        re=request
+        # data=request.form['personName']
+        # data=form.data['personName']
+        data=request.form['userid']
+        data=form.data['userid']
+        return data
+
+# # xijiawei
+# # 测试
+@product_app.route('/test_filter', methods=['GET', 'POST'])
+def test_filter():
     form=UserForm()
     if request.method == "GET":
         users=select_all_users()

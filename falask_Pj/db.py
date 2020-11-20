@@ -589,6 +589,7 @@ def copy_productInfo(productCode, newProductCode, newProductType):
         # 执行SQL语句
         cursor.execute("insert into productInfo (productCode, productType, client, price, profit, totalCost, taxRate, materialCost, adminstrationCost, processCost, supplementaryCost, operatingCost, remark, entryTime, entryClerk) select '%s' as productCode, '%s' as productType, client, 0 as price, 0 as profit, 0 as totalCost, 1 as taxRate, materialCost, 0 as adminstrationCost, 0 as processCost, 0 as supplementaryCost, 0 as operatingCost, remark, entryTime, entryClerk from productInfo where productCode='%s'"%(newProductCode,newProductType,productCode))
         cursor.execute("insert into materialsOfProduct (productCode, materialCode, materialNum, materialPrice, materialCost, patchPoint, patchPrice, patchCost, remark) select '%s' as productCode, materialCode, materialNum, materialPrice, materialCost, patchPoint, patchPrice, patchCost, remark from materialsOfProduct where productCode='%s';"% (newProductCode,productCode))
+        cursor.execute("insert into otherCosts (productCode,processCost,adminstrationCost,supplementaryCost,operationCost,process,adminstration,supplementary,operation) select '%s' as productCode,processCost,adminstrationCost,supplementaryCost,operationCost,process,adminstration,supplementary,operation from otherCosts where productCode='%s';"% (newProductCode,productCode))
         cursor.execute("update productInfo set totalCost=materialCost where productCode='%s';"%newProductCode)
         # 提交到数据库执行
         conn.commit()
@@ -1207,7 +1208,10 @@ def update_materialInfo(materialCode, materialName, materialType, operateNum, pr
         cursor.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
         # 更新成品费用
         cursor.execute("update materialsOfProduct mOP,materialInfo m set materialPrice=m.price,materialCost=m.price*materialNum where mOP.materialCode='%s' and mOP.materialCode=m.materialCode;" % materialCode)
-        cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
+
+        # 2020.11.19修改，库存物料价格修改，成品售价不变，利润变化
+        # cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
+        cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set profit=(p.price/p.taxRate-mOP.sum-p.adminstrationCost-p.processCost-p.supplementaryCost-p.operatingCost),totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
         # 提交到数据库执行
         conn.commit()
         lock.release()
@@ -1571,6 +1575,22 @@ def select_concated_orders():
 
 # xijiawei
 # 查询所有订单
+def select_concated_ordersByMonth(month):
+    try:
+        lock.acquire()
+        conn = db.connect()
+        cursor = conn.cursor()
+        cursor.execute("select orderCode, group_concat(distinct clientCode), group_concat(distinct orderDate), group_concat(productType), date_format(max(deliveryDate),'%%Y-%%m-%%d'), (sum(deliveryNum)<=sum(deliveredNum)), group_concat(remark) from orders where date_format(orderDate,'%%Y-%%m')='%s' group by orderCode;" % month)
+        result = cursor.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
 def select_orderByCode(orderCode):
     try:
         lock.acquire()
@@ -1840,10 +1860,23 @@ def delete_order(orderCode):
         # cursor.execute("update receivableReportGroupByProductType a,orders b set a.remainDeliveryNum=a.remainDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum,a.remainReceivable=a.remainReceivable-b.receivable,a.receivable=a.receivable-b.receivable where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month>date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
 
         # （新）
-        cursor.execute("update orderGroupByProductType a,orders b set a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType;" % (orderCode))
-        cursor.execute("update deliveryGroupByProductType a,orders b set a.beforeDeliveryNum=a.beforeDeliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and date_format(a.entryTime,'%%Y-%%m')>=date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新此订单日期当月出货记录的beforeDeliveryNum
-        cursor.execute("update receivableReportGroupByProductType a,orders b set a.addDeliveryNum=a.addDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month=date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月的addDeliveryNum和addReceivable
-        cursor.execute("update receivableReportGroupByProductType a,orders b set a.remainDeliveryNum=a.remainDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month>date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
+        # cursor.execute("update orderGroupByProductType a,orders b set a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType;" % (orderCode))
+        # cursor.execute("update deliveryGroupByProductType a,orders b set a.beforeDeliveryNum=a.beforeDeliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and date_format(a.entryTime,'%%Y-%%m')>=date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新此订单日期当月出货记录的beforeDeliveryNum
+        # cursor.execute("update receivableReportGroupByProductType a,orders b set a.addDeliveryNum=a.addDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month=date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月的addDeliveryNum和addReceivable
+        # cursor.execute("update receivableReportGroupByProductType a,orders b set a.remainDeliveryNum=a.remainDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month>date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
+
+        cursor.execute("select distinct clientCode cliCode from orders where orderCode='%s';"%orderCode)
+        result=cursor.fetchall()
+        cursor.execute("select count(distinct orderCode) from orders where clientCode='%s';" % result[0][0])
+        if cursor.fetchall()[0][0]==1:
+            cursor.execute("delete from orderGroupByProductType where clientCode='%s';" % result[0][0])
+            cursor.execute("delete from deliveryGroupByProductType where clientCode='%s';" % result[0][0]) # 更新此订单日期当月出货记录的beforeDeliveryNum
+            cursor.execute("delete from receivableReportGroupByProductType where clientCode='%s';" % result[0][0]) # 更新该月的addDeliveryNum和addReceivable
+        else:
+            cursor.execute("update orderGroupByProductType a,orders b set a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType;" % (orderCode))
+            cursor.execute("update deliveryGroupByProductType a,orders b set a.beforeDeliveryNum=a.beforeDeliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and date_format(a.entryTime,'%%Y-%%m')>=date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新此订单日期当月出货记录的beforeDeliveryNum
+            cursor.execute("update receivableReportGroupByProductType a,orders b set a.addDeliveryNum=a.addDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month=date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月的addDeliveryNum和addReceivable
+            cursor.execute("update receivableReportGroupByProductType a,orders b set a.remainDeliveryNum=a.remainDeliveryNum-b.deliveryNum,a.deliveryNum=a.deliveryNum-b.deliveryNum where b.orderCode='%s' and a.clientCode=b.clientCode and a.productType=b.productType and a.month>date_format(b.orderDate,'%%Y-%%m');" % (orderCode)) # 更新该月以后月份的remainDeliveryNum和remainReceivable
 
         cursor.execute("delete from orders where orderCode='%s';"%(orderCode))
         conn.commit()
@@ -2539,6 +2572,25 @@ def select_all_workerSalary():
 
 # xijiawei
 # 查询所有订单
+def select_workerSalaryRecordByMonth(month):
+    try:
+        lock.acquire()
+        conn = db.connect()
+        cursor = conn.cursor()
+        cursor.execute("select month, staff.staffid, name, position, workhours, overhours, timewage, piecewage, workagewage, subsidy, amerce, payablewage, tax, socialSecurityOfPersonal, otherdues, tax+socialSecurityOfPersonal+otherdues, realwage, socialSecurityOfEnterprise, salaryExpense  from staff,performance,workerSalaryRecord where staff.staffid=performance.staffid and staff.staffid=workerSalaryRecord.staffid and workerSalaryRecord.month='%s' order by staff.staffid;" % month)
+        result = cursor.fetchall()
+        # if not result:
+        #     cursor.execute("select month, staff.staffid, name, position, workhours, overhours, timewage, piecewage, workagewage, subsidy, amerce, payablewage, tax, socialSecurityOfPersonal, otherdues, tax+socialSecurityOfPersonal+otherdues, realwage, socialSecurityOfEnterprise, salaryExpense  from staff,performance,workerSalary where staff.staffid=performance.staffid and staff.staffid=workerSalary.staffid order by staff.staffid;")
+        #     result = cursor.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
 def insert_workerSalary(month, name, position, workhours, overhours, realwage, aftertaxwage, payablewage, salaryExpense, timewage, piecewage, workagewage, subsidy, amerce, tax, socialSecurityOfPersonal, otherdues, socialSecurityOfEnterprise, entryTime, entryClerk):
     conn = dbpool.connect()
     cursor = conn.cursor()
@@ -2641,6 +2693,25 @@ def select_all_managerSalary():
 
 # xijiawei
 # 查询所有订单
+def select_managerSalaryRecordByMonth(month):
+    try:
+        lock.acquire()
+        conn = db.connect()
+        cursor = conn.cursor()
+        cursor.execute("select month, staff.staffid, name, position, workhours, overhours, basewage, jobwage, overtimewage, performancewage, workagewage, subsidy, amerce, payablewage, tax, socialSecurityOfPersonal, otherdues, tax+socialSecurityOfPersonal+otherdues, realwage, socialSecurityOfEnterprise, salaryExpense  from staff,performance,managerSalaryRecord where staff.staffid=performance.staffid and staff.staffid=managerSalaryRecord.staffid and managerSalaryRecord.month='%s' order by staff.staffid;" % month)
+        result = cursor.fetchall()
+        # if not result:
+        #     cursor.execute("select month, staff.staffid, name, position, workhours, overhours, basewage, jobwage, overtimewage, performancewage, workagewage, subsidy, amerce, payablewage, tax, socialSecurityOfPersonal, otherdues, tax+socialSecurityOfPersonal+otherdues, realwage, socialSecurityOfEnterprise, salaryExpense  from staff,performance,managerSalary where staff.staffid=performance.staffid and staff.staffid=managerSalary.staffid order by staff.staffid;")
+        #     result = cursor.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
 def insert_managerSalary(month, name, position, workhours, overhours, realwage, aftertaxwage, payablewage, salaryExpense, basewage, jobwage, overtimewage, performancewage, workagewage, subsidy, amerce, tax, socialSecurityOfPersonal, otherdues, socialSecurityOfEnterprise, entryTime, entryClerk):
     conn = dbpool.connect()
     cursor = conn.cursor()
@@ -2717,7 +2788,7 @@ def select_workerSalarySumByMonth(month):
         lock.acquire()
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("select month, round(sum(workhours),2), round(sum(overhours),2), round(sum(timewage),2), round(sum(piecewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from workerSalaryRecord, performance where month='%s' and workerSalaryRecord.staffid=performance.staffid;"%month)
+        cursor.execute("select month, cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(timewage),2), round(sum(piecewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from workerSalaryRecord, performance where month='%s' and workerSalaryRecord.staffid=performance.staffid;"%month)
         result = cursor.fetchall()
         lock.release()
         if not result[0][1]:
@@ -2736,13 +2807,57 @@ def select_managerSalarySumByMonth(month):
         lock.acquire()
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("select month, round(sum(workhours),2), round(sum(overhours),2), round(sum(basewage),2), round(sum(jobwage),2), round(sum(overtimewage),2), round(sum(performancewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from managerSalaryRecord, performance where month='%s' and managerSalaryRecord.staffid=performance.staffid;" % month)
+        cursor.execute("select month, cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(basewage),2), round(sum(jobwage),2), round(sum(overtimewage),2), round(sum(performancewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from managerSalaryRecord, performance where month='%s' and managerSalaryRecord.staffid=performance.staffid;" % month)
         result = cursor.fetchall()
         lock.release()
         if not result[0][1]:
             return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         else:
             return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_workerSalarySumThisMonth():
+    try:
+        lock.acquire()
+        conn = db.connect()
+        cursor = conn.cursor()
+        month = datetime.now().strftime('%Y-%m')
+        cursor.execute("select cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(timewage),2), round(sum(piecewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from workerSalary, performance where workerSalary.staffid=performance.staffid;")
+        result = cursor.fetchall()
+        lock.release()
+        if not result[0][1]:
+            return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        else:
+            result_list = list(result[0])
+            result_list.insert(0, month)
+            return [result_list]
+    except Exception as e:
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
+        conn.rollback()
+
+# xijiawei
+# 查询所有订单
+def select_managerSalarySumThisMonth():
+    try:
+        lock.acquire()
+        conn = db.connect()
+        cursor = conn.cursor()
+        month = datetime.now().strftime('%Y-%m')
+        cursor.execute("select cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(basewage),2), round(sum(jobwage),2), round(sum(overtimewage),2), round(sum(performancewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from managerSalary, performance where managerSalary.staffid=performance.staffid;")
+        result = cursor.fetchall()
+        lock.release()
+        if not result[0][1]:
+            return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
+        else:
+            result_list = list(result[0])
+            result_list.insert(0, month)
+            return [result_list]
     except Exception as e:
         print("数据库操作异常：",e)
         current_app.logger.exception(e)

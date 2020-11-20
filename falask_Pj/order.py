@@ -24,6 +24,19 @@ def order():
 
 # xijiawei
 # 订单管理
+@order_app.route('/orders_in_month/<month>', methods=['GET'])
+def orders_in_month(month):
+    if session.get('username'):
+        if request.method == "POST":
+            print("")
+        elif request.method=="GET":
+            orders = select_concated_ordersByMonth(month)
+            return jsonify({'ok': True, 'orders': orders})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
 @order_app.route('/add_order', methods=['POST'])
 def add_order():
     if session.get('username'):

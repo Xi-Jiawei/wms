@@ -173,6 +173,7 @@ def statement_salary():
     if session.get('username'):
         if request.method=="GET":
             username = session['username']
+            authority = select_user_authority(username)
             form = ProductForm()
             month=datetime.now().strftime('%Y-%m')
             workerSalary = select_workerSalaryByMonth(month)
@@ -180,7 +181,7 @@ def statement_salary():
 
             workerSalarySum = select_workerSalarySumByMonth(month)
             managerSalarySum = select_managerSalarySumByMonth(month)
-            return render_template('statement_salary.html', form=form, username=username, workerSalary=workerSalary, managerSalary=managerSalary, workerSalarySum=workerSalarySum, managerSalarySum=managerSalarySum, month=month)
+            return render_template('statement_salary.html', form=form, username=username, authority=authority[1], workerSalary=workerSalary, managerSalary=managerSalary, workerSalarySum=workerSalarySum, managerSalarySum=managerSalarySum, month=month)
     else:
         return render_template('access_fail.html')
 

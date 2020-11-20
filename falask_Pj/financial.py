@@ -270,14 +270,51 @@ def financial_salary():
             print("")
         elif request.method=="GET":
             username = session['username']
+            authority = select_user_authority(username)
             form = ProductForm()
 
             month=datetime.now().strftime('%Y-%m')
-            workerSalary = select_all_workerSalary()
-            managerSalary = select_all_managerSalary()
+            # workerSalary = select_all_workerSalary()
+            # managerSalary = select_all_managerSalary()
+            # workerSalarySum = select_workerSalarySumThisMonth()
+            # managerSalarySum = select_managerSalarySumThisMonth()
+            workerSalary = select_workerSalaryRecordByMonth(month)
+            managerSalary = select_managerSalaryRecordByMonth(month)
             workerSalarySum = select_workerSalarySumByMonth(month)
             managerSalarySum = select_managerSalarySumByMonth(month)
-            return render_template('financial_salary.html', form=form, username=username, workerSalary=workerSalary, managerSalary=managerSalary, workerSalarySum=workerSalarySum, managerSalarySum=managerSalarySum, month=month)
+            return render_template('financial_salary.html', form=form, username=username, authority=authority[1], workerSalary=workerSalary, managerSalary=managerSalary, workerSalarySum=workerSalarySum, managerSalarySum=managerSalarySum, month=month)
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
+@financial_app.route('/workersalary_in_moth/<month>', methods=['GET'])
+def workersalary_in_moth(month):
+    if session.get('username'):
+        if request.method == "POST":
+            print("")
+        elif request.method=="GET":
+            username = session['username']
+
+            workerSalary = select_workerSalaryRecordByMonth(month)
+            workerSalarySum = select_workerSalarySumByMonth(month)
+            return jsonify({'ok': True, 'workerSalary': workerSalary, 'workerSalarySum': workerSalarySum})
+    else:
+        return render_template('access_fail.html')
+
+# xijiawei
+# 订单管理
+@financial_app.route('/managersalary_in_moth/<month>', methods=['GET'])
+def managersalary_in_moth(month):
+    if session.get('username'):
+        if request.method == "POST":
+            print("")
+        elif request.method=="GET":
+            username = session['username']
+
+            managerSalary = select_managerSalaryRecordByMonth(month)
+            managerSalarySum = select_managerSalarySumByMonth(month)
+            return jsonify({'ok': True, 'managerSalary': managerSalary, 'managerSalarySum': managerSalarySum})
     else:
         return render_template('access_fail.html')
 
@@ -289,6 +326,7 @@ def add_worker_salary():
         username = session['username']
         if request.method == "POST":
             data = request.get_json()
+            month = data['month']
             name = data['name']
             position = data['position']
             workhours = data['workhours']
@@ -308,9 +346,9 @@ def add_worker_salary():
             salaryExpense = payablewage+socialSecurityOfEnterprise
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             entryClerk = username
-            thread=myThread(target=insert_workerSalary, args=(entryTime[0:7], name, position, workhours, overhours, realwage, aftertaxwage, payablewage, salaryExpense, timewage, piecewage, workagewage, subsidy, amerce, tax, socialSecurityOfPersonal, otherdues, socialSecurityOfEnterprise, entryTime, entryClerk,))
+            thread=myThread(target=insert_workerSalary, args=(month, name, position, workhours, overhours, realwage, aftertaxwage, payablewage, salaryExpense, timewage, piecewage, workagewage, subsidy, amerce, tax, socialSecurityOfPersonal, otherdues, socialSecurityOfEnterprise, entryTime, entryClerk,))
             staffid = thread.get_result()
-            return jsonify({'ok': True, 'month': entryTime[0:7], 'staffid': staffid})
+            return jsonify({'ok': True, 'staffid': staffid})
     else:
         return render_template('access_fail.html')
 
@@ -389,6 +427,7 @@ def add_manager_salary():
         username = session['username']
         if request.method == "POST":
             data = request.get_json()
+            month = data['month']
             name = data['name']
             position = data['position']
             workhours = data['workhours']
@@ -410,9 +449,9 @@ def add_manager_salary():
             salaryExpense = payablewage+socialSecurityOfEnterprise
             entryTime = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
             entryClerk = username
-            thread=myThread(target=insert_managerSalary, args=(entryTime[0:7], name, position, workhours, overhours, realwage, aftertaxwage, payablewage, salaryExpense, basewage, jobwage, overtimewage, performancewage, workagewage, subsidy, amerce, tax, socialSecurityOfPersonal, otherdues, socialSecurityOfEnterprise, entryTime, entryClerk,))
+            thread=myThread(target=insert_managerSalary, args=(month, name, position, workhours, overhours, realwage, aftertaxwage, payablewage, salaryExpense, basewage, jobwage, overtimewage, performancewage, workagewage, subsidy, amerce, tax, socialSecurityOfPersonal, otherdues, socialSecurityOfEnterprise, entryTime, entryClerk,))
             staffid = thread.get_result()
-            return jsonify({'ok': True, 'month': entryTime[0:7], 'staffid': staffid})
+            return jsonify({'ok': True, 'staffid': staffid})
     else:
         return render_template('access_fail.html')
 

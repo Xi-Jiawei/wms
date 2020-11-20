@@ -316,17 +316,13 @@
                                 <div class="container-top" id="tabList">
                                     <ul>
                                         <li><a>工&nbsp;&nbsp;&nbsp;&nbsp;人&nbsp;&nbsp;&nbsp;&nbsp;工&nbsp;&nbsp;&nbsp;&nbsp;资</a></li>
+                                        {% if authority=='8'%}
                                         <li><a>管&nbsp;&nbsp;&nbsp;&nbsp;理&nbsp;&nbsp;&nbsp;&nbsp;工&nbsp;&nbsp;&nbsp;&nbsp;资</a></li>
+                                        {% endif %}
                                     </ul>
                                 </div>
                                 <div id="item">
                                     <div class="tab" style="position:relative;">
-                                        <input style="display: none" id="workerSalaryMonth"
-                                                {% if month %}
-                                               value="{{ month }}"
-                                                {% endif %}
-                                        />
-
                                         <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
                                             <div class="col-xs-12" style="position:relative;left: 0;width: 13%">
                                                 <button type="button" class="btn btn-default" style="width: 100%" data-toggle="modal" data-target="#workerSalaryModal" onclick="addWorkerSalary()">添加</button>
@@ -336,6 +332,13 @@
                                             </div>
                                             <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
                                                 <button type="button" class="btn btn-default" style="width: 100%" onclick="setWorkerSalaryRowEditable()">编辑</button>
+                                            </div>
+                                            <div class="col-xs-12" style="width: 240px;">
+                                                <input type="month" id="workerSalaryMonth" name="workerSalaryMonth" class="form-control"
+                                                        {% if month %}
+                                                       value="{{ month }}"
+                                                        {% endif %}
+                                                >
                                             </div>
                                         </div>
                                         <table id="workerSalary" class="table table-striped table-bordered">
@@ -460,12 +463,6 @@
                                     </div>
 
                                     <div class="tab" style="display:none; position:relative;">
-                                        <input style="display: none" id="managerSalaryMonth"
-                                                {% if month %}
-                                               value="{{ month }}"
-                                                {% endif %}
-                                        />
-
                                         <div class="row" style="position:relative;width:100%;height: 42px;margin-top: 20px;">
                                             <div class="col-xs-12" style="position:relative;left: 0;width: 13%">
                                                 <button type="button" class="btn btn-default" style="width: 100%" data-toggle="modal" data-target="#managerSalaryModal" onclick="addManagerSalary()">添加</button>
@@ -475,6 +472,13 @@
                                             </div>
                                             <div class="col-xs-12" style="position:relative;padding-left: 2%;width: 13%;">
                                                 <button type="button" class="btn btn-default" style="width: 100%" onclick="setManagerSalaryRowEditable()">编辑</button>
+                                            </div>
+                                            <div class="col-xs-12" style="width: 240px;">
+                                                <input type="month" id="managerSalaryMonth" name="managerSalaryMonth" class="form-control"
+                                                        {% if month %}
+                                                       value="{{ month }}"
+                                                        {% endif %}
+                                                >
                                             </div>
                                         </div>
                                         <table id="managerSalary" class="table table-striped table-bordered">
@@ -763,6 +767,7 @@
         });
     }
     function workerSalaryModalSubmit() {
+	    var month=$('#workerSalaryMonth').val();
 	    var name=$('#workerName').val();
         var position=$('#workerPosition').val();
         var workhours=parseInt($('#workerWorkhours').val());
@@ -776,6 +781,7 @@
         var socialSecurityOfPersonal=parseFloat($('#workerSocialSecurityOfPersonal').val());
         var socialSecurityOfEnterprise=parseFloat($('#workerSocialSecurityOfEnterprise').val());
 	    var data = {
+            'month': month,
             'name': name,
             'position': position,
             'workhours': workhours,
@@ -802,7 +808,6 @@
                 console.log(callback);
 
                 if (callback['ok']) {
-                    var month=callback['month'];
                     var staffid=callback['staffid'];
                     var table=document.getElementById("workerSalary");
                     var tbody = table.children[1];
@@ -1316,6 +1321,7 @@
         });
     }
     function managerSalaryModalSubmit() {
+	    var month=$('#managerSalaryMonth').val();
 	    var name=$('#managerName').val();
         var position=$('#managerPosition').val();
         var workhours=parseInt($('#managerWorkhours').val());
@@ -1331,6 +1337,7 @@
         var socialSecurityOfPersonal=parseFloat($('#managerSocialSecurityOfPersonal').val());
         var socialSecurityOfEnterprise=parseFloat($('#managerSocialSecurityOfEnterprise').val());
 	    var data = {
+	        'month':month,
             'name': name,
             'position': position,
             'workhours': workhours,
@@ -1359,7 +1366,6 @@
                 console.log(callback);
 
                 if (callback['ok']) {
-                    var month=callback['month'];
                     var staffid=callback['staffid'];
                     var table=document.getElementById("managerSalary");
                     var tbody = table.children[1];
@@ -1847,6 +1853,155 @@
             }
         }}*/
     }
+
+    $('#workerSalaryMonth').on("change", function () {
+        var month=this.value;
+        $.ajax({
+            url: "/workersalary_in_moth/"+month,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var salaryArr=callback['workerSalary'];
+                    var workerSalarySum=callback['workerSalarySum'];
+                    var table=document.getElementById("workerSalary");
+                    var tbody = table.children[1];
+                    var tfoot = table.children[2];
+                    $('#workerSalary tbody').html("");
+                    /*for (var i = 0; i < salaryArr.length; i++)
+                        tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
+                    for (var i = 0; i < salaryArr.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + month + "</td>\n" +
+                            "<td style='display:none'>" + salaryArr[i][1] + "</td>\n" +
+                            "<td>" + salaryArr[i][2] + "</td>\n" +
+                            "<td>" + salaryArr[i][3] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][4] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][10] + "</td>\n" +
+                            "<td>" + salaryArr[i][11] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][12] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][14] + "</td>\n" +
+                            "<td>" + salaryArr[i][15] + "</td>\n" +
+                            "<td>" + salaryArr[i][16] + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + salaryArr[i][17] + "</td>\n" +
+                            "<td>" + salaryArr[i][18] + "</td></tr>";
+
+                    if(salaryArr.length==0)
+                        tbody.insertRow(0).innerHTML = "<tr><td colspan='20' style='text-align: center'>No data available in table</td></tr>";
+
+                    tfoot.rows[0].cells[1].textContent = month;
+                    tfoot.rows[0].cells[5].textContent = workerSalarySum[0][1];
+                    tfoot.rows[0].cells[6].textContent = workerSalarySum[0][2];
+                    tfoot.rows[0].cells[7].textContent = workerSalarySum[0][3];
+                    tfoot.rows[0].cells[8].textContent = workerSalarySum[0][4];
+                    tfoot.rows[0].cells[9].textContent = workerSalarySum[0][5];
+                    tfoot.rows[0].cells[10].textContent = workerSalarySum[0][6];
+                    tfoot.rows[0].cells[11].textContent = workerSalarySum[0][7];
+                    tfoot.rows[0].cells[12].textContent = workerSalarySum[0][8];
+                    tfoot.rows[0].cells[13].textContent = workerSalarySum[0][9];
+                    tfoot.rows[0].cells[14].textContent = workerSalarySum[0][10];
+                    tfoot.rows[0].cells[15].textContent = workerSalarySum[0][11];
+                    tfoot.rows[0].cells[16].textContent = workerSalarySum[0][12];
+                    tfoot.rows[0].cells[17].textContent = workerSalarySum[0][13];
+                    tfoot.rows[0].cells[18].textContent = workerSalarySum[0][14];
+                    tfoot.rows[0].cells[19].textContent = workerSalarySum[0][15];
+
+                    $('#workerSalaryButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });
+    $('#managerSalaryMonth').on("change", function () {
+        var month=this.value;
+        $.ajax({
+            url: "/managersalary_in_moth/"+month,
+            type: "GET",
+            dataType: "json",
+            contentType: 'application/json; charset=UTF-8',
+            success: function (callback) {
+                console.log(callback);
+
+                if(callback['ok']) {
+                    var salaryArr=callback['managerSalary'];
+                    var managerSalarySum=callback['managerSalarySum'];
+                    var table=document.getElementById("managerSalary");
+                    var tbody = table.children[1];
+                    var tfoot = table.children[2];
+                    $('#managerSalary tbody').html("");
+                    /*for (var i = 0; i < salaryArr.length; i++)
+                        tbody.rows[i].cells[2].innerHTML=salaryArr[i][1];*/
+                    for (var i = 0; i < salaryArr.length; i++)
+                        tbody.insertRow(i).innerHTML = "<tr><td><input type='checkbox' name='checkbox' value='checkbox'/></td>\n" +
+                            "<td>" + month + "</td>\n" +
+                            "<td style='display:none'>" + salaryArr[i][1] + "</td>\n" +
+                            "<td>" + salaryArr[i][2] + "</td>\n" +
+                            "<td>" + salaryArr[i][3] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][4] + "</td>\n" +
+                            "<td class='hour'>" + salaryArr[i][5] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][6] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][7] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][8] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][9] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][10] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][11] + "</td>\n" +
+                            "<td class='payablewage'>" + salaryArr[i][12] + "</td>\n" +
+                            "<td>" + salaryArr[i][13] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][14] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][15] + "</td>\n" +
+                            "<td class='dues'>" + salaryArr[i][16] + "</td>\n" +
+                            "<td>" + salaryArr[i][17] + "</td>\n" +
+                            "<td>" + salaryArr[i][18] + "</td>\n" +
+                            "<td class='socialSecurityOfEnterprise'>" + salaryArr[i][19] + "</td>\n" +
+                            "<td>" + salaryArr[i][20] + "</td></tr>";
+
+                    if(salaryArr.length==0)
+                        tbody.insertRow(0).innerHTML = "<tr><td colspan='22' style='text-align: center'>No data available in table</td></tr>";
+
+                    tfoot.rows[0].cells[1].textContent = month;
+                    tfoot.rows[0].cells[5].textContent = managerSalarySum[0][1];
+                    tfoot.rows[0].cells[6].textContent = managerSalarySum[0][2];
+                    tfoot.rows[0].cells[7].textContent = managerSalarySum[0][3];
+                    tfoot.rows[0].cells[8].textContent = managerSalarySum[0][4];
+                    tfoot.rows[0].cells[9].textContent = managerSalarySum[0][5];
+                    tfoot.rows[0].cells[10].textContent = managerSalarySum[0][6];
+                    tfoot.rows[0].cells[11].textContent = managerSalarySum[0][7];
+                    tfoot.rows[0].cells[12].textContent = managerSalarySum[0][8];
+                    tfoot.rows[0].cells[13].textContent = managerSalarySum[0][9];
+                    tfoot.rows[0].cells[14].textContent = managerSalarySum[0][10];
+                    tfoot.rows[0].cells[15].textContent = managerSalarySum[0][11];
+                    tfoot.rows[0].cells[16].textContent = managerSalarySum[0][12];
+                    tfoot.rows[0].cells[17].textContent = managerSalarySum[0][13];
+                    tfoot.rows[0].cells[18].textContent = managerSalarySum[0][14];
+                    tfoot.rows[0].cells[19].textContent = managerSalarySum[0][15];
+                    tfoot.rows[0].cells[20].textContent = managerSalarySum[0][16];
+                    tfoot.rows[0].cells[21].textContent = managerSalarySum[0][17];
+
+                    $('#managerSalaryButtonToolbar').hide();
+                }
+            },
+            error: function (xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                alert('返回值错误');
+            }
+        });
+    });
 </script>
 </body>
 </html>
