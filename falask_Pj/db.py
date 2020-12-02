@@ -2804,12 +2804,14 @@ def select_workerSalarySumByMonth(month):
         lock.acquire()
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("select month, cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(timewage),2), round(sum(piecewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from workerSalaryRecord, performance where month='%s' and workerSalaryRecord.staffid=performance.staffid;"%month)
-        result = cursor.fetchall()
-        lock.release()
-        if not result[0][1]:
+        cursor.execute("select month from managerSalaryRecord where month='%s';" % month)
+        if not cursor.fetchall():
+            lock.release()
             return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         else:
+            cursor.execute("select month, cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(timewage),2), round(sum(piecewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from workerSalaryRecord, performance where month='%s' and workerSalaryRecord.staffid=performance.staffid;"%month)
+            result = cursor.fetchall()
+            lock.release()
             return result
     except Exception as e:
         print("数据库操作异常：",e)
@@ -2823,12 +2825,14 @@ def select_managerSalarySumByMonth(month):
         lock.acquire()
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("select month, cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(basewage),2), round(sum(jobwage),2), round(sum(overtimewage),2), round(sum(performancewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from managerSalaryRecord, performance where month='%s' and managerSalaryRecord.staffid=performance.staffid;" % month)
-        result = cursor.fetchall()
-        lock.release()
-        if not result[0][1]:
+        cursor.execute("select month from managerSalaryRecord where month='%s';" % month)
+        if not cursor.fetchall():
+            lock.release()
             return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
         else:
+            cursor.execute("select month, cast(round(sum(workhours),2) as signed), cast(round(sum(overhours),2) as signed), round(sum(basewage),2), round(sum(jobwage),2), round(sum(overtimewage),2), round(sum(performancewage),2), round(sum(workagewage),2), round(sum(subsidy),2), round(sum(amerce),2), round(sum(payablewage),2), round(sum(tax),2), round(sum(socialSecurityOfPersonal),2), round(sum(otherdues),2), round(sum(tax+socialSecurityOfPersonal+otherdues),2), round(sum(realwage),2), round(sum(socialSecurityOfEnterprise),2), round(sum(salaryExpense),2)  from managerSalaryRecord, performance where month='%s' and managerSalaryRecord.staffid=performance.staffid;" % month)
+            result = cursor.fetchall()
+            lock.release()
             return result
     except Exception as e:
         print("数据库操作异常：",e)
