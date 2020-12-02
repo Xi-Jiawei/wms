@@ -118,26 +118,47 @@ def material_inout_history():
         username = session['username']
         authority = select_user_authority(username)
         if request.method == "GET":
-            # materialInOut = select_all_materialInOut()
-            result = select_all_materialInOut()
-            materialInOut=[]
+            # # materialInOut = select_all_materialInOut()
+            # result = select_all_materialInOut()
+            # materialInOut=[]
+            # for i in result:
+            #     materialInOut.append([i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11],i[12][0:21],i[13]])
+            # materialInOutSums = select_sum_materialInOut()
+            # mSumTitle=""
+            # mSumNum=""
+            # mSumAmount=""
+            # for i in materialInOutSums:
+            #     if i[0]==0:
+            #         mSumTitle+="入库/"
+            #         mSumNum = mSumNum + str(i[1]) + "/"
+            #         mSumAmount = mSumAmount + str(i[2]) + "/"
+            #     if i[0]==1:
+            #         mSumTitle+="出库"
+            #         mSumNum = mSumNum + str(i[1])
+            #         mSumAmount = mSumAmount + str(i[2])
+            # nowTime = datetime.now().strftime('%Y-%m-%d')
+
+            startTime = datetime.now().strftime('%Y-%m') + "-01"
+            nowTime = datetime.now().strftime('%Y-%m-%d')
+            result = select_all_materialInOutFilterByDate(startTime, nowTime)
+            materialInOut = []
             for i in result:
-                materialInOut.append([i[0],i[1],i[2],i[3],i[4],i[5],i[6],i[7],i[8],i[9],i[10],i[11],i[12][0:21],i[13]])
-            materialInOutSums = select_sum_materialInOut()
-            mSumTitle=""
-            mSumNum=""
-            mSumAmount=""
+                materialInOut.append(
+                    [i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], i[8], i[9], i[10], i[11], i[12][0:21], i[13]])
+            materialInOutSums = select_sum_materialInOutFilterByDate(startTime, nowTime)
+            mSumTitle = ""
+            mSumNum = ""
+            mSumAmount = ""
             for i in materialInOutSums:
-                if i[0]==0:
-                    mSumTitle+="入库/"
+                if i[0] == 0:
+                    mSumTitle += "入库/"
                     mSumNum = mSumNum + str(i[1]) + "/"
                     mSumAmount = mSumAmount + str(i[2]) + "/"
-                if i[0]==1:
-                    mSumTitle+="出库"
+                if i[0] == 1:
+                    mSumTitle += "出库"
                     mSumNum = mSumNum + str(i[1])
                     mSumAmount = mSumAmount + str(i[2])
-            nowTime = datetime.now().strftime('%Y-%m-%d')
-            return render_template('material_inout_history.html', authority=authority[0], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount], username=username,nowTime=nowTime)
+            return render_template('material_inout_history.html', authority=authority[0], materialInOut=materialInOut, materialInOutCount=[mSumTitle,mSumNum,mSumAmount], username=username, startTime=startTime, nowTime=nowTime)
         if request.method == "POST":
             data = request.get_json()
             materialCode = data['materialCode']

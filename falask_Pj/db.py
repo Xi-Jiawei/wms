@@ -1287,6 +1287,22 @@ def select_all_materialInOutFilterByDate(startDate,endDate):
         conn.rollback()
 
 # xijiawei
+# 查询每个物料的最近3条出入库记录
+def select_sum_materialInOutFilterByDate(startDate, endDate):
+    try:
+        lock.acquire()
+        conn = db.connect()
+        cursor = conn.cursor()
+        cursor.execute("select isInOrOut,sum(operateNum),round(sum(operateNum*price),2) from materialInOut where materialInOut.documentTime>='%s' and materialInOut.documentTime<='%s' group by isInOrOut;" % (startDate, endDate))
+        result = cursor.fetchall()
+        lock.release()
+        return result
+    except Exception as e:
+        print("数据库操作异常：",e)
+        current_app.logger.exception(e)
+        conn.rollback()
+
+# xijiawei
 # 根据物料编码查询物料出入库记录
 def select_materialInOutByCode(materialCode):
     try:

@@ -178,7 +178,13 @@
                                 <div class="row" style="position:relative;width:1000px;height:60px;">
                                     <div class="col-xs-12" style="position:absolute;bottom:0;left: 0;width: 240px;">
                                         <label class="control-label mb-1">起始时间</label>
-                                        <input type="date" value="2019-01-01" id="startDate" name="startDate" class="form-control">
+                                        <input type="date"
+                                               {% if startTime %}
+                                               value={{ startTime }}
+                                               {% else %}
+                                               value="2019-01-01"
+                                               {% endif %}
+                                               id="startDate" name="startDate" class="form-control">
                                     </div>
                                     <div class="col-xs-12" style="position:absolute;bottom:0;left:260px;width: 240px;">
                                         <label class="control-label mb-1">结束时间</label>

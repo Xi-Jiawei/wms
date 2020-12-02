@@ -381,9 +381,9 @@
                                                             <th style="width: 60px"><a onclick='editSupplementary("{{ i[0] }}")'> 编辑 </a></th>
                                                         </tr>
                                                     {% endfor %}
-                                                {% endif %}
-                                                {% if supplementarySuppliers.__len__()==0 %}
-                                                    <tr><td colspan='9' style='text-align: center'>No data available in table</td></tr>
+                                                    {% if supplementarySuppliers.__len__()==0 %}
+                                                        <tr><td colspan='10' style='text-align: center'>No data available in table</td></tr>
+                                                    {% endif %}
                                                 {% endif %}
                                                 </tbody>
                                                 <tfoot>
@@ -589,18 +589,18 @@
                                             {% if operations %}
                                                 {% for i in operations %}
                                                     <tr>
-                                                        <td><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></td>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
                                                         <td style='display:none'>{{ i[0] }}</td>
                                                         <td>{{ i[1] }}</td>
                                                         <td class="cost">{{ i[2] }}</td>
                                                         <td>{{ i[3] }}</td>
                                                     </tr>
                                                 {% endfor %}
-                                            {% endif %}
-                                            {% if operations.__len__()==0 %}
-                                                <tr>
-                                                    <td colspan='4' style='text-align: center'>No data available in table</td>
-                                                </tr>
+                                                {% if operations.__len__()==0 %}
+                                                    <tr>
+                                                        <td colspan='4' style='text-align: center'>No data available in table</td>
+                                                    </tr>
+                                                {% endif %}
                                             {% endif %}
                                             </tbody>
                                             <tfoot>
@@ -785,7 +785,7 @@
                                             {% if aftersales %}
                                                 {% for i in aftersales %}
                                                     <tr>
-                                                        <td><input type="checkbox" name="checkbox" value="checkbox" onclick="checkAll()"/></td>
+                                                        <td><input type="checkbox" name="checkbox" value="checkbox"/></td>
                                                         <td style='display:none'>{{ i[0] }}</td>
                                                         <td>{{ i[1] }}</td>
                                                         <td>{{ i[2] }}</td>
