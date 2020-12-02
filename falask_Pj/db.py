@@ -2804,7 +2804,7 @@ def select_workerSalarySumByMonth(month):
         lock.acquire()
         conn = db.connect()
         cursor = conn.cursor()
-        cursor.execute("select month from managerSalaryRecord where month='%s';" % month)
+        cursor.execute("select month from workerSalaryRecord where month='%s';" % month)
         if not cursor.fetchall():
             lock.release()
             return [[month, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
