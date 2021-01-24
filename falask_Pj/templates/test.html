@@ -251,7 +251,7 @@
         <div class="drag_main">
             <div class="img_large">
                 <div class="only">
-                    <!-- 发票 -->
+                    <!--发票-->
                     <div class="invoice_box">
                         <div class="invoice_top">
                             <div class="top_left">机器编号：<span class="machine_num" style="color:#2e2e2e"> </span></div>
@@ -432,6 +432,19 @@
                 <td bgcolor="#FFFFFF">0</td>
             </tr>
         </table>
+    </div>
+</div>
+
+<!--上传下载-->
+<div class="card" style="position:relative;width: 80%;left: 10%;top: 50px">
+    <div id="product_table_div" class="card-body">
+        <input id="file" type="file" name="filename"/>
+        <div class="row">
+            <div class="col-xs-12">
+                <button type="button" class="btn btn-success" onclick="upload()">上传</button>
+            </div>
+        </div>
+        <a href="{{url_for("product.upload_download")}}">text.txt</a>
     </div>
 </div>
 
@@ -1099,6 +1112,38 @@
         }
         element.setAttribute("EditState", "false");
     }
+
+    function upload(){
+        var data = new FormData();
+        var file = document.getElementById("file").files[0];
+        data.append("action", "UploadFilePath");
+        data.append('file', file);
+
+        $.ajax({
+            url: "/upload_download",
+            type: "POST",
+            dataType: "json",
+            data: data,
+            //contentType: 'application/json; charset=UTF-8',
+            //ajax2.0可以不用设置请求头，但是jq帮我们自动设置了，这样的话需要我们自己取消掉
+            contentType:false,
+            //取消帮我们格式化数据，是什么就是什么
+            processData:false,
+            success: function (callback) {
+                console.log(callback);
+                if(callback['ok']){
+                    var materials=callback['materials'];//materialCode,materialName,materialType
+                    console.log("上传成功！");
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                console.log(xhr.status);// 状态码
+                console.log(xhr.readyState);// 状态
+                console.log(textStatus);// 错误信息
+                //alert('返回值错误');
+            }
+        });
+    };
 </script>
 </body>
 </html>

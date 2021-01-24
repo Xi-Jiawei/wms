@@ -1,4 +1,4 @@
-from flask import render_template, request, session, Blueprint, jsonify
+from flask import render_template, request, session, Blueprint, jsonify, send_from_directory
 
 from db import *
 from form import *
@@ -541,3 +541,14 @@ def test_filter():
         data=request.form['userid']
         data=form.data['userid']
         return data
+
+# # xijiawei
+# # 测试
+@product_app.route('/upload_download', methods=['GET', 'POST'])
+def upload_download():
+    if request.method == "GET":
+        return send_from_directory('D:/uploads/', 'test.txt', as_attachment=True)
+    elif request.method == "POST":
+        file = request.files['file']
+        file.save('D:/uploads/test.txt')
+        return jsonify({'ok': True})

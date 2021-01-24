@@ -1454,7 +1454,9 @@ def update_materialInOut(documentNumber, documentTime, isInOrOut, operateNum, un
             cursor.execute("update materialInfo set inventoryMoney=price*inventoryNum where materialCode='%s';" % (materialCode))
             # 更新成品费用
             cursor.execute("update materialsOfProduct mOP,materialInfo m set materialPrice=m.price,materialCost=m.price*materialNum where mOP.materialCode='%s' and mOP.materialCode=m.materialCode;" % materialCode)
-            cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
+            # 2020.11.19修改，库存物料价格修改，成品售价不变，利润变化
+            # cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set price=(mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost+p.profit)*p.taxRate,totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
+            cursor.execute("update productInfo p, (select productCode,sum(materialCost+patchCost) sum from materialsOfProduct where productCode in (select distinct productCode from materialsOfProduct where materialCode='%s') group by productCode) mOP set profit=(p.price/p.taxRate-mOP.sum-p.adminstrationCost-p.processCost-p.supplementaryCost-p.operatingCost),totalCost=mOP.sum+p.adminstrationCost+p.processCost+p.supplementaryCost+p.operatingCost,materialCost=mOP.sum where p.productCode=mOP.productCode;" % materialCode)
 
             # 更新供应商的应付款，只关心入库操作
             if beforeIsInOrOut == 0 and isInOrOut == 0:
@@ -1463,6 +1465,8 @@ def update_materialInOut(documentNumber, documentTime, isInOrOut, operateNum, un
                 payableDelta = operateNum*price
             elif beforeIsInOrOut == 0 and isInOrOut == 1:
                 payableDelta = -beforeOperateNum*beforePrice
+            else:
+                payableDelta = 0
             month=documentTime[0:7]
             cursor.execute("update suppliers set payable=payable+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s';" % (payableDelta, operateTime, operatorName, supplierCode))
             cursor.execute("update payableReport set addPayable=addPayable+'%f',payable=payable+'%f', entryTime='%s', entryClerk='%s' where supplierCode='%s' and month='%s';" % (payableDelta, payableDelta, operateTime, operatorName, supplierCode,month)) # 更新该月的addPayable
